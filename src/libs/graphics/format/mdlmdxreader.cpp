@@ -20,6 +20,7 @@
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/model.h"
+#include "reone/graphics/statistic.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
@@ -180,11 +181,10 @@ std::shared_ptr<ModelNode> MdlMdxReader::readNodes(uint32_t offset, ModelNode *p
     }
     if (!animNode) {
         _nodes.push_back(node);
-        _nodeFlags.insert(std::make_pair(nodeNumber, flags));
     }
 
     std::vector<float> controllerData(_mdl.readFloatArrayAt(kMdlDataOffset + controllerDataArrayDef.offset, controllerDataArrayDef.count));
-    readControllers(controllerArrayDef.offset, controllerArrayDef.count, controllerData, animNode, *node);
+    readControllers(controllerArrayDef.offset, controllerArrayDef.count, controllerData, *node);
 
     std::vector<uint32_t> childOffsets(_mdl.readUint32ArrayAt(kMdlDataOffset + childArrayDef.offset, childArrayDef.count));
     for (uint32_t offset : childOffsets) {
@@ -659,22 +659,14 @@ std::shared_ptr<ModelNode::Reference> MdlMdxReader::readReference() {
     return reference;
 }
 
-void MdlMdxReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool animNode, ModelNode &node) {
-    uint16_t nodeFlags;
-    if (animNode) {
-        if (_nodeFlags.count(node.number()) == 0) {
-            return;
-        } else {
-            nodeFlags = 0;
-        }
-    } else {
-        nodeFlags = node.flags();
-    }
-
+void MdlMdxReader::readControllers(uint32_t keyOffset,
+                                   uint32_t keyCount,
+                                   const std::vector<float> &data,
+                                   ModelNode &node) {
     _mdl.seek(kMdlDataOffset + keyOffset);
     for (uint32_t i = 0; i < keyCount; ++i) {
         uint32_t type = _mdl.readUint32();
-        _mdl.skipBytes(2); // unknown
+        uint16_t unk = _mdl.readUint16();
         uint16_t numRows = _mdl.readUint16();
         uint16_t timeIndex = _mdl.readUint16();
         uint16_t dataIndex = _mdl.readUint16();
@@ -688,11 +680,21 @@ void MdlMdxReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const 
         key.dataIndex = dataIndex;
         key.numColumns = numColumns;
 
-        auto fn = getControllerFn(key.type, nodeFlags);
-        if (fn) {
-            fn(key, data, node);
+        int numColumnsBase = numColumns & ~kFlagBezier;
+        if (type == ControllerTypes::orientation) {
+            KeyframeTrack<glm::quat, SlerpInterpolator> track;
+            readQuaternionController(key, data, node, track);
+            node.quaternionTracks().insert({type, std::move(track)});
+        } else if (numColumnsBase == 3) {
+            KeyframeTrack<glm::vec3> track;
+            readVectorController(key, data, node, track);
+            node.vectorTracks().insert({type, std::move(track)});
+        } else if (numColumnsBase == 1) {
+            KeyframeTrack<float> track;
+            readFloatController(key, data, node, track);
+            node.floatTracks().insert({type, std::move(track)});
         } else {
-            debug(str(boost::format("Unsupported MDL controller type: %d") % static_cast<int>(key.type)), LogChannel::Graphics);
+            throw ValidationException(str(boost::format("Unsupported controller: type=%d numColumnsBase=%d") % type % numColumnsBase));
         }
     }
 }
@@ -775,90 +777,6 @@ std::unique_ptr<Animation> MdlMdxReader::readAnimation(uint32_t offset) {
         std::move(events));
 }
 
-void MdlMdxReader::initControllerFn() {
-    _genericControllers = std::unordered_map<uint32_t, ControllerFn> {
-        {8, &readPositionController},
-        {20, &readOrientationController},
-        {36, &readScaleController}};
-    _meshControllers = std::unordered_map<uint32_t, ControllerFn> {
-        {100, &readSelfIllumColorController},
-        {132, &readAlphaController}};
-    _lightControllers = std::unordered_map<uint32_t, ControllerFn> {
-        {76, &readColorController},
-        {88, &readRadiusController},
-        {96, &readShadowRadiusController},
-        {100, &readVerticalDisplacementController},
-        {140, &readMultiplierController}};
-    _emitterControllers = std::unordered_map<uint32_t, ControllerFn> {
-        {80, &readAlphaEndController},
-        {84, &readAlphaStartController},
-        {88, &readBirthrateController},
-        {92, &readBounceCoController},
-        {96, &readCombineTimeController},
-        {100, &readDragController},
-        {104, &readFPSController},
-        {108, &readFrameEndController},
-        {112, &readFrameStartController},
-        {116, &readGravController},
-        {120, &readLifeExpController},
-        {124, &readMassController},
-        {128, &readP2PBezier2Controller},
-        {132, &readP2PBezier3Controller},
-        {136, &readParticleRotController},
-        {140, &readRandVelController},
-        {144, &readSizeStartController},
-        {148, &readSizeEndController},
-        {152, &readSizeStartYController},
-        {156, &readSizeEndYController},
-        {160, &readSpreadController},
-        {164, &readThresholdController},
-        {168, &readVelocityController},
-        {172, &readXSizeController},
-        {176, &readYSizeController},
-        {180, &readBlurLengthController},
-        {184, &readLightingDelayController},
-        {188, &readLightingRadiusController},
-        {192, &readLightingScaleController},
-        {196, &readLightingSubDivController},
-        {200, &readLightingZigZagController},
-        {216, &readAlphaMidController},
-        {220, &readPercentStartController},
-        {224, &readPercentMidController},
-        {228, &readPercentEndController},
-        {232, &readSizeMidController},
-        {236, &readSizeMidYController},
-        {240, &readRandomBirthRateController},
-        {252, &readTargetSizeController},
-        {256, &readNumControlPtsController},
-        {260, &readControlPtRadiusController},
-        {264, &readControlPtDelayController},
-        {268, &readTangentSpreadController},
-        {272, &readTangentLengthController},
-        {284, &readColorMidController},
-        {380, &readColorEndController},
-        {392, &readColorStartController},
-        {502, &readDetonateController}};
-}
-
-MdlMdxReader::ControllerFn MdlMdxReader::getControllerFn(uint32_t type, int nodeFlags) {
-    ControllerFn fn;
-    if (nodeFlags & MdlNodeFlags::mesh) {
-        auto it = _meshControllers.find(type);
-        fn = it != _meshControllers.end() ? it->second : nullptr;
-    } else if (nodeFlags & MdlNodeFlags::light) {
-        auto it = _lightControllers.find(type);
-        fn = it != _lightControllers.end() ? it->second : nullptr;
-    } else if (nodeFlags & MdlNodeFlags::emitter) {
-        auto it = _emitterControllers.find(type);
-        fn = it != _emitterControllers.end() ? it->second : nullptr;
-    }
-    if (!fn) {
-        auto it = _genericControllers.find(type);
-        fn = it != _genericControllers.end() ? it->second : nullptr;
-    }
-    return fn;
-}
-
 static inline void ensureNumColumnsEquals(int type, int expected, int actual) {
     if (actual != expected) {
         throw ValidationException(str(boost::format("Controller %d: number of columns is %d, expected %d") % type % actual % expected));
@@ -868,48 +786,41 @@ static inline void ensureNumColumnsEquals(int type, int expected, int actual) {
 void MdlMdxReader::readFloatController(const ControllerKey &key,
                                        const std::vector<float> &data,
                                        ModelNode &node,
-                                       AnimatedProperty<float> &prop) {
+                                       KeyframeTrack<float> &track) {
     bool bezier = key.numColumns & kFlagBezier;
     int numColumns = key.numColumns & ~kFlagBezier;
     ensureNumColumnsEquals(key.type, 1, numColumns);
-
     for (uint16_t i = 0; i < key.numRows; ++i) {
         float time = data[key.timeIndex + i];
         float value = data[key.dataIndex + (bezier ? 3 : 1) * i];
-        prop.addFrame(time, value);
-        node.controllers()[key.type].push_back({time, {value}});
+        track.add(time, value);
     }
-    prop.update();
+    track.update();
 }
 
 void MdlMdxReader::readVectorController(const ControllerKey &key,
                                         const std::vector<float> &data,
                                         ModelNode &node,
-                                        AnimatedProperty<glm::vec3> &prop) {
+                                        KeyframeTrack<glm::vec3> &track) {
     bool bezier = key.numColumns & kFlagBezier;
     int numColumns = key.numColumns & ~kFlagBezier;
-
-    // HACK: workaround for s_male02 from TSLRCM
     if (numColumns == 9) {
+        // HACK: workaround for s_male02 from TSLRCM
         numColumns = 3;
     }
-
     ensureNumColumnsEquals(key.type, 3, numColumns);
-
     for (uint16_t i = 0; i < key.numRows; ++i) {
         float time = data[key.timeIndex + i];
         glm::vec3 value(glm::make_vec3(&data[key.dataIndex + (bezier ? 9 : 3) * i]));
-        node.controllers()[key.type].push_back({time, {value[0], value[1], value[2]}});
-        prop.addFrame(time, value);
+        track.add(time, value);
     }
-    prop.update();
+    track.update();
 }
 
-void MdlMdxReader::readPositionController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readVectorController(key, data, node, node.position());
-}
-
-void MdlMdxReader::readOrientationController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readQuaternionController(const ControllerKey &key,
+                                            const std::vector<float> &data,
+                                            ModelNode &node,
+                                            KeyframeTrack<glm::quat, SlerpInterpolator> &track) {
     switch (key.numColumns) {
     case 2:
         for (uint16_t i = 0; i < key.numRows; ++i) {
@@ -934,9 +845,7 @@ void MdlMdxReader::readOrientationController(const ControllerKey &key, const std
             }
 
             float time = data[rowTimeIdx];
-            glm::quat orientation(w, x, y, z);
-            node.controllers()[key.type].push_back({time, {orientation[0], orientation[1], orientation[2], orientation[3]}});
-            node.orientation().addFrame(time, std::move(orientation));
+            track.add(time, glm::quat {w, x, y, z});
         }
         break;
     case 4:
@@ -950,240 +859,13 @@ void MdlMdxReader::readOrientationController(const ControllerKey &key, const std
             float y = data[rowDataIdx + 1];
             float z = data[rowDataIdx + 2];
             float w = data[rowDataIdx + 3];
-            glm::quat orientation(w, x, y, z);
-            node.controllers()[key.type].push_back({time, {orientation[0], orientation[1], orientation[2], orientation[3]}});
-            node.orientation().addFrame(time, std::move(orientation));
+            track.add(time, glm::quat {w, x, y, z});
         }
         break;
     default:
         throw ValidationException("Unexpected number of columns: " + std::to_string(key.numColumns));
     }
-
-    node.orientation().update();
-}
-
-void MdlMdxReader::readScaleController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.scale());
-}
-
-void MdlMdxReader::readSelfIllumColorController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readVectorController(key, data, node, node.selfIllumColor());
-}
-
-void MdlMdxReader::readAlphaController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.alpha());
-}
-
-void MdlMdxReader::readColorController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readVectorController(key, data, node, node.color());
-}
-
-void MdlMdxReader::readRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.radius());
-}
-
-void MdlMdxReader::readShadowRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.shadowRadius());
-}
-
-void MdlMdxReader::readVerticalDisplacementController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.verticalDisplacement());
-}
-
-void MdlMdxReader::readMultiplierController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.multiplier());
-}
-
-void MdlMdxReader::readAlphaEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.alphaEnd());
-}
-
-void MdlMdxReader::readAlphaStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.alphaStart());
-}
-
-void MdlMdxReader::readBirthrateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.birthrate());
-}
-
-void MdlMdxReader::readBounceCoController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.bounceCo());
-}
-
-void MdlMdxReader::readCombineTimeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.combineTime());
-}
-
-void MdlMdxReader::readDragController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.drag());
-}
-
-void MdlMdxReader::readFPSController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.fps());
-}
-
-void MdlMdxReader::readFrameEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.frameEnd());
-}
-
-void MdlMdxReader::readFrameStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.frameStart());
-}
-
-void MdlMdxReader::readGravController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.grav());
-}
-
-void MdlMdxReader::readLifeExpController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.lifeExp());
-}
-
-void MdlMdxReader::readMassController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.mass());
-}
-
-void MdlMdxReader::readP2PBezier2Controller(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.p2pBezier2());
-}
-
-void MdlMdxReader::readP2PBezier3Controller(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.p2pBezier3());
-}
-
-void MdlMdxReader::readParticleRotController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.particleRot());
-}
-
-void MdlMdxReader::readRandVelController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.randVel());
-}
-
-void MdlMdxReader::readSizeStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.sizeStart());
-}
-
-void MdlMdxReader::readSizeEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.sizeEnd());
-}
-
-void MdlMdxReader::readSizeStartYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.sizeStartY());
-}
-
-void MdlMdxReader::readSizeEndYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.sizeEndY());
-}
-
-void MdlMdxReader::readSpreadController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.spread());
-}
-
-void MdlMdxReader::readThresholdController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.threshold());
-}
-
-void MdlMdxReader::readVelocityController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.velocity());
-}
-
-void MdlMdxReader::readXSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.xSize());
-}
-
-void MdlMdxReader::readYSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.ySize());
-}
-
-void MdlMdxReader::readBlurLengthController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.blurLength());
-}
-
-void MdlMdxReader::readLightingDelayController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.lightingDelay());
-}
-
-void MdlMdxReader::readLightingRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.lightingRadius());
-}
-
-void MdlMdxReader::readLightingScaleController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.lightingScale());
-}
-
-void MdlMdxReader::readLightingSubDivController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.lightingSubDiv());
-}
-
-void MdlMdxReader::readLightingZigZagController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.lightingZigZag());
-}
-
-void MdlMdxReader::readAlphaMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.alphaMid());
-}
-
-void MdlMdxReader::readPercentStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.percentStart());
-}
-
-void MdlMdxReader::readPercentMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.percentMid());
-}
-
-void MdlMdxReader::readPercentEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.percentEnd());
-}
-
-void MdlMdxReader::readSizeMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.sizeMid());
-}
-
-void MdlMdxReader::readSizeMidYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.sizeMidY());
-}
-
-void MdlMdxReader::readRandomBirthRateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.randomBirthRate());
-}
-
-void MdlMdxReader::readTargetSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.targetSize());
-}
-
-void MdlMdxReader::readNumControlPtsController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.numControlPts());
-}
-
-void MdlMdxReader::readControlPtRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.controlPtRadius());
-}
-
-void MdlMdxReader::readControlPtDelayController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.controlPtDelay());
-}
-
-void MdlMdxReader::readTangentSpreadController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.tangentSpread());
-}
-
-void MdlMdxReader::readTangentLengthController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.tangentLength());
-}
-
-void MdlMdxReader::readColorMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readVectorController(key, data, node, node.colorMid());
-}
-
-void MdlMdxReader::readColorEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readVectorController(key, data, node, node.colorEnd());
-}
-
-void MdlMdxReader::readColorStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readVectorController(key, data, node, node.colorStart());
-}
-
-void MdlMdxReader::readDetonateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
-    readFloatController(key, data, node, node.detonate());
+    track.update();
 }
 
 } // namespace graphics

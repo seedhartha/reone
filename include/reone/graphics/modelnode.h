@@ -18,17 +18,9 @@
 #pragma once
 
 #include "aabb.h"
-#include "animatedproperty.h"
+#include "keyframetrack.h"
 #include "mesh.h"
 #include "texture.h"
-
-#define R_ANIMPROP(a, b, c)                \
-    const AnimatedProperty<a> &b() const { \
-        return c;                          \
-    };                                     \
-    AnimatedProperty<a> &b() {             \
-        return c;                          \
-    };
 
 namespace reone {
 
@@ -38,6 +30,9 @@ class Model;
 
 class ModelNode : boost::noncopyable {
 public:
+    template <class Value, class Interpolator = MixInterpolator<Value>>
+    using KeyframeTrackMap = std::unordered_map<ControllerType, KeyframeTrack<Value, Interpolator>>;
+
     struct Skin {
         std::vector<uint32_t> boneSerial;     /**< node index per bone in depth-first order */
         std::vector<uint16_t> boneNodeNumber; /**< node number per bone */
@@ -167,9 +162,6 @@ public:
         bool reattachable {false};
     };
 
-    using ControllerFrame = std::pair<float, std::vector<float>>;
-    using Controllers = std::map<int, std::vector<ControllerFrame>>;
-
     ModelNode(
         uint16_t number,
         std::string name,
@@ -189,7 +181,6 @@ public:
     uint16_t flags() const { return _flags; }
     const ModelNode *parent() const { return _parent; }
     const std::vector<std::shared_ptr<ModelNode>> &children() const { return _children; }
-    Controllers &controllers() { return _controllers; }
 
     void setFlags(uint16_t flags) { _flags = flags; }
 
@@ -226,77 +217,29 @@ public:
 
     // END Specialization
 
-    // Keyframes
+    // Keyframe Tracks
 
-    bool getPosition(int leftFrameIdx, int rightFrameIdx, float factor, glm::vec3 &position) const;
-    bool getOrientation(int leftFrameIdx, int rightFrameIdx, float factor, glm::quat &orientation) const;
-    bool getScale(int leftFrameIx, int rightFrameIdx, float factor, float &scale) const;
+    inline bool positionAtTime(float time, glm::vec3 &position) const {
+        return vectorValueAtTime(ControllerTypes::position, time, position);
+    }
 
-    const AnimatedProperty<glm::quat, SlerpInterpolator> &orientation() const { return _orientation; }
-    AnimatedProperty<glm::quat, SlerpInterpolator> &orientation() { return _orientation; }
+    inline bool orientationAtTime(float time, glm::quat &orientation) const {
+        return quaternionValueAt(ControllerTypes::orientation, time, orientation);
+    }
 
-    R_ANIMPROP(glm::vec3, position, _position)
-    R_ANIMPROP(float, scale, _scale)
+    inline bool scaleAtTime(float time, float &scale) const {
+        return floatValueAtTime(ControllerTypes::scale, time, scale);
+    }
 
-    R_ANIMPROP(glm::vec3, selfIllumColor, _selfIllumColor)
-    R_ANIMPROP(float, alpha, _alpha)
+    bool floatValueAtTime(ControllerType type, float time, float &value) const;
+    bool vectorValueAtTime(ControllerType type, float time, glm::vec3 &value) const;
+    bool quaternionValueAt(ControllerType type, float time, glm::quat &value) const;
 
-    R_ANIMPROP(glm::vec3, color, _color)
-    R_ANIMPROP(float, radius, _radius)
-    R_ANIMPROP(float, shadowRadius, _shadowRadius)
-    R_ANIMPROP(float, verticalDisplacement, _verticalDisplacement)
-    R_ANIMPROP(float, multiplier, _multiplier)
+    KeyframeTrackMap<float> &floatTracks() { return _floatTracks; }
+    KeyframeTrackMap<glm::vec3> &vectorTracks() { return _vectorTracks; }
+    KeyframeTrackMap<glm::quat, SlerpInterpolator> &quaternionTracks() { return _quaternionTracks; }
 
-    R_ANIMPROP(float, alphaEnd, _alphaEnd)
-    R_ANIMPROP(float, alphaStart, _alphaStart)
-    R_ANIMPROP(float, birthrate, _birthrate)
-    R_ANIMPROP(float, bounceCo, _bounceCo)
-    R_ANIMPROP(float, combineTime, _combineTime)
-    R_ANIMPROP(float, drag, _drag)
-    R_ANIMPROP(float, fps, _fps)
-    R_ANIMPROP(float, frameEnd, _frameEnd)
-    R_ANIMPROP(float, frameStart, _frameStart)
-    R_ANIMPROP(float, grav, _grav)
-    R_ANIMPROP(float, lifeExp, _lifeExp)
-    R_ANIMPROP(float, mass, _mass)
-    R_ANIMPROP(float, p2pBezier2, _p2pBezier2)
-    R_ANIMPROP(float, p2pBezier3, _p2pBezier3)
-    R_ANIMPROP(float, particleRot, _particleRot)
-    R_ANIMPROP(float, randVel, _randVel)
-    R_ANIMPROP(float, sizeStart, _sizeStart)
-    R_ANIMPROP(float, sizeEnd, _sizeEnd)
-    R_ANIMPROP(float, sizeStartY, _sizeStartY)
-    R_ANIMPROP(float, sizeEndY, _sizeEndY)
-    R_ANIMPROP(float, spread, _spread)
-    R_ANIMPROP(float, threshold, _threshold)
-    R_ANIMPROP(float, velocity, _velocity)
-    R_ANIMPROP(float, xSize, _xSize)
-    R_ANIMPROP(float, ySize, _ySize)
-    R_ANIMPROP(float, blurLength, _blurLength)
-    R_ANIMPROP(float, lightingDelay, _lightingDelay)
-    R_ANIMPROP(float, lightingRadius, _lightingRadius)
-    R_ANIMPROP(float, lightingScale, _lightingScale)
-    R_ANIMPROP(float, lightingSubDiv, _lightingSubDiv)
-    R_ANIMPROP(float, lightingZigZag, _lightingZigZag)
-    R_ANIMPROP(float, alphaMid, _alphaMid)
-    R_ANIMPROP(float, percentStart, _percentStart)
-    R_ANIMPROP(float, percentMid, _percentMid)
-    R_ANIMPROP(float, percentEnd, _percentEnd)
-    R_ANIMPROP(float, sizeMid, _sizeMid)
-    R_ANIMPROP(float, sizeMidY, _sizeMidY)
-    R_ANIMPROP(float, randomBirthRate, _randomBirthRate)
-    R_ANIMPROP(float, targetSize, _targetSize)
-    R_ANIMPROP(float, numControlPts, _numControlPts)
-    R_ANIMPROP(float, controlPtRadius, _controlPtRadius)
-    R_ANIMPROP(float, controlPtDelay, _controlPtDelay)
-    R_ANIMPROP(float, tangentSpread, _tangentSpread)
-    R_ANIMPROP(float, tangentLength, _tangentLength)
-    R_ANIMPROP(glm::vec3, colorMid, _colorMid)
-    R_ANIMPROP(glm::vec3, colorEnd, _colorEnd)
-    R_ANIMPROP(glm::vec3, colorStart, _colorStart)
-    R_ANIMPROP(float, detonate, _detonate)
-
-    // END Keyframes
+    // END Keyframe Tracks
 
 private:
     uint16_t _number;
@@ -306,7 +249,6 @@ private:
 
     uint16_t _flags {0};
     std::vector<std::shared_ptr<ModelNode>> _children;
-    Controllers _controllers;
 
     // Transformations
 
@@ -327,71 +269,13 @@ private:
 
     // END Specialization
 
-    // Keyframes
+    // Keyframe Tracks
 
-    AnimatedProperty<glm::vec3> _position;
-    AnimatedProperty<glm::quat, SlerpInterpolator> _orientation;
-    AnimatedProperty<float> _scale;
+    KeyframeTrackMap<glm::vec3> _vectorTracks;
+    KeyframeTrackMap<glm::quat, SlerpInterpolator> _quaternionTracks;
+    KeyframeTrackMap<float> _floatTracks;
 
-    AnimatedProperty<glm::vec3> _selfIllumColor;
-    AnimatedProperty<float> _alpha;
-
-    AnimatedProperty<glm::vec3> _color;
-    AnimatedProperty<float> _radius;
-    AnimatedProperty<float> _shadowRadius;
-    AnimatedProperty<float> _verticalDisplacement;
-    AnimatedProperty<float> _multiplier;
-
-    AnimatedProperty<float> _alphaEnd;
-    AnimatedProperty<float> _alphaStart;
-    AnimatedProperty<float> _birthrate;
-    AnimatedProperty<float> _bounceCo;
-    AnimatedProperty<float> _combineTime;
-    AnimatedProperty<float> _drag;
-    AnimatedProperty<float> _fps;
-    AnimatedProperty<float> _frameEnd;
-    AnimatedProperty<float> _frameStart;
-    AnimatedProperty<float> _grav;
-    AnimatedProperty<float> _lifeExp;
-    AnimatedProperty<float> _mass;
-    AnimatedProperty<float> _p2pBezier2;
-    AnimatedProperty<float> _p2pBezier3;
-    AnimatedProperty<float> _particleRot;
-    AnimatedProperty<float> _randVel;
-    AnimatedProperty<float> _sizeStart;
-    AnimatedProperty<float> _sizeEnd;
-    AnimatedProperty<float> _sizeStartY;
-    AnimatedProperty<float> _sizeEndY;
-    AnimatedProperty<float> _spread;
-    AnimatedProperty<float> _threshold;
-    AnimatedProperty<float> _velocity;
-    AnimatedProperty<float> _xSize;
-    AnimatedProperty<float> _ySize;
-    AnimatedProperty<float> _blurLength;
-    AnimatedProperty<float> _lightingDelay;
-    AnimatedProperty<float> _lightingRadius;
-    AnimatedProperty<float> _lightingScale;
-    AnimatedProperty<float> _lightingSubDiv;
-    AnimatedProperty<float> _lightingZigZag;
-    AnimatedProperty<float> _alphaMid;
-    AnimatedProperty<float> _percentStart;
-    AnimatedProperty<float> _percentMid;
-    AnimatedProperty<float> _percentEnd;
-    AnimatedProperty<float> _sizeMid;
-    AnimatedProperty<float> _sizeMidY;
-    AnimatedProperty<float> _randomBirthRate;
-    AnimatedProperty<float> _targetSize;
-    AnimatedProperty<float> _numControlPts;
-    AnimatedProperty<float> _controlPtRadius;
-    AnimatedProperty<float> _controlPtDelay;
-    AnimatedProperty<float> _tangentSpread;
-    AnimatedProperty<float> _tangentLength;
-    AnimatedProperty<glm::vec3> _colorMid;
-    AnimatedProperty<glm::vec3> _colorEnd;
-    AnimatedProperty<glm::vec3> _colorStart;
-    AnimatedProperty<float> _detonate;
-
-    // END Keyframes
+    // END Keyframe Tracks
 
     void computeLocalTransform();
     void computeAbsoluteTransform();

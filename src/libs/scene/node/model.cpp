@@ -392,36 +392,32 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
             uint8_t leftShape, rightShape;
             float factor;
             if (channel.lipAnim->getKeyframes(time, leftShape, rightShape, factor)) {
-                glm::vec3 animPosition;
-                if (animNode->getPosition(leftShape, rightShape, factor, animPosition)) {
-                    position += channel.properties.scale * animPosition;
+                float oneOverNumShapes = 1.0f / static_cast<float>(kNumLipShapes);
+                float leftShapeTime = leftShape * oneOverNumShapes * channel.anim->length();
+                float rightShapeTime = rightShape * oneOverNumShapes * channel.anim->length();
+                glm::vec3 leftShapePos, rightShapePos;
+                glm::quat leftShapeRot, rightShapeRot;
+                if (animNode->positionAtTime(leftShapeTime, leftShapePos) &&
+                    animNode->positionAtTime(rightShapeTime, rightShapePos)) {
+                    position += channel.properties.scale * glm::mix(leftShapePos, rightShapePos, factor);
                     state.flags |= AnimationStateFlags::transform;
                 }
-                glm::quat animOrientation;
-                if (animNode->getOrientation(leftShape, rightShape, factor, animOrientation)) {
-                    orientation = std::move(animOrientation);
-                    state.flags |= AnimationStateFlags::transform;
-                }
-                float animScale;
-                if (animNode->getScale(leftShape, rightShape, factor, animScale)) {
-                    scale = animScale;
+                if (animNode->orientationAtTime(leftShapeTime, leftShapeRot) &&
+                    animNode->orientationAtTime(rightShapeTime, rightShapeRot)) {
+                    orientation = glm::slerp(leftShapeRot, rightShapeRot, factor);
                     state.flags |= AnimationStateFlags::transform;
                 }
             }
         } else {
             glm::vec3 animPosition;
-            if (animNode->position().getByTime(time, animPosition)) {
+            if (animNode->positionAtTime(time, animPosition)) {
                 position += channel.properties.scale * animPosition;
                 state.flags |= AnimationStateFlags::transform;
             }
-            glm::quat animOrientation;
-            if (animNode->orientation().getByTime(time, animOrientation)) {
-                orientation = std::move(animOrientation);
+            if (animNode->orientationAtTime(time, orientation)) {
                 state.flags |= AnimationStateFlags::transform;
             }
-            float animScale;
-            if (animNode->scale().getByTime(time, animScale)) {
-                scale = animScale;
+            if (animNode->scaleAtTime(time, scale)) {
                 state.flags |= AnimationStateFlags::transform;
             }
         }
@@ -430,20 +426,14 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
             state.transform *= glm::translate(position);
             state.transform *= glm::mat4_cast(orientation);
         }
-        float animAlpha;
-        if (animNode->alpha().getByTime(time, animAlpha)) {
+        if (animNode->floatValueAtTime(ControllerTypes::alpha, time, state.alpha)) {
             state.flags |= AnimationStateFlags::alpha;
-            state.alpha = animAlpha;
         }
-        glm::vec3 animSelfIllum;
-        if (animNode->selfIllumColor().getByTime(time, animSelfIllum)) {
+        if (animNode->vectorValueAtTime(ControllerTypes::selfIllumColor, time, state.selfIllumColor)) {
             state.flags |= AnimationStateFlags::selfIllumColor;
-            state.selfIllumColor = std::move(animSelfIllum);
         }
-        glm::vec3 animColor;
-        if (animNode->color().getByTime(time, animColor)) {
+        if (animNode->vectorValueAtTime(ControllerTypes::color, time, state.color)) {
             state.flags |= AnimationStateFlags::color;
-            state.color = std::move(animColor);
         }
         channel.stateByNodeNumber[modelNode.number()] = std::move(state);
     }

@@ -17,10 +17,9 @@
 
 #include "reone/graphics/modelnode.h"
 
-#include "reone/system/logutil.h"
-
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/texture.h"
+#include "reone/system/logutil.h"
 
 namespace reone {
 
@@ -69,55 +68,28 @@ void ModelNode::addChild(std::shared_ptr<ModelNode> child) {
     _children.push_back(std::move(child));
 }
 
-bool ModelNode::getPosition(int leftFrameIdx, int rightFrameIdx, float factor, glm::vec3 &position) const {
-    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_position.getNumFrames()) ||
-        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_position.getNumFrames()))
+bool ModelNode::floatValueAtTime(ControllerType type, float time, float &value) const {
+    if (_floatTracks.count(type) == 0) {
         return false;
-
-    if (leftFrameIdx == rightFrameIdx) {
-        position = _position.getByFrame(leftFrameIdx);
-    } else {
-        position = glm::mix(
-            _position.getByFrame(leftFrameIdx),
-            _position.getByFrame(rightFrameIdx),
-            factor);
     }
-
-    return true;
+    const auto &track = _floatTracks.at(type);
+    return track.valueAtTime(time, value);
 }
 
-bool ModelNode::getOrientation(int leftFrameIdx, int rightFrameIdx, float factor, glm::quat &orientation) const {
-    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_orientation.getNumFrames()) ||
-        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_orientation.getNumFrames()))
+bool ModelNode::vectorValueAtTime(ControllerType type, float time, glm::vec3 &value) const {
+    if (_vectorTracks.count(type) == 0) {
         return false;
-
-    if (leftFrameIdx == rightFrameIdx) {
-        orientation = _orientation.getByFrame(leftFrameIdx);
-    } else {
-        orientation = glm::slerp(
-            _orientation.getByFrame(leftFrameIdx),
-            _orientation.getByFrame(rightFrameIdx),
-            factor);
     }
-
-    return true;
+    const auto &track = _vectorTracks.at(type);
+    return track.valueAtTime(time, value);
 }
 
-bool ModelNode::getScale(int leftFrameIdx, int rightFrameIdx, float factor, float &scale) const {
-    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_scale.getNumFrames()) ||
-        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_scale.getNumFrames()))
+bool ModelNode::quaternionValueAt(ControllerType type, float time, glm::quat &value) const {
+    if (_quaternionTracks.count(type) == 0) {
         return false;
-
-    if (leftFrameIdx == rightFrameIdx) {
-        scale = _scale.getByFrame(leftFrameIdx);
-    } else {
-        scale = glm::mix(
-            _scale.getByFrame(leftFrameIdx),
-            _scale.getByFrame(rightFrameIdx),
-            factor);
     }
-
-    return true;
+    const auto &track = _quaternionTracks.at(type);
+    return track.valueAtTime(time, value);
 }
 
 } // namespace graphics

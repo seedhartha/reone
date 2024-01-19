@@ -18,7 +18,6 @@ set(GRAPHICS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/graphics)
 
 set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/aabb.h
-    ${GRAPHICS_INCLUDE_DIR}/animatedproperty.h
     ${GRAPHICS_INCLUDE_DIR}/animation.h
     ${GRAPHICS_INCLUDE_DIR}/attachment.h
     ${GRAPHICS_INCLUDE_DIR}/barycentricutil.h
@@ -41,6 +40,7 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/format/tpcreader.h
     ${GRAPHICS_INCLUDE_DIR}/format/txireader.h
     ${GRAPHICS_INCLUDE_DIR}/framebuffer.h
+    ${GRAPHICS_INCLUDE_DIR}/keyframetrack.h
     ${GRAPHICS_INCLUDE_DIR}/lipanimation.h
     ${GRAPHICS_INCLUDE_DIR}/lumautil.h
     ${GRAPHICS_INCLUDE_DIR}/material.h

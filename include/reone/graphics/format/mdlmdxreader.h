@@ -39,8 +39,6 @@ public:
         _mdl(BinaryReader(mdl)),
         _mdx(BinaryReader(mdx)),
         _statistic(statistic) {
-
-        initControllerFn();
     }
 
     void load();
@@ -63,21 +61,14 @@ private:
     };
 
     using MaterialMap = std::unordered_map<uint32_t, std::vector<uint32_t>>;
-    using ControllerFn = std::function<void(const ControllerKey &, const std::vector<float> &, ModelNode &)>;
 
     BinaryReader _mdl;
     BinaryReader _mdx;
     IStatistic &_statistic;
 
-    std::unordered_map<uint32_t, ControllerFn> _genericControllers;
-    std::unordered_map<uint32_t, ControllerFn> _meshControllers;
-    std::unordered_map<uint32_t, ControllerFn> _lightControllers;
-    std::unordered_map<uint32_t, ControllerFn> _emitterControllers;
-
     bool _tsl {false};
     std::vector<std::string> _nodeNames;
     std::vector<std::shared_ptr<ModelNode>> _nodes; /**< nodes in depth-first order */
-    std::map<uint16_t, uint16_t> _nodeFlags;
     std::shared_ptr<Model> _model;
     std::string _modelName;
     uint32_t _offAnimRoot {0};
@@ -87,7 +78,7 @@ private:
     std::shared_ptr<ModelNode> readNodes(uint32_t offset, ModelNode *parent, bool animated, bool animNode = false);
     std::vector<std::shared_ptr<Animation>> readAnimations(const std::vector<uint32_t> &offsets);
     std::unique_ptr<Animation> readAnimation(uint32_t offset);
-    void readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool animNode, ModelNode &node);
+    void readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, ModelNode &node);
 
     std::shared_ptr<ModelNode::Reference> readReference();
     std::shared_ptr<ModelNode::Light> readLight();
@@ -100,78 +91,20 @@ private:
 
     // Controllers
 
-    void initControllerFn();
-
-    ControllerFn getControllerFn(uint32_t type, int nodeFlags);
-
-    static void readPositionController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readOrientationController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readScaleController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readAlphaController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readSelfIllumColorController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readColorController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readShadowRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readVerticalDisplacementController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readMultiplierController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readAlphaEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readAlphaStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readBirthrateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readBounceCoController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readCombineTimeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readDragController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readFPSController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readFrameEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readFrameStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readGravController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readLifeExpController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readMassController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readP2PBezier2Controller(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readP2PBezier3Controller(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readParticleRotController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readRandVelController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readSizeStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readSizeEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readSizeStartYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readSizeEndYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readSpreadController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readThresholdController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readVelocityController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readXSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readYSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readBlurLengthController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readLightingDelayController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readLightingRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readLightingScaleController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readLightingSubDivController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readLightingZigZagController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readAlphaMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readPercentStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readPercentMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readPercentEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readSizeMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readSizeMidYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readRandomBirthRateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readTargetSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readNumControlPtsController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readControlPtRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readControlPtDelayController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readTangentSpreadController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readTangentLengthController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readColorMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readColorEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readColorStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-    static void readDetonateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node);
-
     static void readFloatController(const ControllerKey &key,
                                     const std::vector<float> &data,
                                     ModelNode &node,
-                                    AnimatedProperty<float> &prop);
+                                    KeyframeTrack<float> &track);
 
     static void readVectorController(const ControllerKey &key,
                                      const std::vector<float> &data,
                                      ModelNode &node,
-                                     AnimatedProperty<glm::vec3> &prop);
+                                     KeyframeTrack<glm::vec3> &track);
+
+    static void readQuaternionController(const ControllerKey &key,
+                                         const std::vector<float> &data,
+                                         ModelNode &node,
+                                         KeyframeTrack<glm::quat, SlerpInterpolator> &track);
 
     // END Controllers
 };

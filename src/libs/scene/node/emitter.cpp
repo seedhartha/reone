@@ -32,7 +32,6 @@
 #include "reone/scene/render/pass.h"
 #include "reone/system/randomutil.h"
 
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -43,32 +42,43 @@ static constexpr float kMotionBlurStrength = 0.25f;
 static constexpr float kProjectileSpeed = 16.0f;
 
 void EmitterSceneNode::init() {
-    _birthrate = _modelNode.birthrate().getByFrameOrElse(0, 0.0f);
-    _lifeExpectancy = _modelNode.lifeExp().getByFrameOrElse(0, 0.0f);
-    _size.x = _modelNode.xSize().getByFrameOrElse(0, 0.0f);
-    _size.y = _modelNode.ySize().getByFrameOrElse(0, 0.0f);
-    _frameStart = static_cast<int>(_modelNode.frameStart().getByFrameOrElse(0, 0.0f));
-    _frameEnd = static_cast<int>(_modelNode.frameEnd().getByFrameOrElse(0, 0.0f));
-    _fps = _modelNode.fps().getByFrameOrElse(0, 0.0f);
-    _spread = _modelNode.spread().getByFrameOrElse(0, 0.0f);
-    _velocity = _modelNode.velocity().getByFrameOrElse(0, 0.0f);
-    _randomVelocity = _modelNode.randVel().getByFrameOrElse(0, 0.0f);
-    _mass = _modelNode.mass().getByFrameOrElse(0, 0.0f);
-    _grav = _modelNode.grav().getByFrameOrElse(0, 0.0f);
-    _lightningDelay = _modelNode.lightingDelay().getByFrameOrElse(0, 0.0f);
-    _lightningRadius = _modelNode.lightingRadius().getByFrameOrElse(0, 0.0f);
-    _lightningScale = _modelNode.lightingScale().getByFrameOrElse(0, 0.0f);
-    _lightningSubDiv = static_cast<int>(_modelNode.lightingSubDiv().getByFrameOrElse(0, 0.0f));
+    _modelNode.floatValueAtTime(ControllerTypes::birthrate, 0.0f, _birthrate);
+    _modelNode.floatValueAtTime(ControllerTypes::lifeExp, 0.0f, _lifeExpectancy);
+    _modelNode.floatValueAtTime(ControllerTypes::xSize, 0.0f, _size.x);
+    _modelNode.floatValueAtTime(ControllerTypes::ySize, 0.0f, _size.y);
 
-    _particleSize.start = _modelNode.sizeStart().getByFrameOrElse(0, 0.0f);
-    _particleSize.mid = _modelNode.sizeMid().getByFrameOrElse(0, 0.0f);
-    _particleSize.end = _modelNode.sizeEnd().getByFrameOrElse(0, 0.0f);
-    _color.start = _modelNode.colorStart().getByFrameOrElse(0, glm::vec3(0.0f));
-    _color.mid = _modelNode.colorMid().getByFrameOrElse(0, glm::vec3(0.0f));
-    _color.end = _modelNode.colorEnd().getByFrameOrElse(0, glm::vec3(0.0f));
-    _alpha.start = _modelNode.alphaStart().getByFrameOrElse(0, 0.0f);
-    _alpha.mid = _modelNode.alphaMid().getByFrameOrElse(0, 0.0f);
-    _alpha.end = _modelNode.alphaEnd().getByFrameOrElse(0, 0.0f);
+    float frameStart, frameEnd;
+    if (_modelNode.floatValueAtTime(ControllerTypes::frameStart, 0.0f, frameStart)) {
+        _frameStart = static_cast<int>(frameStart);
+    }
+    if (_modelNode.floatValueAtTime(ControllerTypes::frameEnd, 0.0f, frameEnd)) {
+        _frameEnd = static_cast<int>(frameEnd);
+    }
+
+    _modelNode.floatValueAtTime(ControllerTypes::fps, 0.0f, _fps);
+    _modelNode.floatValueAtTime(ControllerTypes::spread, 0.0f, _spread);
+    _modelNode.floatValueAtTime(ControllerTypes::velocity, 0.0f, _velocity);
+    _modelNode.floatValueAtTime(ControllerTypes::randVel, 0.0f, _randomVelocity);
+    _modelNode.floatValueAtTime(ControllerTypes::mass, 0.0f, _mass);
+    _modelNode.floatValueAtTime(ControllerTypes::grav, 0.0f, _grav);
+    _modelNode.floatValueAtTime(ControllerTypes::lightingDelay, 0.0f, _lightningDelay);
+    _modelNode.floatValueAtTime(ControllerTypes::lightingRadius, 0.0f, _lightningRadius);
+    _modelNode.floatValueAtTime(ControllerTypes::lightingScale, 0.0f, _lightningScale);
+
+    float lightingSubDiv;
+    if (_modelNode.floatValueAtTime(ControllerTypes::lightingSubDiv, 0.0f, lightingSubDiv)) {
+        _lightningSubDiv = static_cast<int>(lightingSubDiv);
+    }
+
+    _modelNode.floatValueAtTime(ControllerTypes::sizeStart, 0.0f, _particleSize.start);
+    _modelNode.floatValueAtTime(ControllerTypes::sizeMid, 0.0f, _particleSize.mid);
+    _modelNode.floatValueAtTime(ControllerTypes::sizeEnd, 0.0f, _particleSize.end);
+    _modelNode.vectorValueAtTime(ControllerTypes::colorStart, 0.0f, _color.start);
+    _modelNode.vectorValueAtTime(ControllerTypes::colorMid, 0.0f, _color.mid);
+    _modelNode.vectorValueAtTime(ControllerTypes::colorEnd, 0.0f, _color.end);
+    _modelNode.floatValueAtTime(ControllerTypes::alphaStart, 0.0f, _alpha.start);
+    _modelNode.floatValueAtTime(ControllerTypes::alphaMid, 0.0f, _alpha.mid);
+    _modelNode.floatValueAtTime(ControllerTypes::alphaEnd, 0.0f, _alpha.end);
 
     if (_birthrate != 0.0f) {
         _birthInterval = 1.0f / _birthrate;

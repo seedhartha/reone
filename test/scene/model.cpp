@@ -125,8 +125,8 @@ TEST(model_scene_node, should_play_single_fire_forget_animation) {
     auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
     auto animRootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
-    animRootNode->position().addFrame(0.0f, glm::vec3(0.0f));
-    animRootNode->position().addFrame(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
+    animRootNode->vectorTracks()[ControllerTypes::position].add(0.0f, glm::vec3(0.0f));
+    animRootNode->vectorTracks()[ControllerTypes::position].add(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
 
     auto animations = std::vector<std::shared_ptr<Animation>> {
         std::make_shared<Animation>("some_animation", 1.0f, 0.5f, "root_node", animRootNode, std::vector<Animation::Event>())};
@@ -178,8 +178,8 @@ TEST(model_scene_node, should_play_single_looping_animation) {
     auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
     auto animRootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
-    animRootNode->position().addFrame(0.0f, glm::vec3(0.0f));
-    animRootNode->position().addFrame(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
+    animRootNode->vectorTracks()[ControllerTypes::position].add(0.0f, glm::vec3(0.0f));
+    animRootNode->vectorTracks()[ControllerTypes::position].add(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
 
     auto animations = std::vector<std::shared_ptr<Animation>> {
         std::make_shared<Animation>("some_animation", 1.0f, 0.5f, "root_node", animRootNode, std::vector<Animation::Event>())};
@@ -232,13 +232,13 @@ TEST(model_scene_node, should_play_two_overlayed_animations) {
     rootNode->addChild(dummyNode);
 
     auto anim1RootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
-    anim1RootNode->position().addFrame(0.0f, glm::vec3(0.0f));
-    anim1RootNode->position().addFrame(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
+    anim1RootNode->vectorTracks()[ControllerTypes::position].add(0.0f, glm::vec3(0.0f));
+    anim1RootNode->vectorTracks()[ControllerTypes::position].add(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
 
     auto anim2RootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
     auto anim2DummyNode = std::make_shared<ModelNode>(1, "dummy_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, anim2RootNode.get());
-    anim2DummyNode->position().addFrame(0.0f, glm::vec3(0.0f));
-    anim2DummyNode->position().addFrame(2.0f, glm::vec3(4.0f, 5.0f, 6.0f));
+    anim2DummyNode->vectorTracks()[ControllerTypes::position].add(0.0f, glm::vec3(0.0f));
+    anim2DummyNode->vectorTracks()[ControllerTypes::position].add(2.0f, glm::vec3(4.0f, 5.0f, 6.0f));
     anim2RootNode->addChild(anim2DummyNode);
 
     auto animations = std::vector<std::shared_ptr<Animation>> {
@@ -300,12 +300,12 @@ TEST(model_scene_node, hould_transition_between_two_animations) {
     auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
     auto anim1RootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
-    anim1RootNode->position().addFrame(0.0f, glm::vec3(0.0f));
-    anim1RootNode->position().addFrame(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
+    anim1RootNode->vectorTracks()[ControllerTypes::position].add(0.0f, glm::vec3(0.0f));
+    anim1RootNode->vectorTracks()[ControllerTypes::position].add(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
 
     auto anim2RootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
-    anim2RootNode->position().addFrame(0.0f, glm::vec3(0.0f));
-    anim2RootNode->position().addFrame(2.0f, glm::vec3(4.0f, 5.0f, 6.0f));
+    anim2RootNode->vectorTracks()[ControllerTypes::position].add(0.0f, glm::vec3(0.0f));
+    anim2RootNode->vectorTracks()[ControllerTypes::position].add(2.0f, glm::vec3(4.0f, 5.0f, 6.0f));
 
     auto animations = std::vector<std::shared_ptr<Animation>> {
         std::make_shared<Animation>("animation1", 1.0f, 0.5f, "root_node", anim1RootNode, std::vector<Animation::Event>()),

@@ -46,8 +46,8 @@ static constexpr float kUvAnimationSpeed = 250.0f;
 
 void MeshSceneNode::init() {
     _point = false;
-    _alpha = _modelNode.alpha().getByFrameOrElse(0, 1.0f);
-    _selfIllumColor = _modelNode.selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
+    _modelNode.floatValueAtTime(ControllerTypes::alpha, 0.0f, _alpha);
+    _modelNode.vectorValueAtTime(ControllerTypes::selfIllumColor, 0.0f, _selfIllumColor);
 
     initTextures();
     initDanglyMesh();
@@ -192,7 +192,7 @@ void MeshSceneNode::updateSaberAnimation(float dt) {
 
 bool MeshSceneNode::shouldRender() const {
     auto mesh = _modelNode.mesh();
-    if (!mesh || !mesh->render || _modelNode.alpha().getByFrameOrElse(0, 1.0f) == 0.0f) {
+    if (!mesh || !mesh->render || _alpha == 0.0f) {
         return false;
     }
     return !_modelNode.isAABBMesh() && !mesh->diffuseMap.empty();

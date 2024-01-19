@@ -31,50 +31,199 @@ using namespace reone;
 using namespace reone::graphics;
 using namespace reone::resource;
 
-namespace reone {
-
-template <class T>
-struct MinMaxPair {
-    T min {std::numeric_limits<T>::max()};
-    T max {std::numeric_limits<T>::lowest()};
+template <>
+struct std::less<glm::vec3> {
+    bool operator()(const glm::vec3 &lhs, const glm::vec3 &rhs) const {
+        if (lhs.x < rhs.x) {
+            return true;
+        }
+        if (lhs.x > rhs.x) {
+            return false;
+        }
+        if (lhs.y < rhs.y) {
+            return true;
+        }
+        if (lhs.y > rhs.y) {
+            return false;
+        }
+        if (lhs.z < rhs.z) {
+            return true;
+        }
+        if (lhs.z > rhs.z) {
+            return false;
+        }
+        return false;
+    }
 };
 
-using ControllerType = int;
+namespace reone {
 
-template <class T>
-using ControllerTypeToMinMax = std::map<ControllerType, MinMaxPair<T>>;
+static const std::unordered_map<ControllerType, std::string> g_ctrlTypeToNameDummy {
+    {{8, "position"},
+     {20, "orientation"},
+     {36, "scale"}}};
+
+static const std::unordered_map<ControllerType, std::string> g_ctrlTypeToNameMesh {
+    {{8, "position"},
+     {20, "orientation"},
+     {36, "scale"},
+
+     // Mesh
+     {100, "selfIllumColor"},
+     {132, "alpha"}}};
+
+static const std::unordered_map<ControllerType, std::string> g_ctrlTypeToNameLight {
+    {{8, "position"},
+     {20, "orientation"},
+     {36, "scale"},
+
+     // Light
+     {76, "color"},
+     {88, "radius"},
+     {96, "shadowRadius"},
+     {100, "verticalDisplacement"},
+     {140, "multiplier"}}};
+
+static const std::unordered_map<ControllerType, std::string> g_ctrlTypeToNameEmitter {
+    {{8, "position"},
+     {20, "orientation"},
+     {36, "scale"},
+
+     // Emitter
+     {80, "alphaEnd"},
+     {84, "alphaStart"},
+     {88, "birthrate"},
+     {92, "bounceCo"},
+     {96, "combineTime"},
+     {100, "drag"},
+     {104, "fps"},
+     {108, "frameEnd"},
+     {112, "frameStart"},
+     {116, "grav"},
+     {120, "lifeExp"},
+     {124, "mass"},
+     {128, "p2pBezier2"},
+     {132, "p2pBezier3"},
+     {136, "particleRot"},
+     {140, "randVel"},
+     {144, "sizeStart"},
+     {148, "sizeEnd"},
+     {152, "sizeStartY"},
+     {156, "sizeEndY"},
+     {160, "spread"},
+     {164, "threshold"},
+     {168, "velocity"},
+     {172, "xSize"},
+     {176, "ySize"},
+     {180, "blurLength"},
+     {184, "lightingDelay"},
+     {188, "lightingRadius"},
+     {192, "lightingScale"},
+     {196, "lightingSubDiv"},
+     {200, "lighitngZigZag"},
+     {216, "alphaMid"},
+     {220, "percentStart"},
+     {224, "percentMid"},
+     {228, "percentEnd"},
+     {232, "sizeMid"},
+     {236, "sizeMidY"},
+     {240, "randomBirthRate"},
+     {252, "targetSize"},
+     {256, "numControlPts"},
+     {260, "controlPtRadius"},
+     {264, "controlPtDelay"},
+     {268, "tangentSpread"},
+     {272, "tangentLength"},
+     {284, "colorMid"},
+     {380, "colorEnd"},
+     {392, "colorStart"},
+     {502, "detonate"}}};
+
+template <class T, class U = T, class Comparer = std::less<T>>
+struct ControllerStats {
+    T min {std::numeric_limits<U>::max()};
+    T max {std::numeric_limits<U>::lowest()};
+    std::vector<T> values;
+
+    T median() const {
+        if (values.empty()) {
+            return T();
+        }
+        if (values.size() == 1ll) {
+            return values[0];
+        }
+        auto valuesCopy = values;
+        std::sort(valuesCopy.begin(), valuesCopy.end(), Comparer());
+        int midIdx = valuesCopy.size() / 2;
+        return valuesCopy[midIdx];
+    }
+};
+
+template <class T, class U = T>
+using ControllerStatsMap = std::map<ControllerType, ControllerStats<T, U>>;
 
 struct ModelNodeStats {
-    ControllerTypeToMinMax<float> ctrlTypeToMinMax;
+public:
+    ControllerStatsMap<float> floatCtrlTypeToStats;
+    ControllerStatsMap<glm::vec3, float> vecCtrlTypeToStats;
+    ControllerStatsMap<glm::vec3, float> quatCtrlTypeToStats;
 
-    void append(ControllerType type, float value) {
-        if (ctrlTypeToMinMax.count(type) == 0) {
-            ctrlTypeToMinMax[type] = MinMaxPair<float> {value, value};
-        } else {
-            auto &current = ctrlTypeToMinMax.at(type);
-            current.min = std::min(current.min, value);
-            current.max = std::max(current.max, value);
-        }
+    void appendFloat(ControllerType type, float value) {
+        append(floatCtrlTypeToStats, type, value);
+    }
+
+    void appendVector(ControllerType type, glm::vec3 value) {
+        append(vecCtrlTypeToStats, type, value);
+    }
+
+    void appendQuaternion(ControllerType type, glm::quat value) {
+        append(quatCtrlTypeToStats, type, glm::vec3 {value.x, value.y, value.z});
     }
 
     void extend(const ModelNodeStats &other) {
-        for (const auto &[type, minMax] : other.ctrlTypeToMinMax) {
-            if (ctrlTypeToMinMax.count(type) == 0) {
-                ctrlTypeToMinMax[type] = minMax;
+        extend(floatCtrlTypeToStats, other.floatCtrlTypeToStats);
+        extend(vecCtrlTypeToStats, other.vecCtrlTypeToStats);
+        extend(quatCtrlTypeToStats, other.quatCtrlTypeToStats);
+    }
+
+private:
+    template <class T, class U = T>
+    void append(ControllerStatsMap<T, U> &map, ControllerType type, T value) {
+        if (map.count(type) == 0) {
+            map[type] = {value, value, {value}};
+        } else {
+            auto &current = map.at(type);
+            current.min = glm::min(current.min, value);
+            current.max = glm::max(current.max, value);
+            current.values.push_back(std::move(value));
+        }
+    }
+
+    template <class T, class U = T>
+    void extend(ControllerStatsMap<T, U> &map, const ControllerStatsMap<T, U> &otherMap) {
+        for (const auto &[type, stats] : otherMap) {
+            if (map.count(type) == 0) {
+                map[type] = stats;
             } else {
-                auto &current = ctrlTypeToMinMax.at(type);
-                current.min = std::min(current.min, minMax.min);
-                current.max = std::max(current.max, minMax.max);
+                auto &current = map.at(type);
+                current.min = glm::min(current.min, stats.min);
+                current.max = glm::max(current.max, stats.max);
+                for (const auto &value : stats.values) {
+                    current.values.push_back(value);
+                }
             }
         }
     }
 };
+
 struct ModelStats {
+    ModelNodeStats dummy;
     ModelNodeStats mesh;
     ModelNodeStats light;
     ModelNodeStats emitter;
 
     void extend(const ModelStats &other) {
+        dummy.extend(other.dummy);
         mesh.extend(other.mesh);
         light.extend(other.light);
         emitter.extend(other.emitter);
@@ -102,13 +251,21 @@ static ModelStats analyzeModel(graphics::Model &model) {
         } else if (node.isEmitter()) {
             nodeStats = &stats.emitter;
         } else {
-            continue;
+            nodeStats = &stats.dummy;
         }
-        for (const auto &[type, frame] : node.controllers()) {
-            for (const auto &[time, values] : frame) {
-                for (const auto &val : values) {
-                    nodeStats->append(type, val);
-                }
+        for (const auto &[type, track] : node.quaternionTracks()) {
+            for (const auto &[time, value] : track.keyframes()) {
+                nodeStats->appendQuaternion(type, value);
+            }
+        }
+        for (const auto &[type, track] : node.vectorTracks()) {
+            for (const auto &[time, value] : track.keyframes()) {
+                nodeStats->appendVector(type, value);
+            }
+        }
+        for (const auto &[type, track] : node.floatTracks()) {
+            for (const auto &[time, value] : track.keyframes()) {
+                nodeStats->appendFloat(type, value);
             }
         }
     }
@@ -139,22 +296,64 @@ static ModelStats analyzeModels(const std::filesystem::path &gameDir) {
                 auto model = reader.model();
                 stats.extend(analyzeModel(*model));
             } catch (const std::exception &e) {
-                std::cerr << e.what() << std::endl;
+                std::cerr << "Model " << resId.resRef.value() << ": " << e.what() << std::endl;
             }
         }
     }
     return stats;
 }
 
-void printModelNodeStats(const std::string &nodeType, const ModelNodeStats &stats) {
+void printModelNodeStats(const std::string &nodeType,
+                         const ModelNodeStats &stats,
+                         const std::unordered_map<ControllerType, std::string> &ctrlTypeToName) {
     std::cout << "Node type " << nodeType << ":" << std::endl;
     std::cout << std::setprecision(4);
-    for (const auto &[type, minMax] : stats.ctrlTypeToMinMax) {
+    for (auto &[type, ctrlStats] : stats.floatCtrlTypeToStats) {
+        std::string name;
+        if (ctrlTypeToName.count(type) > 0) {
+            name = ctrlTypeToName.at(type);
+        } else {
+            name = "unknown";
+        }
+        auto median = ctrlStats.median();
         std::cout
             << "  "
-            << "Controller type " << static_cast<int>(type) << ": "
-            << "min=" << minMax.min << ": "
-            << "max=" << minMax.max
+            << "Controller type " << static_cast<int>(type) << " (" << name << "): "
+            << "min=" << ctrlStats.min << " "
+            << "max=" << ctrlStats.max << " "
+            << "median=" << median
+            << std::endl;
+    }
+    for (auto &[type, ctrlStats] : stats.vecCtrlTypeToStats) {
+        std::string name;
+        if (ctrlTypeToName.count(type) > 0) {
+            name = ctrlTypeToName.at(type);
+        } else {
+            name = "unknown";
+        }
+        auto median = ctrlStats.median();
+        std::cout
+            << "  "
+            << "Controller type " << static_cast<int>(type) << " (" << name << "): "
+            << "min=[" << ctrlStats.min.x << ", " << ctrlStats.min.y << ", " << ctrlStats.min.z << "] "
+            << "max=[" << ctrlStats.max.x << ", " << ctrlStats.max.y << ", " << ctrlStats.max.z << "] "
+            << "median=[" << median.x << ", " << median.y << ", " << median.z << "]"
+            << std::endl;
+    }
+    for (auto &[type, ctrlStats] : stats.quatCtrlTypeToStats) {
+        std::string name;
+        if (ctrlTypeToName.count(type) > 0) {
+            name = ctrlTypeToName.at(type);
+        } else {
+            name = "unknown";
+        }
+        auto median = ctrlStats.median();
+        std::cout
+            << "  "
+            << "Controller type " << static_cast<int>(type) << " (" << name << "): "
+            << "min=[" << ctrlStats.min.x << ", " << ctrlStats.min.y << ", " << ctrlStats.min.z << "] "
+            << "max=[" << ctrlStats.max.x << ", " << ctrlStats.max.y << ", " << ctrlStats.max.z << "] "
+            << "median=[" << median.x << ", " << median.y << ", " << median.z << "]"
             << std::endl;
     }
 }
@@ -166,11 +365,13 @@ void analyzeModels(const std::filesystem::path &k1Dir, const std::filesystem::pa
     std::cout << "Analyzing TSL models" << std::endl;
     stats.extend(analyzeModels(k2Dir));
     std::cout << std::endl;
-    printModelNodeStats("mesh", stats.mesh);
+    printModelNodeStats("dummy", stats.dummy, g_ctrlTypeToNameDummy);
     std::cout << std::endl;
-    printModelNodeStats("light", stats.light);
+    printModelNodeStats("mesh", stats.mesh, g_ctrlTypeToNameMesh);
     std::cout << std::endl;
-    printModelNodeStats("emitter", stats.emitter);
+    printModelNodeStats("light", stats.light, g_ctrlTypeToNameLight);
+    std::cout << std::endl;
+    printModelNodeStats("emitter", stats.emitter, g_ctrlTypeToNameEmitter);
 }
 
 } // namespace reone
