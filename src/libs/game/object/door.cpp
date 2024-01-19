@@ -32,7 +32,6 @@
 #include "reone/scene/node/model.h"
 #include "reone/scene/types.h"
 
-
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 
@@ -75,7 +74,6 @@ void Door::loadFromBlueprint(const std::string &resRef) {
 
     auto modelSceneNode = sceneGraph.newModel(*model, ModelUsage::Door);
     modelSceneNode->setUser(*this);
-    modelSceneNode->setCullable(true);
     // modelSceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = std::move(modelSceneNode);
 

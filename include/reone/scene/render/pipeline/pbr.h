@@ -89,7 +89,7 @@ private:
 
     graphics::PBRTextures &_pbrTextures;
 
-    RenderTargets _renderTargets;
+    RenderTargets _targets;
 
     void initRenderTargets();
     void initSSAOSamples();

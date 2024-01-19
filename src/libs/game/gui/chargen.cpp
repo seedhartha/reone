@@ -387,7 +387,6 @@ std::shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGra
     creature->setAppearance(_character.appearance);
     creature->equip("g_a_clothes01");
     creature->loadAppearance();
-    creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
     auto model = sceneGraph.newModel(*_services.resource.models.get("cgbody_light"), ModelUsage::GUI);

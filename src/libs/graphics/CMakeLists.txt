@@ -70,6 +70,7 @@ set(GRAPHICS_HEADERS
 set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/aabb.cpp
     ${GRAPHICS_SOURCE_DIR}/animation.cpp
+    ${GRAPHICS_SOURCE_DIR}/camera.cpp
     ${GRAPHICS_SOURCE_DIR}/context.cpp
     ${GRAPHICS_SOURCE_DIR}/cursor.cpp
     ${GRAPHICS_SOURCE_DIR}/di/module.cpp

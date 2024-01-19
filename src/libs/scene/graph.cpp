@@ -180,7 +180,7 @@ void SceneGraph::cullRoots() {
         bool culled =
             !root->isEnabled() ||
             root->getSquareDistanceTo(*_activeCamera) > root->drawDistance() * root->drawDistance() ||
-            (root->isCullable() && !_activeCamera->isInFrustum(*root));
+            !_activeCamera->isInFrustum(*root);
 
         root->setCulled(culled);
     }
@@ -558,7 +558,9 @@ void SceneGraph::renderOpaque(IRenderPass &pass) {
 
     if (_renderAABB) {
         for (auto &model : _modelRoots) {
-            model->renderAABB(pass);
+            if (model->isEnabled()) {
+                model->renderAABB(pass);
+            }
         }
     }
     if (_renderWalkmeshes) {

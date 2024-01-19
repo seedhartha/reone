@@ -33,8 +33,7 @@ public:
         _zNear = zNear;
         _zFar = zFar;
 
-        auto proj = glm::ortho(left, right, bottom, top, zNear, zFar);
-        Camera::setProjection(proj, proj);
+        Camera::setProjection(glm::ortho(left, right, bottom, top, zNear, zFar));
     }
 };
 

@@ -199,7 +199,6 @@ std::shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance
     character->setAppearance(appearance);
     character->equip("g_a_clothes01");
     character->loadAppearance();
-    character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
     auto model = sceneGraph.newModel(*_services.resource.models.get("cgbody_light"), ModelUsage::GUI);

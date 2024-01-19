@@ -59,7 +59,6 @@ public:
     }
 
     bool isEnabled() const { return _enabled; }
-    bool isCullable() const { return _cullable; }
     bool isCulled() const { return _culled; }
     bool isPoint() const { return _point; }
 
@@ -87,7 +86,6 @@ public:
     // Flags
 
     void setEnabled(bool enabled) { _enabled = enabled; }
-    void setCullable(bool cullable) { _cullable = cullable; }
     void setCulled(bool culled) { _culled = culled; }
 
     // END Flags
@@ -119,9 +117,8 @@ protected:
     // Flags
 
     bool _enabled {true};
-    bool _cullable {false}; /**< can this node be frustum- or distance-culled? */
-    bool _culled {false};   /**< has this node been frustum- or distance-culled? */
-    bool _point {true};     /**< is this node represented by a single point?  */
+    bool _culled {false}; /**< has this node been frustum- or distance-culled? */
+    bool _point {true};   /**< is this node represented by a single point?  */
 
     // END Flags
 

@@ -32,24 +32,8 @@ public:
 
     virtual ~Camera() = default;
 
-    bool isInFrustum(const glm::vec3 &pt) const {
-        glm::vec4 pt4(pt, 1.0f);
-        return glm::dot(_frustumLeft, pt4) >= 0.0f &&
-               glm::dot(_frustumRight, pt4) >= 0.0f &&
-               glm::dot(_frustumBottom, pt4) >= 0.0f &&
-               glm::dot(_frustumTop, pt4) >= 0.0f &&
-               glm::dot(_frustumNear, pt4) >= 0.0f &&
-               glm::dot(_frustumFar, pt4) >= 0.0f;
-    }
-
-    bool isInFrustum(const AABB &aabb) const {
-        for (auto &corner : aabb.corners()) {
-            if (isInFrustum(corner)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    bool isInFrustum(const glm::vec3 &point) const;
+    bool isInFrustum(const AABB &aabb) const;
 
     CameraType type() const { return _type; }
     const glm::mat4 &projection() const { return _projection; }
@@ -60,55 +44,44 @@ public:
     float zFar() const { return _zFar; }
 
     void setView(glm::mat4 view) {
-        _viewInv = glm::inverse(view);
-        _position = _viewInv[3];
         _view = std::move(view);
-        updateFrustumPlanes();
+        _viewInv = glm::inverse(_view);
+        _position = _viewInv[3];
+        updateFrustum();
     }
 
 protected:
     glm::mat4 _projection {1.0f};
+    glm::mat4 _projectionInv {1.0f};
     glm::mat4 _view {1.0f};
     glm::mat4 _viewInv {1.0f};
     glm::vec3 _position {0.0f};
     float _zNear {0.0f};
     float _zFar {0.0f};
 
-    void setProjection(glm::mat4 proj, glm::mat4 frustumProj) {
-        _projection = std::move(proj);
-        _frustumProjection = std::move(frustumProj);
-        updateFrustumPlanes();
+    void setProjection(glm::mat4 projection) {
+        _projection = std::move(projection);
+        _projectionInv = glm::inverse(_projection);
+        updateFrustum();
     }
 
 private:
+    struct Plane {
+        glm::vec3 normal {0.0f};
+        float distance {0.0f};
+
+        float distanceTo(const glm::vec3 &point) const {
+            return glm::dot(normal, point) + distance;
+        }
+    };
+
+    struct Frustum {
+        std::array<Plane, 6> planes;
+    } _frustum;
+
     CameraType _type;
 
-    glm::mat4 _frustumProjection {1.0f};
-
-    glm::vec4 _frustumLeft {0.0f};
-    glm::vec4 _frustumRight {0.0f};
-    glm::vec4 _frustumBottom {0.0f};
-    glm::vec4 _frustumTop {0.0f};
-    glm::vec4 _frustumNear {0.0f};
-    glm::vec4 _frustumFar {0.0f};
-
-    void updateFrustumPlanes() {
-        glm::mat4 vp(_frustumProjection * _view);
-        for (int i = 3; i >= 0; --i) {
-            _frustumLeft[i] = vp[i][3] + vp[i][0];
-            _frustumRight[i] = vp[i][3] - vp[i][0];
-            _frustumBottom[i] = vp[i][3] + vp[i][1];
-            _frustumTop[i] = vp[i][3] - vp[i][1];
-            _frustumNear[i] = vp[i][3] + vp[i][2];
-            _frustumFar[i] = vp[i][3] - vp[i][2];
-        }
-        _frustumLeft = glm::normalize(_frustumLeft);
-        _frustumRight = glm::normalize(_frustumRight);
-        _frustumBottom = glm::normalize(_frustumBottom);
-        _frustumTop = glm::normalize(_frustumTop);
-        _frustumNear = glm::normalize(_frustumNear);
-        _frustumFar = glm::normalize(_frustumFar);
-    }
+    void updateFrustum();
 };
 
 } // namespace graphics

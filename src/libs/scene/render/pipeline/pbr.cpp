@@ -61,216 +61,216 @@ void PBRRenderPipeline::initRenderTargets() {
 
     // Reusable targets
 
-    _renderTargets.dbCommon = std::make_unique<Renderbuffer>();
-    _renderTargets.dbCommon->configure(_targetSize.x, _targetSize.y, PixelFormat::Depth32F);
-    _renderTargets.dbCommon->init();
+    _targets.dbCommon = std::make_unique<Renderbuffer>();
+    _targets.dbCommon->configure(_targetSize.x, _targetSize.y, PixelFormat::Depth32F);
+    _targets.dbCommon->init();
 
-    _renderTargets.dbCommonHalf = std::make_unique<Renderbuffer>();
-    _renderTargets.dbCommonHalf->configure(halfSize.x, halfSize.y, PixelFormat::Depth32F);
-    _renderTargets.dbCommonHalf->init();
+    _targets.dbCommonHalf = std::make_unique<Renderbuffer>();
+    _targets.dbCommonHalf->configure(halfSize.x, halfSize.y, PixelFormat::Depth32F);
+    _targets.dbCommonHalf->init();
 
-    _renderTargets.cbPing = std::make_unique<Texture>(
+    _targets.cbPing = std::make_unique<Texture>(
         "ping_color",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbPing->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbPing->init();
+    _targets.cbPing->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
+    _targets.cbPing->init();
 
-    _renderTargets.fbPing = std::make_unique<Framebuffer>();
-    _renderTargets.fbPing->attachColorDepth(_renderTargets.cbPing, _renderTargets.dbCommon);
-    _renderTargets.fbPing->init();
+    _targets.fbPing = std::make_unique<Framebuffer>();
+    _targets.fbPing->attachColorDepth(_targets.cbPing, _targets.dbCommon);
+    _targets.fbPing->init();
 
-    _renderTargets.cbPingHalf = std::make_unique<Texture>(
+    _targets.cbPingHalf = std::make_unique<Texture>(
         "ping_color_half",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbPingHalf->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbPingHalf->init();
+    _targets.cbPingHalf->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
+    _targets.cbPingHalf->init();
 
-    _renderTargets.fbPingHalf = std::make_unique<Framebuffer>();
-    _renderTargets.fbPingHalf->attachColorDepth(_renderTargets.cbPingHalf, _renderTargets.dbCommonHalf);
-    _renderTargets.fbPingHalf->init();
+    _targets.fbPingHalf = std::make_unique<Framebuffer>();
+    _targets.fbPingHalf->attachColorDepth(_targets.cbPingHalf, _targets.dbCommonHalf);
+    _targets.fbPingHalf->init();
 
-    _renderTargets.cbPong = std::make_unique<Texture>(
+    _targets.cbPong = std::make_unique<Texture>(
         "pong_color",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbPong->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbPong->init();
+    _targets.cbPong->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
+    _targets.cbPong->init();
 
-    _renderTargets.fbPong = std::make_unique<Framebuffer>();
-    _renderTargets.fbPong->attachColorDepth(_renderTargets.cbPong, _renderTargets.dbCommon);
-    _renderTargets.fbPong->init();
+    _targets.fbPong = std::make_unique<Framebuffer>();
+    _targets.fbPong->attachColorDepth(_targets.cbPong, _targets.dbCommon);
+    _targets.fbPong->init();
 
-    _renderTargets.cbPongHalf = std::make_unique<Texture>(
+    _targets.cbPongHalf = std::make_unique<Texture>(
         "pong_color_half",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbPongHalf->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbPongHalf->init();
+    _targets.cbPongHalf->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
+    _targets.cbPongHalf->init();
 
-    _renderTargets.fbPongHalf = std::make_unique<Framebuffer>();
-    _renderTargets.fbPongHalf->attachColorDepth(_renderTargets.cbPongHalf, _renderTargets.dbCommonHalf);
-    _renderTargets.fbPongHalf->init();
+    _targets.fbPongHalf = std::make_unique<Framebuffer>();
+    _targets.fbPongHalf->attachColorDepth(_targets.cbPongHalf, _targets.dbCommonHalf);
+    _targets.fbPongHalf->init();
 
     // Directional light shadows framebuffer
 
-    _renderTargets.dbDirectionalLightShadows = std::make_unique<Texture>(
+    _targets.dbDirectionalLightShadows = std::make_unique<Texture>(
         "point_light_shadows_color",
         TextureType::TwoDimArray,
         getTextureProperties(TextureUsage::DepthBuffer));
-    _renderTargets.dbDirectionalLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F, kNumShadowCascades);
-    _renderTargets.dbDirectionalLightShadows->init();
+    _targets.dbDirectionalLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F, kNumShadowCascades);
+    _targets.dbDirectionalLightShadows->init();
 
-    _renderTargets.fbDirLightShadows = std::make_shared<Framebuffer>();
-    _renderTargets.fbDirLightShadows->attachDepth(_renderTargets.dbDirectionalLightShadows);
-    _renderTargets.fbDirLightShadows->init();
+    _targets.fbDirLightShadows = std::make_shared<Framebuffer>();
+    _targets.fbDirLightShadows->attachDepth(_targets.dbDirectionalLightShadows);
+    _targets.fbDirLightShadows->init();
 
     // Point light shadows framebuffer
 
-    _renderTargets.dbPointLightShadows = std::make_unique<Texture>(
+    _targets.dbPointLightShadows = std::make_unique<Texture>(
         "directional_light_shadows_color",
         TextureType::CubeMap,
         getTextureProperties(TextureUsage::DepthBuffer));
-    _renderTargets.dbPointLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F);
-    _renderTargets.dbPointLightShadows->init();
+    _targets.dbPointLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F);
+    _targets.dbPointLightShadows->init();
 
-    _renderTargets.fbPointLightShadows = std::make_shared<Framebuffer>();
-    _renderTargets.fbPointLightShadows->attachDepth(_renderTargets.dbPointLightShadows);
-    _renderTargets.fbPointLightShadows->init();
+    _targets.fbPointLightShadows = std::make_shared<Framebuffer>();
+    _targets.fbPointLightShadows->attachDepth(_targets.dbPointLightShadows);
+    _targets.fbPointLightShadows->init();
 
     // G-Buffer framebuffer
 
-    _renderTargets.cbGBufDiffuse = std::make_unique<Texture>(
+    _targets.cbGBufDiffuse = std::make_unique<Texture>(
         "gbuffer_diffuse",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbGBufDiffuse->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbGBufDiffuse->init();
+    _targets.cbGBufDiffuse->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
+    _targets.cbGBufDiffuse->init();
 
-    _renderTargets.cbGBufLightmap = std::make_unique<Texture>(
+    _targets.cbGBufLightmap = std::make_unique<Texture>(
         "gbuffer_lightmap",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbGBufLightmap->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbGBufLightmap->init();
+    _targets.cbGBufLightmap->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
+    _targets.cbGBufLightmap->init();
 
-    _renderTargets.cbGBufSelfIllum = std::make_unique<Texture>(
+    _targets.cbGBufSelfIllum = std::make_unique<Texture>(
         "gbuffer_selfillum",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbGBufSelfIllum->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbGBufSelfIllum->init();
+    _targets.cbGBufSelfIllum->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
+    _targets.cbGBufSelfIllum->init();
 
-    _renderTargets.cbGBufEyeNormal = std::make_unique<Texture>(
+    _targets.cbGBufEyeNormal = std::make_unique<Texture>(
         "gbuffer_eyenormal",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbGBufEyeNormal->clear(_targetSize.x, _targetSize.y, PixelFormat::RGB8);
-    _renderTargets.cbGBufEyeNormal->init();
+    _targets.cbGBufEyeNormal->clear(_targetSize.x, _targetSize.y, PixelFormat::RGB8);
+    _targets.cbGBufEyeNormal->init();
 
-    _renderTargets.dbGBuffer = std::make_shared<Texture>(
+    _targets.dbGBuffer = std::make_shared<Texture>(
         "gbuffer_depth",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::DepthBuffer));
-    _renderTargets.dbGBuffer->clear(_targetSize.x, _targetSize.y, PixelFormat::Depth32F);
-    _renderTargets.dbGBuffer->init();
+    _targets.dbGBuffer->clear(_targetSize.x, _targetSize.y, PixelFormat::Depth32F);
+    _targets.dbGBuffer->init();
 
-    _renderTargets.fbOpaqueGeometry = std::make_shared<Framebuffer>();
-    _renderTargets.fbOpaqueGeometry->attachColorsDepth(
-        {_renderTargets.cbGBufDiffuse,
-         _renderTargets.cbGBufEyeNormal,
-         _renderTargets.cbGBufLightmap,
-         _renderTargets.cbGBufSelfIllum},
-        _renderTargets.dbGBuffer);
-    _renderTargets.fbOpaqueGeometry->init();
+    _targets.fbOpaqueGeometry = std::make_shared<Framebuffer>();
+    _targets.fbOpaqueGeometry->attachColorsDepth(
+        {_targets.cbGBufDiffuse,
+         _targets.cbGBufEyeNormal,
+         _targets.cbGBufLightmap,
+         _targets.cbGBufSelfIllum},
+        _targets.dbGBuffer);
+    _targets.fbOpaqueGeometry->init();
 
     // Opaque geometry framebuffer
 
-    _renderTargets.cbDeferredOpaque1 = std::make_unique<Texture>(
+    _targets.cbDeferredOpaque1 = std::make_unique<Texture>(
         "deferred_opaque_color1",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbDeferredOpaque1->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbDeferredOpaque1->init();
+    _targets.cbDeferredOpaque1->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
+    _targets.cbDeferredOpaque1->init();
 
-    _renderTargets.cbDeferredOpaque2 = std::make_unique<Texture>(
+    _targets.cbDeferredOpaque2 = std::make_unique<Texture>(
         "deferred_opaque_color2",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbDeferredOpaque2->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbDeferredOpaque2->init();
+    _targets.cbDeferredOpaque2->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
+    _targets.cbDeferredOpaque2->init();
 
-    _renderTargets.fbDeferredCombine = std::make_shared<Framebuffer>();
-    _renderTargets.fbDeferredCombine->attachColorsDepth({_renderTargets.cbDeferredOpaque1,
-                                                         _renderTargets.cbDeferredOpaque2},
-                                                        _renderTargets.dbCommon);
-    _renderTargets.fbDeferredCombine->init();
+    _targets.fbDeferredCombine = std::make_shared<Framebuffer>();
+    _targets.fbDeferredCombine->attachColorsDepth({_targets.cbDeferredOpaque1,
+                                                   _targets.cbDeferredOpaque2},
+                                                  _targets.dbCommon);
+    _targets.fbDeferredCombine->init();
 
     // Transparent geometry framebuffer
 
-    _renderTargets.cbTransparentGeometry1 = std::make_unique<Texture>(
+    _targets.cbTransparentGeometry1 = std::make_unique<Texture>(
         "transparent_geometry_color1",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbTransparentGeometry1->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA16F);
-    _renderTargets.cbTransparentGeometry1->init();
+    _targets.cbTransparentGeometry1->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA16F);
+    _targets.cbTransparentGeometry1->init();
 
-    _renderTargets.cbTransparentGeometry2 = std::make_unique<Texture>(
+    _targets.cbTransparentGeometry2 = std::make_unique<Texture>(
         "transparent_geometry_color2",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbTransparentGeometry2->clear(_targetSize.x, _targetSize.y, PixelFormat::R16F);
-    _renderTargets.cbTransparentGeometry2->init();
+    _targets.cbTransparentGeometry2->clear(_targetSize.x, _targetSize.y, PixelFormat::R16F);
+    _targets.cbTransparentGeometry2->init();
 
-    _renderTargets.fbTransparentGeometry = std::make_shared<Framebuffer>();
-    _renderTargets.fbTransparentGeometry->attachColorsDepth(
-        {_renderTargets.cbTransparentGeometry1, _renderTargets.cbTransparentGeometry2},
-        _renderTargets.dbCommon);
-    _renderTargets.fbTransparentGeometry->init();
+    _targets.fbTransparentGeometry = std::make_shared<Framebuffer>();
+    _targets.fbTransparentGeometry->attachColorsDepth(
+        {_targets.cbTransparentGeometry1, _targets.cbTransparentGeometry2},
+        _targets.dbCommon);
+    _targets.fbTransparentGeometry->init();
 
     // SSAO framebuffer
 
     if (_options.ssao) {
-        _renderTargets.cbSSAO = std::make_shared<Texture>(
+        _targets.cbSSAO = std::make_shared<Texture>(
             "ssao_color",
             TextureType::TwoDim,
             getTextureProperties(TextureUsage::ColorBuffer));
-        _renderTargets.cbSSAO->clear(halfSize.x, halfSize.y, PixelFormat::R8);
-        _renderTargets.cbSSAO->init();
+        _targets.cbSSAO->clear(halfSize.x, halfSize.y, PixelFormat::R8);
+        _targets.cbSSAO->init();
 
-        _renderTargets.fbSSAO = std::make_shared<Framebuffer>();
-        _renderTargets.fbSSAO->attachColorDepth(_renderTargets.cbSSAO, _renderTargets.dbCommonHalf);
-        _renderTargets.fbSSAO->init();
+        _targets.fbSSAO = std::make_shared<Framebuffer>();
+        _targets.fbSSAO->attachColorDepth(_targets.cbSSAO, _targets.dbCommonHalf);
+        _targets.fbSSAO->init();
     }
 
     // SSR framebuffer
 
     if (_options.ssr) {
-        _renderTargets.cbSSR = std::make_unique<Texture>(
+        _targets.cbSSR = std::make_unique<Texture>(
             "ssr_color",
             TextureType::TwoDim,
             getTextureProperties(TextureUsage::ColorBuffer));
-        _renderTargets.cbSSR->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
-        _renderTargets.cbSSR->init();
+        _targets.cbSSR->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
+        _targets.cbSSR->init();
 
-        _renderTargets.fbSSR = std::make_shared<Framebuffer>();
-        _renderTargets.fbSSR->attachColorDepth(_renderTargets.cbSSR, _renderTargets.dbCommonHalf);
-        _renderTargets.fbSSR->init();
+        _targets.fbSSR = std::make_shared<Framebuffer>();
+        _targets.fbSSR->attachColorDepth(_targets.cbSSR, _targets.dbCommonHalf);
+        _targets.fbSSR->init();
     }
 
     // Output framebuffer
 
-    _renderTargets.cbOutput = std::make_unique<Texture>(
+    _targets.cbOutput = std::make_unique<Texture>(
         "output_color",
         TextureType::TwoDim,
         getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbOutput->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbOutput->init();
+    _targets.cbOutput->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
+    _targets.cbOutput->init();
 
-    _renderTargets.fbOutput = std::make_unique<Framebuffer>();
-    _renderTargets.fbOutput->attachColorDepth(_renderTargets.cbOutput, _renderTargets.dbCommon);
-    _renderTargets.fbOutput->init();
+    _targets.fbOutput = std::make_unique<Framebuffer>();
+    _targets.fbOutput->attachColorDepth(_targets.cbOutput, _targets.dbCommon);
+    _targets.fbOutput->init();
 }
 
 void PBRRenderPipeline::initSSAOSamples() {
@@ -318,23 +318,23 @@ Texture &PBRRenderPipeline::render() {
             auto halfSize = _targetSize / 2;
             if (_options.ssao) {
                 renderSSAO(kSSAOSampleRadius, kSSAOBias);
-                applyBoxBlur(*_renderTargets.cbSSAO, *_renderTargets.fbPingHalf, halfSize);
+                applyBoxBlur(*_targets.cbSSAO, *_targets.fbPingHalf, halfSize);
                 _context.blitFramebuffer(
-                    *_renderTargets.fbPingHalf,
-                    *_renderTargets.fbSSAO,
+                    *_targets.fbPingHalf,
+                    *_targets.fbSSAO,
                     glm::ivec4(0, 0, halfSize),
                     glm::ivec4(0, 0, halfSize));
             }
             if (_options.ssr) {
                 renderSSR(kSSRBias, kSSRPixelStride, kSSRMaxSteps);
                 applyGaussianBlur(
-                    *_renderTargets.cbSSR,
-                    *_renderTargets.fbPingHalf,
+                    *_targets.cbSSR,
+                    *_targets.fbPingHalf,
                     halfSize,
                     GaussianBlurParams {false, true});
                 applyGaussianBlur(
-                    *_renderTargets.cbPingHalf,
-                    *_renderTargets.fbSSR,
+                    *_targets.cbPingHalf,
+                    *_targets.fbSSR,
                     halfSize,
                     GaussianBlurParams {true, true});
             }
@@ -343,24 +343,24 @@ Texture &PBRRenderPipeline::render() {
         // Blur highlights
         combineOpaqueGeometry();
         applyGaussianBlur(
-            *_renderTargets.cbDeferredOpaque2,
-            *_renderTargets.fbPing,
+            *_targets.cbDeferredOpaque2,
+            *_targets.fbPing,
             _targetSize,
             GaussianBlurParams {false, true});
         applyGaussianBlur(
-            *_renderTargets.cbPing,
-            *_renderTargets.fbPong,
+            *_targets.cbPing,
+            *_targets.fbPong,
             _targetSize,
             GaussianBlurParams {true, true});
         _context.blitFramebuffer(
-            *_renderTargets.fbPong,
-            *_renderTargets.fbDeferredCombine,
+            *_targets.fbPong,
+            *_targets.fbDeferredCombine,
             screenRect, screenRect,
             0, 1);
 
         // Blit opaque geometry depth into transparent geometry
-        _context.blitFramebuffer(*_renderTargets.fbOpaqueGeometry,
-                                 *_renderTargets.fbTransparentGeometry,
+        _context.blitFramebuffer(*_targets.fbOpaqueGeometry,
+                                 *_targets.fbTransparentGeometry,
                                  screenRect, screenRect,
                                  0, 0,
                                  FramebufferBlitFlags::depth);
@@ -380,29 +380,29 @@ Texture &PBRRenderPipeline::render() {
         }
         endPostProcessingPass();
         if (_options.fxaa && _options.sharpen) {
-            applyFXAA(*_renderTargets.cbOutput, *_renderTargets.fbPing, _targetSize);
-            applySharpen(*_renderTargets.cbPing, *_renderTargets.fbOutput, _targetSize, kSharpenAmount);
+            applyFXAA(*_targets.cbOutput, *_targets.fbPing, _targetSize);
+            applySharpen(*_targets.cbPing, *_targets.fbOutput, _targetSize, kSharpenAmount);
         } else if (_options.fxaa || _options.sharpen) {
             if (_options.fxaa) {
-                applyFXAA(*_renderTargets.cbOutput, *_renderTargets.fbPing, _targetSize);
+                applyFXAA(*_targets.cbOutput, *_targets.fbPing, _targetSize);
             } else {
-                applySharpen(*_renderTargets.cbOutput, *_renderTargets.fbPing, _targetSize, kSharpenAmount);
+                applySharpen(*_targets.cbOutput, *_targets.fbPing, _targetSize, kSharpenAmount);
             }
             _context.blitFramebuffer(
-                *_renderTargets.fbPing,
-                *_renderTargets.fbOutput,
+                *_targets.fbPing,
+                *_targets.fbOutput,
                 screenRect, screenRect);
         }
 
         _context.resetDrawFramebuffer();
     });
 
-    return *_renderTargets.cbOutput;
+    return *_targets.cbOutput;
 }
 
 void PBRRenderPipeline::beginDirLightShadowsPass() {
     _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
-    _context.bindDrawFramebuffer(*_renderTargets.fbDirLightShadows);
+    _context.bindDrawFramebuffer(*_targets.fbDirLightShadows);
     _context.clearDepth();
 }
 
@@ -412,7 +412,7 @@ void PBRRenderPipeline::endDirLightShadowsPass() {
 
 void PBRRenderPipeline::beginPointLightShadowsPass() {
     _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
-    _context.bindDrawFramebuffer(*_renderTargets.fbPointLightShadows);
+    _context.bindDrawFramebuffer(*_targets.fbPointLightShadows);
     _context.clearDepth();
 }
 
@@ -421,7 +421,7 @@ void PBRRenderPipeline::endPointLightShadowsPass() {
 }
 
 void PBRRenderPipeline::beginOpaqueGeometryPass() {
-    _context.bindDrawFramebuffer(*_renderTargets.fbOpaqueGeometry, {0, 1, 2, 3});
+    _context.bindDrawFramebuffer(*_targets.fbOpaqueGeometry, {0, 1, 2, 3});
     _context.clearColorDepth();
 }
 
@@ -436,10 +436,10 @@ void PBRRenderPipeline::renderSSAO(float sampleRadius, float bias) {
         se.ssaoSampleRadius = sampleRadius;
         se.ssaoBias = bias;
     });
-    _context.bindDrawFramebuffer(*_renderTargets.fbSSAO, {0});
+    _context.bindDrawFramebuffer(*_targets.fbSSAO, {0});
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrSSAO));
-    _context.bindTexture(*_renderTargets.dbGBuffer, TextureUnits::gBufDepth);
-    _context.bindTexture(*_renderTargets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
+    _context.bindTexture(*_targets.dbGBuffer, TextureUnits::gBufDepth);
+    _context.bindTexture(*_targets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
     _context.bindTexture(_textureRegistry.get(TextureName::noiseRg), TextureUnits::noise);
     _context.withViewport(glm::ivec4(0, 0, size.x, size.y), [this]() {
         _context.clearColorDepth();
@@ -456,12 +456,12 @@ void PBRRenderPipeline::renderSSR(float bias, float pixelStride, float maxSteps)
         se.ssrPixelStride = pixelStride;
         se.ssrMaxSteps = maxSteps;
     });
-    _context.bindDrawFramebuffer(*_renderTargets.fbSSR, {0});
+    _context.bindDrawFramebuffer(*_targets.fbSSR, {0});
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrSSR));
-    _context.bindTexture(*_renderTargets.cbGBufDiffuse);
-    _context.bindTexture(*_renderTargets.cbGBufLightmap, TextureUnits::lightmap);
-    _context.bindTexture(*_renderTargets.dbGBuffer, TextureUnits::gBufDepth);
-    _context.bindTexture(*_renderTargets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
+    _context.bindTexture(*_targets.cbGBufDiffuse);
+    _context.bindTexture(*_targets.cbGBufLightmap, TextureUnits::lightmap);
+    _context.bindTexture(*_targets.dbGBuffer, TextureUnits::gBufDepth);
+    _context.bindTexture(*_targets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
     _context.withViewport(glm::ivec4(0, 0, size.x, size.y), [this]() {
         _context.clearColorDepth();
         _meshRegistry.get(MeshName::quadNDC).draw();
@@ -470,29 +470,29 @@ void PBRRenderPipeline::renderSSR(float bias, float pixelStride, float maxSteps)
 
 void PBRRenderPipeline::combineOpaqueGeometry() {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrCombine));
-    _context.bindDrawFramebuffer(*_renderTargets.fbDeferredCombine, {0, 1});
-    _context.bindTexture(*_renderTargets.cbGBufDiffuse);
-    _context.bindTexture(*_renderTargets.cbGBufLightmap, TextureUnits::lightmap);
-    _context.bindTexture(*_renderTargets.cbGBufSelfIllum, TextureUnits::gBufSelfIllum);
-    _context.bindTexture(*_renderTargets.dbGBuffer, TextureUnits::gBufDepth);
-    _context.bindTexture(*_renderTargets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
-    _context.bindTexture(*_renderTargets.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
-    _context.bindTexture(*_renderTargets.dbPointLightShadows, TextureUnits::shadowMapCube);
+    _context.bindDrawFramebuffer(*_targets.fbDeferredCombine, {0, 1});
+    _context.bindTexture(*_targets.cbGBufDiffuse);
+    _context.bindTexture(*_targets.cbGBufLightmap, TextureUnits::lightmap);
+    _context.bindTexture(*_targets.cbGBufSelfIllum, TextureUnits::gBufSelfIllum);
+    _context.bindTexture(*_targets.dbGBuffer, TextureUnits::gBufDepth);
+    _context.bindTexture(*_targets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
+    _context.bindTexture(*_targets.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
+    _context.bindTexture(*_targets.dbPointLightShadows, TextureUnits::shadowMapCube);
     _context.bindTexture(_pbrTextures.brdf(), TextureUnits::brdfLUT);
     _context.bindTexture(_pbrTextures.irradianceMapArray(), TextureUnits::irradianceMapArray);
     _context.bindTexture(_pbrTextures.prefilteredEnvMapArray(), TextureUnits::prefilteredEnvMapArray);
     if (_options.ssao) {
-        _context.bindTexture(*_renderTargets.cbSSAO, TextureUnits::ssao);
+        _context.bindTexture(*_targets.cbSSAO, TextureUnits::ssao);
     }
     if (_options.ssr) {
-        _context.bindTexture(*_renderTargets.cbSSR, TextureUnits::ssr);
+        _context.bindTexture(*_targets.cbSSR, TextureUnits::ssr);
     }
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void PBRRenderPipeline::beginTransparentGeometryPass() {
-    _context.bindDrawFramebuffer(*_renderTargets.fbTransparentGeometry, {0, 1});
+    _context.bindDrawFramebuffer(*_targets.fbTransparentGeometry, {0, 1});
     _context.clearColor({0.0f, 0.0f, 0.0f, 1.0f});
     _context.pushBlendMode(BlendMode::OIT_Transparent);
     _context.pushDepthMask(false);
@@ -505,17 +505,17 @@ void PBRRenderPipeline::endTransparentGeometryPass() {
 
 void PBRRenderPipeline::blendTransparentGeometry() {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::oitBlend));
-    _context.bindDrawFramebuffer(*_renderTargets.fbOutput, {0});
-    _context.bindTexture(*_renderTargets.cbDeferredOpaque1);
-    _context.bindTexture(*_renderTargets.cbDeferredOpaque2, TextureUnits::hilights);
-    _context.bindTexture(*_renderTargets.cbTransparentGeometry1, TextureUnits::oitAccum);
-    _context.bindTexture(*_renderTargets.cbTransparentGeometry2, TextureUnits::oitRevealage);
+    _context.bindDrawFramebuffer(*_targets.fbOutput, {0});
+    _context.bindTexture(*_targets.cbDeferredOpaque1);
+    _context.bindTexture(*_targets.cbDeferredOpaque2, TextureUnits::hilights);
+    _context.bindTexture(*_targets.cbTransparentGeometry1, TextureUnits::oitAccum);
+    _context.bindTexture(*_targets.cbTransparentGeometry2, TextureUnits::oitRevealage);
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void PBRRenderPipeline::beginPostProcessingPass() {
-    _context.bindDrawFramebuffer(*_renderTargets.fbOutput, {0});
+    _context.bindDrawFramebuffer(*_targets.fbOutput, {0});
 }
 
 void PBRRenderPipeline::endPostProcessingPass() {

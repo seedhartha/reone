@@ -35,7 +35,6 @@
 #include "reone/scene/node/model.h"
 #include "reone/system/randomutil.h"
 
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -118,7 +117,6 @@ std::shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph
     creature->setAppearance(getAppearanceFromCurrentPortrait());
     creature->equip("g_a_clothes01");
     creature->loadAppearance();
-    creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
     // Attach creature model to the root scene node
