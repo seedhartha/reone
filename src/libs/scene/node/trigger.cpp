@@ -22,6 +22,7 @@
 #include "reone/graphics/material.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/shaderregistry.h"
+#include "reone/graphics/statistic.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/scene/render/pipeline.h"
 
@@ -89,7 +90,11 @@ void TriggerSceneNode::init() {
     spec.offNormals = 3 * sizeof(float);
     spec.offMaterial = 6 * sizeof(float);
 
-    _mesh = std::make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
+    _mesh = std::make_unique<Mesh>(
+        std::move(vertices),
+        std::move(faces),
+        std::move(spec),
+        _graphicsSvc.statistic);
 
     for (auto &point : _geometry) {
         _aabb.expand(point);

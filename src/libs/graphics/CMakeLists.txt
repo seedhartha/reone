@@ -55,6 +55,7 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/shader.h
     ${GRAPHICS_INCLUDE_DIR}/shaderprogram.h
     ${GRAPHICS_INCLUDE_DIR}/shaderregistry.h
+    ${GRAPHICS_INCLUDE_DIR}/statistic.h
     ${GRAPHICS_INCLUDE_DIR}/texture.h
     ${GRAPHICS_INCLUDE_DIR}/textureregistry.h
     ${GRAPHICS_INCLUDE_DIR}/textureutil.h

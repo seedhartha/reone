@@ -183,6 +183,7 @@ int Engine::run() {
             _profiler->update(frameTime);
         });
         _profiler->timeRender([this]() {
+            _services->graphics.statistic.resetDrawCalls();
             runMainThreadTasks();
             if (_options.graphics.pbr) {
                 _services->graphics.pbrTextures.refresh();

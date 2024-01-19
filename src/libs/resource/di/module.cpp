@@ -32,7 +32,7 @@ void ResourceModule::init() {
     _gffs = std::make_unique<Gffs>(*_resources);
     _shaders = std::make_unique<Shaders>(_graphicsOpt, _graphics.shaderRegistry(), *_resources);
     _textures = std::make_unique<Textures>(_graphicsOpt, *_resources);
-    _models = std::make_unique<Models>(*_textures, *_resources);
+    _models = std::make_unique<Models>(*_textures, *_resources, _graphics.statistic());
     _walkmeshes = std::make_unique<Walkmeshes>(*_resources);
     _lips = std::make_unique<Lips>(*_resources);
     _fonts = std::make_unique<Fonts>(

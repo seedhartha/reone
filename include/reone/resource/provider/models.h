@@ -23,9 +23,10 @@ namespace reone {
 
 namespace graphics {
 
+class IStatistic;
 class Model;
 
-}
+} // namespace graphics
 
 namespace resource {
 
@@ -42,7 +43,13 @@ public:
 
 class Models : public IModels, boost::noncopyable {
 public:
-    Models(Textures &textures, Resources &resources);
+    Models(Textures &textures,
+           Resources &resources,
+           graphics::IStatistic &statistic) :
+        _textures(textures),
+        _resources(resources),
+        _statistic(statistic) {
+    }
 
     void clear();
 
@@ -51,6 +58,7 @@ public:
 private:
     Textures &_textures;
     Resources &_resources;
+    graphics::IStatistic &_statistic;
 
     std::unordered_map<std::string, std::shared_ptr<graphics::Model>> _cache;
 

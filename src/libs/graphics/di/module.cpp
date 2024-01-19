@@ -23,7 +23,8 @@ namespace graphics {
 
 void GraphicsModule::init() {
     _context = std::make_unique<Context>(_options);
-    _meshRegistry = std::make_unique<MeshRegistry>();
+    _statistic = std::make_unique<Statistic>();
+    _meshRegistry = std::make_unique<MeshRegistry>(*_statistic);
     _shaderRegistry = std::make_unique<ShaderRegistry>();
     _textureRegistry = std::make_unique<TextureRegistry>();
     _uniforms = std::make_unique<Uniforms>(*_context);
@@ -38,6 +39,7 @@ void GraphicsModule::init() {
         *_meshRegistry,
         *_pbrTextures,
         *_shaderRegistry,
+        *_statistic,
         *_textureRegistry,
         *_uniforms);
 
@@ -54,6 +56,7 @@ void GraphicsModule::deinit() {
     _uniforms.reset();
     _meshRegistry.reset();
     _textureRegistry.reset();
+    _statistic.reset();
     _context.reset();
 }
 

@@ -56,7 +56,8 @@ void ModelResourceViewModel::openModel(const ResourceId &id, IInputStream &mdl) 
         throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef.value());
     }
     auto mdx = MemoryInputStream(mdxRes->data);
-    auto reader = MdlMdxReader(mdl, mdx);
+    Statistic statistic;
+    auto reader = MdlMdxReader(mdl, mdx, statistic);
     reader.load();
 
     auto &scene = _sceneSvc.graphs().get(kSceneMain);

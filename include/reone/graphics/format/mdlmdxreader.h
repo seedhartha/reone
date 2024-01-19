@@ -28,14 +28,17 @@ class IInputStream;
 namespace graphics {
 
 class Animation;
+class IStatistic;
 class Model;
 
 class MdlMdxReader : boost::noncopyable {
 public:
     MdlMdxReader(IInputStream &mdl,
-                 IInputStream &mdx) :
+                 IInputStream &mdx,
+                 IStatistic &statistic) :
         _mdl(BinaryReader(mdl)),
-        _mdx(BinaryReader(mdx)) {
+        _mdx(BinaryReader(mdx)),
+        _statistic(statistic) {
 
         initControllerFn();
     }
@@ -64,6 +67,7 @@ private:
 
     BinaryReader _mdl;
     BinaryReader _mdx;
+    IStatistic &_statistic;
 
     std::unordered_map<uint32_t, ControllerFn> _genericControllers;
     std::unordered_map<uint32_t, ControllerFn> _meshControllers;

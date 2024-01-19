@@ -21,6 +21,7 @@
 #include "../meshregistry.h"
 #include "../pbrtextures.h"
 #include "../shaderregistry.h"
+#include "../statistic.h"
 #include "../textureregistry.h"
 #include "../uniforms.h"
 
@@ -43,10 +44,11 @@ public:
 
     Context &context() { return *_context; }
     MeshRegistry &meshRegistry() { return *_meshRegistry; }
+    PBRTextures &pbrTextures() { return *_pbrTextures; }
     ShaderRegistry &shaderRegistry() { return *_shaderRegistry; }
+    Statistic &statistic() { return *_statistic; }
     TextureRegistry &textureRegistry() { return *_textureRegistry; }
     Uniforms &uniforms() { return *_uniforms; }
-    PBRTextures &pbrTextures() { return *_pbrTextures; }
 
     GraphicsServices &services() { return *_services; }
 
@@ -57,6 +59,7 @@ private:
     std::unique_ptr<MeshRegistry> _meshRegistry;
     std::unique_ptr<PBRTextures> _pbrTextures;
     std::unique_ptr<ShaderRegistry> _shaderRegistry;
+    std::unique_ptr<Statistic> _statistic;
     std::unique_ptr<TextureRegistry> _textureRegistry;
     std::unique_ptr<Uniforms> _uniforms;
 

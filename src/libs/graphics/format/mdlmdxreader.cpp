@@ -447,7 +447,11 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         }
     }
 
-    auto mesh = std::make_unique<Mesh>(std::move(vertices), std::move(faces), spec);
+    auto mesh = std::make_unique<Mesh>(
+        std::move(vertices),
+        std::move(faces),
+        spec,
+        _statistic);
 
     ModelNode::UVAnimation uvAnimation;
     if (animateUV) {

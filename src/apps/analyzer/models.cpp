@@ -21,11 +21,11 @@
 #include "reone/graphics/format/mdlmdxreader.h"
 #include "reone/graphics/model.h"
 #include "reone/graphics/options.h"
+#include "reone/graphics/statistic.h"
 #include "reone/resource/provider/models.h"
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
-
 
 using namespace reone;
 using namespace reone::graphics;
@@ -36,7 +36,7 @@ namespace reone {
 template <class T>
 struct MinMaxPair {
     T min {std::numeric_limits<T>::max()};
-    T max {std::numeric_limits<T>::min()};
+    T max {std::numeric_limits<T>::lowest()};
 };
 
 using ControllerType = int;
@@ -133,7 +133,8 @@ static ModelStats analyzeModels(const std::filesystem::path &gameDir) {
                 }
                 auto mdl = MemoryInputStream(*mdlData);
                 auto mdx = MemoryInputStream(*mdxData);
-                auto reader = MdlMdxReader(mdl, mdx);
+                Statistic statistic;
+                auto reader = MdlMdxReader(mdl, mdx, statistic);
                 reader.load();
                 auto model = reader.model();
                 stats.extend(analyzeModel(*model));

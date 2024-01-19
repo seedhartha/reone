@@ -23,6 +23,8 @@ namespace reone {
 
 namespace graphics {
 
+class IStatistic;
+
 class Mesh : boost::noncopyable {
 public:
     struct VertexSpec {
@@ -56,11 +58,13 @@ public:
 
     Mesh(std::vector<float> vertices,
          std::vector<Face> faces,
-         VertexSpec spec) :
+         VertexSpec spec,
+         IStatistic &statistic) :
         _numVertices(vertices.size() / (spec.stride / sizeof(float))),
         _vertices(std::move(vertices)),
         _faces(std::move(faces)),
-        _spec(std::move(spec)) {
+        _spec(std::move(spec)),
+        _statistic(statistic) {
         computeFaceData();
         computeAABB();
     }
@@ -87,6 +91,7 @@ private:
     std::vector<float> _vertices;
     std::vector<Face> _faces;
     VertexSpec _spec;
+    IStatistic &_statistic;
 
     AABB _aabb;
     bool _inited {false};

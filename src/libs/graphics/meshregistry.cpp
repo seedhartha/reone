@@ -19,6 +19,7 @@
 #include "reone/graphics/meshregistry.h"
 
 #include "reone/graphics/mesh.h"
+#include "reone/graphics/statistic.h"
 
 namespace reone {
 
@@ -154,20 +155,27 @@ static const Mesh::VertexSpec g_cubemapSpec {8 * sizeof(float), 0, 3 * sizeof(fl
 
 // END Cubemap
 
-static std::unique_ptr<Mesh> getMesh(std::vector<float> vertices, std::vector<Mesh::Face> faces, Mesh::VertexSpec spec) {
-    return std::make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
+static std::unique_ptr<Mesh> makeMesh(std::vector<float> vertices,
+                                      std::vector<Mesh::Face> faces,
+                                      Mesh::VertexSpec spec,
+                                      Statistic &statistic) {
+    return std::make_unique<Mesh>(
+        std::move(vertices),
+        std::move(faces),
+        std::move(spec),
+        statistic);
 }
 
 void MeshRegistry::init() {
     if (_inited) {
         return;
     }
-    add(MeshName::quad, getMesh(g_quadVertices, g_quadFaces, g_quadSpec));
-    add(MeshName::quadNDC, getMesh(g_quadNDCVertices, g_quadFaces, g_quadSpec));
-    add(MeshName::billboard, getMesh(g_billboardVertices, g_quadFaces, g_quadSpec));
-    add(MeshName::grass, getMesh(g_grassVertices, g_quadFaces, g_quadSpec));
-    add(MeshName::aabb, getMesh(g_aabbVertices, g_aabbFaces, g_aabbSpec));
-    add(MeshName::cubemap, getMesh(g_cubemapVertices, g_cubemapFaces, g_cubemapSpec));
+    add(MeshName::quad, makeMesh(g_quadVertices, g_quadFaces, g_quadSpec, _statistic));
+    add(MeshName::quadNDC, makeMesh(g_quadNDCVertices, g_quadFaces, g_quadSpec, _statistic));
+    add(MeshName::billboard, makeMesh(g_billboardVertices, g_quadFaces, g_quadSpec, _statistic));
+    add(MeshName::grass, makeMesh(g_grassVertices, g_quadFaces, g_quadSpec, _statistic));
+    add(MeshName::aabb, makeMesh(g_aabbVertices, g_aabbFaces, g_aabbSpec, _statistic));
+    add(MeshName::cubemap, makeMesh(g_cubemapVertices, g_cubemapFaces, g_cubemapSpec, _statistic));
     _inited = true;
 }
 

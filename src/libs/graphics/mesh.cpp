@@ -18,6 +18,7 @@
 #include "reone/graphics/mesh.h"
 
 #include "reone/graphics/barycentricutil.h"
+#include "reone/graphics/statistic.h"
 #include "reone/graphics/triangleutil.h"
 #include "reone/system/threadutil.h"
 
@@ -116,7 +117,12 @@ void Mesh::draw() {
         init();
     }
     glBindVertexArray(_vaoId);
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(3 * _faces.size()), GL_UNSIGNED_SHORT, nullptr);
+    glDrawElements(
+        GL_TRIANGLES,
+        static_cast<GLsizei>(3 * _faces.size()),
+        GL_UNSIGNED_SHORT,
+        nullptr);
+    _statistic.incrementDrawCalls();
 }
 
 void Mesh::drawInstanced(int count) {
@@ -124,7 +130,13 @@ void Mesh::drawInstanced(int count) {
         init();
     }
     glBindVertexArray(_vaoId);
-    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(3 * _faces.size()), GL_UNSIGNED_SHORT, nullptr, count);
+    glDrawElementsInstanced(
+        GL_TRIANGLES,
+        static_cast<GLsizei>(3 * _faces.size()),
+        GL_UNSIGNED_SHORT,
+        nullptr,
+        count);
+    _statistic.incrementDrawCalls();
 }
 
 void Mesh::computeFaceData() {

@@ -25,6 +25,7 @@ class IContext;
 class IMeshRegistry;
 class IPBRTextures;
 class IShaderRegistry;
+class IStatistic;
 class ITextureRegistry;
 class IUniforms;
 class IWindow;
@@ -34,6 +35,7 @@ struct GraphicsServices {
     IMeshRegistry &meshRegistry;
     IPBRTextures &pbrTextures;
     IShaderRegistry &shaderRegistry;
+    IStatistic &statistic;
     ITextureRegistry &textureRegistry;
     IUniforms &uniforms;
 
@@ -42,12 +44,14 @@ struct GraphicsServices {
         IMeshRegistry &meshRegistry,
         IPBRTextures &pbrTextures,
         IShaderRegistry &shaderRegistry,
+        IStatistic &statistic,
         ITextureRegistry &textureRegistry,
         IUniforms &uniforms) :
         context(context),
         meshRegistry(meshRegistry),
         pbrTextures(pbrTextures),
         shaderRegistry(shaderRegistry),
+        statistic(statistic),
         textureRegistry(textureRegistry),
         uniforms(uniforms) {
     }

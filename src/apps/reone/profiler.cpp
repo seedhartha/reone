@@ -22,6 +22,7 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
+#include "reone/graphics/statistic.h"
 #include "reone/graphics/textutil.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/di/services.h"
@@ -165,6 +166,7 @@ void Profiler::renderFrameTimes() {
 
 void Profiler::renderText() {
     StringBuilder text;
+    text.append("[Render]\n");
     if (_p99FrameTime > 0.0f) {
         text.append(str(boost::format("p99: %.03f %d") % _p99FrameTime % static_cast<int>(1.0f / _p99FrameTime)));
     } else {
@@ -176,6 +178,8 @@ void Profiler::renderText() {
     } else {
         text.append("p95: 0 inf");
     }
+    text.append("\n");
+    text.append(str(boost::format("%d draw calls") % _graphicsSvc.statistic.numDrawCalls()));
     std::vector<std::string> lines;
     boost::split(lines, text.string(), boost::is_any_of("\n"));
     float y = kTextOffset;

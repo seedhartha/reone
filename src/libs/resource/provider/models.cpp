@@ -31,10 +31,6 @@ namespace reone {
 
 namespace resource {
 
-Models::Models(Textures &textures, Resources &resources) :
-    _textures(textures), _resources(resources) {
-}
-
 void Models::clear() {
     _cache.clear();
 }
@@ -64,7 +60,7 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
     if (mdlRes && mdxRes) {
         auto mdl = MemoryInputStream(mdlRes->data);
         auto mdx = MemoryInputStream(mdxRes->data);
-        auto reader = MdlMdxReader(mdl, mdx);
+        auto reader = MdlMdxReader(mdl, mdx, _statistic);
         try {
             reader.load();
             model = reader.model();

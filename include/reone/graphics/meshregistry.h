@@ -39,8 +39,14 @@ public:
     virtual Mesh &get(const std::string &name) = 0;
 };
 
+class Statistic;
+
 class MeshRegistry : public IMeshRegistry, boost::noncopyable {
 public:
+    MeshRegistry(Statistic &statistic) :
+        _statistic(statistic) {
+    }
+
     ~MeshRegistry() { deinit(); }
 
     void init();
@@ -59,6 +65,8 @@ public:
     }
 
 private:
+    Statistic &_statistic;
+
     bool _inited {false};
 
     std::map<std::string, std::shared_ptr<Mesh>> _nameToMesh;
