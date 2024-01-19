@@ -82,9 +82,6 @@ void main() {
     bool fogEnabled;
     unpackGeometryFeatures(lightmapSample.a, envmapped, shadowsEnabled, fogEnabled);
     environment *= int(envmapped);
-    if (!isFeatureEnabled(FEATURE_FOG)) {
-        fogEnabled = false;
-    }
 
     float shadow = getShadow(eyePos, fragPosWorld, normal, sShadowMap, sShadowMapCube);
     shadow = max(shadow, 1.0 - rgbToLuma(lightmapSample.rgb));

@@ -341,14 +341,12 @@ void SceneGraph::refreshFromNode(SceneNode &node) {
         }
         break;
     }
-    case SceneNodeType::Light: {
+    case SceneNodeType::Light:
         _lights.push_back(static_cast<LightSceneNode *>(&node));
         break;
-    }
-    case SceneNodeType::Emitter: {
+    case SceneNodeType::Emitter:
         _emitters.push_back(static_cast<EmitterSceneNode *>(&node));
         break;
-    }
     default:
         break;
     }
