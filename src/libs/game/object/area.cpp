@@ -225,7 +225,7 @@ void Area::loadGIT(const resource::generated::GIT &git) {
 void Area::loadProperties(const resource::generated::GIT &git) {
     int musicIdx = git.AreaProperties.MusicDay;
     if (musicIdx) {
-        std::shared_ptr<TwoDa> musicTable(_services.resource.twoDas.get("ambientmusic"));
+        std::shared_ptr<TwoDA> musicTable(_services.resource.twoDas.get("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }
@@ -852,7 +852,7 @@ void Area::update3rdPersonCameraTarget() {
     }
     auto cameraHook = model->getNodeByName("camerahook");
     if (cameraHook) {
-        _thirdPersonCamera->setTargetPosition(cameraHook->getOrigin());
+        _thirdPersonCamera->setTargetPosition(cameraHook->origin());
     } else {
         _thirdPersonCamera->setTargetPosition(model->getWorldCenterOfAABB());
     }
@@ -1006,7 +1006,7 @@ void Area::updateObjectSelection() {
     if (!camera) {
         return;
     }
-    auto cameraPos = camera->sceneNode()->getOrigin();
+    auto cameraPos = camera->sceneNode()->origin();
 
     if (_hilightedObject) {
         if (!_hilightedObject->isSelectable()) {

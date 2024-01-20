@@ -85,7 +85,7 @@ void AbilitiesMenu::onGUILoaded() {
 }
 
 void AbilitiesMenu::loadSkills() {
-    std::shared_ptr<TwoDa> skills(_services.resource.twoDas.get("skills"));
+    std::shared_ptr<TwoDA> skills(_services.resource.twoDas.get("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<SkillType>(row);
 

@@ -25,14 +25,14 @@ namespace reone {
 
 namespace resource {
 
-std::shared_ptr<TwoDa> TwoDas::get(const std::string &resRef) {
+std::shared_ptr<TwoDA> TwoDAs::get(const std::string &resRef) {
     return _cache.getOrAdd(resRef, [this, &resRef]() {
-        auto res = _resources.find(ResourceId(resRef, ResType::TwoDa));
+        auto res = _resources.find(ResourceId(resRef, ResType::TwoDA));
         if (!res) {
-            return std::shared_ptr<TwoDa>();
+            return std::shared_ptr<TwoDA>();
         }
         MemoryInputStream stream(res->data);
-        TwoDaReader reader(stream);
+        TwoDAReader reader(stream);
         reader.load();
         return reader.twoDa();
     });

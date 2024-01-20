@@ -20,6 +20,7 @@
 #include "reone/audio/di/module.h"
 #include "reone/game/di/module.h"
 #include "reone/game/game.h"
+#include "reone/game/neo/game.h"
 #include "reone/graphics/di/module.h"
 #include "reone/graphics/window.h"
 #include "reone/gui/di/module.h"
@@ -79,6 +80,7 @@ private:
 
     std::unique_ptr<game::ServicesView> _services;
     std::unique_ptr<game::Game> _game;
+    std::unique_ptr<game::neo::Game> _neoGame;
     std::unique_ptr<Profiler> _profiler;
 
     std::atomic_bool _quit {false};

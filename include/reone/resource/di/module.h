@@ -91,7 +91,7 @@ public:
     Gffs &gffs() { return *_gffs; }
     Resources &resources() { return *_resources; }
     Strings &strings() { return *_strings; }
-    TwoDas &twoDas() { return *_twoDas; }
+    TwoDAs &twoDas() { return *_twoDas; }
     Scripts &scripts() { return *_scripts; }
     Movies &movies() { return *_movies; }
     AudioClips &audioClips() { return *_audioClips; }
@@ -127,7 +127,7 @@ private:
     std::unique_ptr<Gffs> _gffs;
     std::unique_ptr<Resources> _resources;
     std::unique_ptr<Strings> _strings;
-    std::unique_ptr<TwoDas> _twoDas;
+    std::unique_ptr<TwoDAs> _twoDas;
     std::unique_ptr<Scripts> _scripts;
     std::unique_ptr<Movies> _movies;
     std::unique_ptr<AudioClips> _audioClips;

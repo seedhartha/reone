@@ -21,15 +21,15 @@ namespace reone {
 
 namespace resource {
 
-class TwoDaReader;
+class TwoDAReader;
 
-class TwoDa : boost::noncopyable {
+class TwoDA : boost::noncopyable {
 public:
     struct Row {
         std::vector<std::string> values;
     };
 
-    TwoDa(std::vector<std::string> columns, std::vector<Row> rows) :
+    TwoDA(std::vector<std::string> columns, std::vector<Row> rows) :
         _columns(std::move(columns)),
         _rows(std::move(rows)) {
     }

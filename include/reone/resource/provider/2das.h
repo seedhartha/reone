@@ -27,18 +27,18 @@ namespace resource {
 
 class Resources;
 
-class ITwoDas {
+class ITwoDAs {
 public:
-    virtual ~ITwoDas() = default;
+    virtual ~ITwoDAs() = default;
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<TwoDa> get(const std::string &key) = 0;
+    virtual std::shared_ptr<TwoDA> get(const std::string &key) = 0;
 };
 
-class TwoDas : public ITwoDas, boost::noncopyable {
+class TwoDAs : public ITwoDAs, boost::noncopyable {
 public:
-    TwoDas(Resources &resources) :
+    TwoDAs(Resources &resources) :
         _resources(resources) {
     }
 
@@ -46,12 +46,12 @@ public:
         _cache.clear();
     }
 
-    std::shared_ptr<TwoDa> get(const std::string &key) override;
+    std::shared_ptr<TwoDA> get(const std::string &key) override;
 
 private:
     Resources &_resources;
 
-    Cache<std::string, TwoDa> _cache;
+    Cache<std::string, TwoDA> _cache;
 };
 
 } // namespace resource

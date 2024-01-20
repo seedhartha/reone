@@ -29,9 +29,9 @@ namespace reone {
 
 namespace game {
 
-static const char kSkillsTwoDaResRef[] = "skills";
+static const char kSkillsTwoDAResRef[] = "skills";
 
-void CreatureClass::load(const TwoDa &twoDa, int row) {
+void CreatureClass::load(const TwoDA &twoDa, int row) {
     _name = _strings.getText(twoDa.getInt(row, "name"));
     _description = _strings.getText(twoDa.getInt(row, "description"));
     _hitdie = twoDa.getInt(row, "hitdie");
@@ -56,7 +56,7 @@ void CreatureClass::load(const TwoDa &twoDa, int row) {
 }
 
 void CreatureClass::loadClassSkills(const std::string &skillsTable) {
-    std::shared_ptr<TwoDa> skills(_twoDas.get(kSkillsTwoDaResRef));
+    std::shared_ptr<TwoDA> skills(_twoDas.get(kSkillsTwoDAResRef));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         if (skills->getInt(row, skillsTable + "_class") == 1) {
             _classSkills.insert(static_cast<SkillType>(row));
@@ -65,7 +65,7 @@ void CreatureClass::loadClassSkills(const std::string &skillsTable) {
 }
 
 void CreatureClass::loadSavingThrows(const std::string &savingThrowTable) {
-    std::shared_ptr<TwoDa> twoDa(_twoDas.get(savingThrowTable));
+    std::shared_ptr<TwoDA> twoDa(_twoDas.get(savingThrowTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         int level = twoDa->getInt(row, "level");
 
@@ -79,7 +79,7 @@ void CreatureClass::loadSavingThrows(const std::string &savingThrowTable) {
 }
 
 void CreatureClass::loadAttackBonuses(const std::string &attackBonusTable) {
-    std::shared_ptr<TwoDa> twoDa(_twoDas.get(attackBonusTable));
+    std::shared_ptr<TwoDA> twoDa(_twoDas.get(attackBonusTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         _attackBonuses.push_back(twoDa->getInt(row, "bab"));
     }

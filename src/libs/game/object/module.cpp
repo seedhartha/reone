@@ -286,7 +286,7 @@ std::vector<ContextAction> Module::getContextActions(const std::shared_ptr<Objec
         auto creature = std::static_pointer_cast<Creature>(object);
         if (!creature->isDead() && _services.game.reputes.getIsEnemy(*leader, *creature)) {
             actions.push_back(ContextAction(ActionType::AttackObject));
-            auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
+            auto weapon = leader->getEquippedItem(InventorySlots::rightWeapon);
             if (weapon && weapon->isRanged()) {
                 if (leader->attributes().hasFeat(FeatType::MasterPowerBlast)) {
                     actions.push_back(ContextAction(FeatType::MasterPowerBlast));

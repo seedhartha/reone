@@ -26,15 +26,15 @@ namespace reone {
 
 namespace resource {
 
-class TwoDaReader : boost::noncopyable {
+class TwoDAReader : boost::noncopyable {
 public:
-    TwoDaReader(IInputStream &stream) :
+    TwoDAReader(IInputStream &stream) :
         _reader(BinaryReader(stream)) {
     }
 
     void load();
 
-    const std::shared_ptr<TwoDa> &twoDa() const { return _twoDa; }
+    const std::shared_ptr<TwoDA> &twoDa() const { return _twoDa; }
 
 private:
     BinaryReader _reader;
@@ -43,9 +43,9 @@ private:
     int _dataSize {0};
 
     std::vector<std::string> _columns;
-    std::vector<TwoDa::Row> _rows;
+    std::vector<TwoDA::Row> _rows;
 
-    std::shared_ptr<TwoDa> _twoDa;
+    std::shared_ptr<TwoDA> _twoDa;
 
     void loadRows();
     void loadTable();

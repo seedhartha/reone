@@ -123,7 +123,7 @@ void Item::loadUTI(const resource::generated::UTI &uti) {
     _textureVariation = uti.TextureVar;
     _bodyVariation = uti.BodyVariation;
 
-    std::shared_ptr<TwoDa> baseItems(_services.resource.twoDas.get("baseitems"));
+    std::shared_ptr<TwoDA> baseItems(_services.resource.twoDas.get("baseitems"));
     _attackRange = baseItems->getInt(_baseItem, "maxattackrange");
     _criticalHitMultiplier = baseItems->getInt(_baseItem, "crithitmult");
     _criticalThreat = baseItems->getInt(_baseItem, "critthreat");
@@ -136,10 +136,10 @@ void Item::loadUTI(const resource::generated::UTI &uti) {
     _weaponWield = static_cast<WeaponWield>(baseItems->getInt(_baseItem, "weaponwield"));
 
     std::string iconResRef;
-    if (isEquippable(InventorySlot::body)) {
+    if (isEquippable(InventorySlots::body)) {
         _baseBodyVariation = boost::to_lower_copy(baseItems->getString(_baseItem, "bodyvar"));
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _textureVariation);
-    } else if (isEquippable(InventorySlot::rightWeapon)) {
+    } else if (isEquippable(InventorySlots::rightWeapon)) {
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
     } else {
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
@@ -157,11 +157,11 @@ void Item::loadUTI(const resource::generated::UTI &uti) {
 }
 
 void Item::loadAmmunitionType() {
-    std::shared_ptr<TwoDa> baseItems(_services.resource.twoDas.get("baseitems"));
+    std::shared_ptr<TwoDA> baseItems(_services.resource.twoDas.get("baseitems"));
 
     int ammunitionIdx = baseItems->getInt(_baseItem, "ammunitiontype", -1);
     if (ammunitionIdx != -1) {
-        std::shared_ptr<TwoDa> twoDa(_services.resource.twoDas.get("ammunitiontypes"));
+        std::shared_ptr<TwoDA> twoDa(_services.resource.twoDas.get("ammunitiontypes"));
         _ammunitionType = std::make_shared<Item::AmmunitionType>();
         _ammunitionType->model = _services.resource.models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
         _ammunitionType->shotSound1 = _services.resource.audioClips.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));

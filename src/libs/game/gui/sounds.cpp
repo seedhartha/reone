@@ -29,7 +29,7 @@ namespace reone {
 namespace game {
 
 void GUISounds::init() {
-    std::shared_ptr<TwoDa> sounds(_twoDas.get("guisounds"));
+    std::shared_ptr<TwoDA> sounds(_twoDas.get("guisounds"));
     if (!sounds) {
         return;
     }
@@ -37,7 +37,7 @@ void GUISounds::init() {
     loadSound(*sounds, "Entered_Default", _onEnter);
 }
 
-void GUISounds::loadSound(const TwoDa &twoDa, const std::string &label, std::shared_ptr<AudioClip> &sound) {
+void GUISounds::loadSound(const TwoDA &twoDa, const std::string &label, std::shared_ptr<AudioClip> &sound) {
     int row = twoDa.indexByCellValue("label", label);
     if (row != -1) {
         sound = _audioClips.get(twoDa.getString(row, "soundresref"));

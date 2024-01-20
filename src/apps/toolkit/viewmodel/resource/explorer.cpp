@@ -166,8 +166,8 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         page->viewModel = std::make_shared<TextResourceViewModel>(std::move(text));
         _pages.add(std::move(page));
 
-    } else if (id.type == ResType::TwoDa) {
-        auto reader = TwoDaReader(data);
+    } else if (id.type == ResType::TwoDA) {
+        auto reader = TwoDAReader(data);
         reader.load();
         auto twoDa = reader.twoDa();
 
@@ -333,7 +333,7 @@ PageType ResourceExplorerViewModel::getPageType(ResType type) const {
         return PageType::GFF;
     }
     switch (type) {
-    case ResType::TwoDa:
+    case ResType::TwoDA:
     case ResType::Tlk:
     case ResType::Lip:
     case ResType::Ssf:
@@ -708,17 +708,17 @@ void ResourceExplorerViewModel::saveFile(Page &page, const std::filesystem::path
         auto &viewModel = *std::static_pointer_cast<TableResourceViewModel>(page.viewModel);
         auto &table = viewModel.content();
         switch (page.resourceId.type) {
-        case ResType::TwoDa: {
+        case ResType::TwoDA: {
             std::vector<std::string> columns;
-            std::vector<TwoDa::Row> rows;
+            std::vector<TwoDA::Row> rows;
             for (const auto &column : table.columns) {
                 columns.emplace_back(column.name);
             }
             for (const auto &row : table.rows) {
                 rows.push_back({row});
             }
-            TwoDa twoDa {std::move(columns), std::move(rows)};
-            TwoDaWriter writer {twoDa};
+            TwoDA twoDa {std::move(columns), std::move(rows)};
+            TwoDAWriter writer {twoDa};
             FileOutputStream stream {destPath};
             writer.save(stream);
             break;

@@ -374,7 +374,7 @@ void SceneGraph::prepareOpaqueLeafs() {
                 continue;
             }
             auto cluster = static_cast<GrassClusterSceneNode *>(child);
-            if (!camera->isInFrustum(cluster->getOrigin())) {
+            if (!camera->isInFrustum(cluster->origin())) {
                 continue;
             }
             if (bucket.size() >= kMaxGrassClusters) {
@@ -406,7 +406,7 @@ void SceneGraph::prepareTransparentLeafs() {
                 continue;
             }
             auto particle = static_cast<ParticleSceneNode *>(child);
-            if (!camera->isInFrustum(particle->getOrigin())) {
+            if (!camera->isInFrustum(particle->origin())) {
                 continue;
             }
             leafs.push_back(particle);
@@ -450,8 +450,9 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
     auto &pipeline = *_renderPipeline;
     pipeline.reset();
 
-    auto camera = this->camera();
-    if (camera) {
+    auto cameraNode = this->camera();
+    if (cameraNode) {
+        auto camera = cameraNode->get().camera();
         _graphicsSvc.uniforms.setGlobals([this, &camera](auto &globals) {
             globals.projection = camera->projection();
             globals.projectionInv = glm::inverse(globals.projection);
@@ -464,7 +465,7 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
             globals.numLights = static_cast<int>(_activeLights.size());
             for (size_t i = 0; i < _activeLights.size(); ++i) {
                 auto &light = globals.lights[i];
-                light.position = glm::vec4(_activeLights[i]->getOrigin(), _activeLights[i]->isDirectional() ? 0.0f : 1.0f);
+                light.position = glm::vec4(_activeLights[i]->origin(), _activeLights[i]->isDirectional() ? 0.0f : 1.0f);
                 light.color = glm::vec4(_activeLights[i]->color(), 1.0f);
                 light.multiplier = _activeLights[i]->multiplier() * _activeLights[i]->strength();
                 light.radius = _activeLights[i]->radius();
@@ -596,7 +597,7 @@ void SceneGraph::renderLensFlares(IRenderPass &pass) {
     _graphicsSvc.context.withDepthTestMode(DepthTestMode::None, [this, &pass]() {
         for (auto &light : _flareLights) {
             Collision collision;
-            if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
+            if (testLineOfSight(_activeCamera->origin(), light->origin(), collision)) {
                 continue;
             }
             light->renderLensFlare(pass, light->modelNode().light()->flares.front());
@@ -694,7 +695,7 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
 
 void SceneGraph::computeLightSpaceMatrices() {
     if (isShadowLightDirectional()) {
-        auto camera = std::static_pointer_cast<PerspectiveCamera>(this->camera());
+        auto camera = std::static_pointer_cast<PerspectiveCamera>(this->camera()->get().camera());
         auto lightDir = glm::normalize(camera->position() - shadowLightPosition());
         float fovy = camera->fovy();
         float aspect = camera->aspect();

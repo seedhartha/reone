@@ -189,6 +189,9 @@ void ResourceDirector::loadModuleResources(const std::string &name) {
     if (modPath) {
         resources.addERF(*modPath, true);
     }
+    if (!rimPath && !rimsPath && !modPath) {
+        throw ResourceNotFoundException("Module archives not found: " + name);
+    }
 
     auto lipsPath = findFileIgnoreCase(_gamePath, kLipsDirectoryName);
     if (lipsPath) {

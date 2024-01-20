@@ -149,27 +149,27 @@ void Equipment::configureItemsListBox() {
 static int getInventorySlot(Equipment::Slot slot) {
     switch (slot) {
     case Equipment::Slot::Implant:
-        return InventorySlot::implant;
+        return InventorySlots::implant;
     case Equipment::Slot::Head:
-        return InventorySlot::head;
+        return InventorySlots::head;
     case Equipment::Slot::Hands:
-        return InventorySlot::hands;
+        return InventorySlots::hands;
     case Equipment::Slot::ArmL:
-        return InventorySlot::leftArm;
+        return InventorySlots::leftArm;
     case Equipment::Slot::Body:
-        return InventorySlot::body;
+        return InventorySlots::body;
     case Equipment::Slot::ArmR:
-        return InventorySlot::rightArm;
+        return InventorySlots::rightArm;
     case Equipment::Slot::WeapL:
-        return InventorySlot::leftWeapon;
+        return InventorySlots::leftWeapon;
     case Equipment::Slot::Belt:
-        return InventorySlot::belt;
+        return InventorySlots::belt;
     case Equipment::Slot::WeapR:
-        return InventorySlot::rightWeapon;
+        return InventorySlots::rightWeapon;
     case Equipment::Slot::WeapL2:
-        return InventorySlot::leftWeapon2;
+        return InventorySlots::leftWeapon2;
     case Equipment::Slot::WeapR2:
-        return InventorySlot::rightWeapon2;
+        return InventorySlots::rightWeapon2;
     default:
         throw std::invalid_argument("Equipment: invalid slot: " + std::to_string(static_cast<int>(slot)));
     }

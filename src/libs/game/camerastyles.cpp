@@ -27,7 +27,7 @@ namespace reone {
 namespace game {
 
 void CameraStyles::init() {
-    std::shared_ptr<TwoDa> twoDa(_twoDas.get("camerastyle"));
+    std::shared_ptr<TwoDA> twoDa(_twoDas.get("camerastyle"));
     if (!twoDa) {
         return;
     }

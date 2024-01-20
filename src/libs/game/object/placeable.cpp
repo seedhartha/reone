@@ -56,7 +56,7 @@ void Placeable::loadFromBlueprint(const std::string &resRef) {
     }
     auto utpParsed = resource::generated::parseUTP(*utp);
     loadUTP(utpParsed);
-    std::shared_ptr<TwoDa> placeables(_services.resource.twoDas.get("placeables"));
+    std::shared_ptr<TwoDA> placeables(_services.resource.twoDas.get("placeables"));
     std::string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
     auto model = _services.resource.models.get(modelName);

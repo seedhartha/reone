@@ -23,7 +23,7 @@ namespace reone {
 
 namespace resource {
 
-class TwoDas;
+class TwoDAs;
 
 }
 
@@ -45,7 +45,7 @@ public:
 
 class Surfaces : public ISurfaces, boost::noncopyable {
 public:
-    Surfaces(resource::TwoDas &twoDas) :
+    Surfaces(resource::TwoDAs &twoDas) :
         _twoDas(twoDas) {
     }
 
@@ -61,7 +61,7 @@ public:
     std::set<uint32_t> getLineOfSightSurfaces() const override;
 
 private:
-    resource::TwoDas &_twoDas;
+    resource::TwoDAs &_twoDas;
 
     std::vector<Surface> _surfaces;
 

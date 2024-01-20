@@ -95,7 +95,7 @@ void Creature::loadFromBlueprint(const std::string &resRef) {
 }
 
 void Creature::loadAppearance() {
-    std::shared_ptr<TwoDa> appearances(_services.resource.twoDas.get("appearance"));
+    std::shared_ptr<TwoDA> appearances(_services.resource.twoDas.get("appearance"));
     if (!appearances) {
         throw ResourceNotFoundException("appearance 2DA not found");
     }
@@ -313,10 +313,10 @@ bool Creature::equip(const std::string &resRef) {
 
     bool equipped = false;
 
-    if (item->isEquippable(InventorySlot::body)) {
-        equipped = equip(InventorySlot::body, item);
-    } else if (item->isEquippable(InventorySlot::rightWeapon)) {
-        equipped = equip(InventorySlot::rightWeapon, item);
+    if (item->isEquippable(InventorySlots::body)) {
+        equipped = equip(InventorySlots::body, item);
+    } else if (item->isEquippable(InventorySlots::rightWeapon)) {
+        equipped = equip(InventorySlots::rightWeapon, item);
     }
 
     return equipped;
@@ -333,7 +333,7 @@ bool Creature::equip(int slot, const std::shared_ptr<Item> &item) {
     if (_sceneNode) {
         updateModel();
 
-        if (slot == InventorySlot::rightWeapon) {
+        if (slot == InventorySlots::rightWeapon) {
             auto model = std::static_pointer_cast<ModelSceneNode>(_sceneNode);
             auto weapon = static_cast<ModelSceneNode *>(model->getAttachment("rhand"));
             if (weapon && weapon->model().classification() == MdlClassification::lightsaber) {
@@ -424,17 +424,17 @@ glm::vec3 Creature::getSelectablePosition() const {
     auto headModel = static_cast<ModelSceneNode *>(model->getAttachment(g_headHookNode));
     if (headModel) {
         auto talkDummy = headModel->getNodeByName(g_talkDummyNode);
-        return talkDummy ? talkDummy->getOrigin() : headModel->getWorldCenterOfAABB();
+        return talkDummy ? talkDummy->origin() : headModel->getWorldCenterOfAABB();
     } else {
         auto talkDummy = model->getNodeByName(g_talkDummyNode);
-        return talkDummy ? talkDummy->getOrigin() : model->getWorldCenterOfAABB();
+        return talkDummy ? talkDummy->origin() : model->getWorldCenterOfAABB();
     }
 }
 
 float Creature::getAttackRange() const {
     float result = kDefaultAttackRange;
 
-    std::shared_ptr<Item> item(getEquippedItem(InventorySlot::rightWeapon));
+    std::shared_ptr<Item> item(getEquippedItem(InventorySlots::rightWeapon));
     if (item && item->attackRange() > kDefaultAttackRange) {
         result = item->attackRange();
     }
@@ -506,8 +506,8 @@ void Creature::runDeathScript() {
 }
 
 CreatureWieldType Creature::getWieldType() const {
-    auto rightWeapon = getEquippedItem(InventorySlot::rightWeapon);
-    auto leftWeapon = getEquippedItem(InventorySlot::leftWeapon);
+    auto rightWeapon = getEquippedItem(InventorySlots::rightWeapon);
+    auto leftWeapon = getEquippedItem(InventorySlots::leftWeapon);
 
     if (rightWeapon && leftWeapon) {
         return (rightWeapon->weaponWield() == WeaponWield::BlasterPistol) ? CreatureWieldType::DualPistols : CreatureWieldType::DualSwords;
@@ -593,7 +593,7 @@ void Creature::deactivateCombat(float delay) {
 }
 
 bool Creature::isTwoWeaponFighting() const {
-    return static_cast<bool>(getEquippedItem(InventorySlot::leftWeapon));
+    return static_cast<bool>(getEquippedItem(InventorySlots::leftWeapon));
 }
 
 std::shared_ptr<Object> Creature::getAttemptedAttackTarget() const {
@@ -613,8 +613,8 @@ std::shared_ptr<Object> Creature::getAttemptedAttackTarget() const {
 }
 
 int Creature::getAttackBonus(bool offHand) const {
-    auto rightWeapon(getEquippedItem(InventorySlot::rightWeapon));
-    auto leftWeapon(getEquippedItem(InventorySlot::leftWeapon));
+    auto rightWeapon(getEquippedItem(InventorySlots::rightWeapon));
+    auto leftWeapon(getEquippedItem(InventorySlots::leftWeapon));
     auto &weapon = offHand ? leftWeapon : rightWeapon;
 
     int modifier;
@@ -640,7 +640,7 @@ int Creature::getDefense() const {
 }
 
 void Creature::getMainHandDamage(int &min, int &max) const {
-    getWeaponDamage(InventorySlot::rightWeapon, min, max);
+    getWeaponDamage(InventorySlots::rightWeapon, min, max);
 }
 
 void Creature::getWeaponDamage(int slot, int &min, int &max) const {
@@ -665,7 +665,7 @@ void Creature::getWeaponDamage(int slot, int &min, int &max) const {
 }
 
 void Creature::getOffhandDamage(int &min, int &max) const {
-    getWeaponDamage(InventorySlot::leftWeapon, min, max);
+    getWeaponDamage(InventorySlots::leftWeapon, min, max);
 }
 
 void Creature::onEventSignalled(const std::string &name) {
@@ -942,7 +942,7 @@ std::string Creature::getPauseAnimation() const {
 }
 
 bool Creature::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
-    std::shared_ptr<Item> item(getEquippedItem(InventorySlot::rightWeapon));
+    std::shared_ptr<Item> item(getEquippedItem(InventorySlots::rightWeapon));
     if (item) {
         type = item->weaponType();
         wield = item->weaponWield();
@@ -957,11 +957,11 @@ int Creature::getWeaponWieldNumber(WeaponWield wield) const {
     case WeaponWield::StunBaton:
         return 1;
     case WeaponWield::SingleSword:
-        return isSlotEquipped(InventorySlot::leftWeapon) ? 4 : 2;
+        return isSlotEquipped(InventorySlots::leftWeapon) ? 4 : 2;
     case WeaponWield::DoubleBladedSword:
         return 3;
     case WeaponWield::BlasterPistol:
-        return isSlotEquipped(InventorySlot::leftWeapon) ? 6 : 5;
+        return isSlotEquipped(InventorySlots::leftWeapon) ? 6 : 5;
     case WeaponWield::BlasterRifle:
         return 7;
     case WeaponWield::HeavyWeapon:
@@ -988,7 +988,7 @@ std::string Creature::getRunAnimation() const {
 
         switch (wield) {
         case WeaponWield::SingleSword:
-            return isSlotEquipped(InventorySlot::leftWeapon) ? "runds" : "runss";
+            return isSlotEquipped(InventorySlots::leftWeapon) ? "runds" : "runss";
         case WeaponWield::DoubleBladedSword:
             return "runst";
         case WeaponWield::BlasterRifle:
@@ -1114,7 +1114,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     // Right weapon
 
-    std::string rightWeaponModelName(getWeaponModelName(InventorySlot::rightWeapon));
+    std::string rightWeaponModelName(getWeaponModelName(InventorySlots::rightWeapon));
     if (!rightWeaponModelName.empty()) {
         std::shared_ptr<Model> weaponModel(_services.resource.models.get(rightWeaponModelName));
         if (weaponModel) {
@@ -1125,7 +1125,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     // Left weapon
 
-    std::string leftWeaponModelName(getWeaponModelName(InventorySlot::leftWeapon));
+    std::string leftWeaponModelName(getWeaponModelName(InventorySlots::leftWeapon));
     if (!leftWeaponModelName.empty()) {
         std::shared_ptr<Model> weaponModel(_services.resource.models.get(leftWeaponModelName));
         if (weaponModel) {
@@ -1141,7 +1141,7 @@ std::string Creature::getBodyModelName() const {
     if (_modelType == Creature::ModelType::Character) {
         column = "model";
 
-        std::shared_ptr<Item> bodyItem(getEquippedItem(InventorySlot::body));
+        std::shared_ptr<Item> bodyItem(getEquippedItem(InventorySlots::body));
         if (bodyItem) {
             std::string baseBodyVar(bodyItem->baseBodyVariation());
             column += baseBodyVar;
@@ -1153,7 +1153,7 @@ std::string Creature::getBodyModelName() const {
         column = "race";
     }
 
-    std::shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
+    std::shared_ptr<TwoDA> appearance(_services.resource.twoDas.get("appearance"));
     if (!appearance) {
         throw ResourceNotFoundException("appearance 2DA not found");
     }
@@ -1166,7 +1166,7 @@ std::string Creature::getBodyModelName() const {
 
 std::string Creature::getBodyTextureName() const {
     std::string column;
-    std::shared_ptr<Item> bodyItem(getEquippedItem(InventorySlot::body));
+    std::shared_ptr<Item> bodyItem(getEquippedItem(InventorySlots::body));
 
     if (_modelType == Creature::ModelType::Character) {
         column = "tex";
@@ -1181,7 +1181,7 @@ std::string Creature::getBodyTextureName() const {
         column = "racetex";
     }
 
-    std::shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
+    std::shared_ptr<TwoDA> appearance(_services.resource.twoDas.get("appearance"));
     if (!appearance) {
         throw ResourceNotFoundException("appearance 2DA not found");
     }
@@ -1212,7 +1212,7 @@ std::string Creature::getHeadModelName() const {
     if (_modelType != Creature::ModelType::Character) {
         return "";
     }
-    std::shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
+    std::shared_ptr<TwoDA> appearance(_services.resource.twoDas.get("appearance"));
     if (!appearance) {
         throw ResourceNotFoundException("appearance 2DA not found");
     }
@@ -1220,7 +1220,7 @@ std::string Creature::getHeadModelName() const {
     if (headIdx == -1) {
         return "";
     }
-    std::shared_ptr<TwoDa> heads(_services.resource.twoDas.get("heads"));
+    std::shared_ptr<TwoDA> heads(_services.resource.twoDas.get("heads"));
     if (!heads) {
         throw ResourceNotFoundException("heads 2DA not found");
     }
@@ -1232,7 +1232,7 @@ std::string Creature::getHeadModelName() const {
 }
 
 std::string Creature::getMaskModelName() const {
-    std::shared_ptr<Item> headItem(getEquippedItem(InventorySlot::head));
+    std::shared_ptr<Item> headItem(getEquippedItem(InventorySlots::head));
     if (!headItem)
         return "";
 
@@ -1344,7 +1344,7 @@ void Creature::loadSoundSetFromUTC(const resource::generated::UTC &utc) {
     if (soundSetIdx == 0xffff) {
         return;
     }
-    std::shared_ptr<TwoDa> soundSetTable(_services.resource.twoDas.get("soundset"));
+    std::shared_ptr<TwoDA> soundSetTable(_services.resource.twoDas.get("soundset"));
     if (!soundSetTable) {
         return;
     }
@@ -1355,7 +1355,7 @@ void Creature::loadSoundSetFromUTC(const resource::generated::UTC &utc) {
 }
 
 void Creature::loadBodyBagFromUTC(const resource::generated::UTC &utc) {
-    std::shared_ptr<TwoDa> bodyBags(_services.resource.twoDas.get("bodybag"));
+    std::shared_ptr<TwoDA> bodyBags(_services.resource.twoDas.get("bodybag"));
     if (!bodyBags) {
         return;
     }
@@ -1396,7 +1396,7 @@ void Creature::loadAttributesFromUTC(const resource::generated::UTC &utc) {
 }
 
 void Creature::loadPerceptionRangeFromUTC(const resource::generated::UTC &utc) {
-    std::shared_ptr<TwoDa> ranges(_services.resource.twoDas.get("ranges"));
+    std::shared_ptr<TwoDA> ranges(_services.resource.twoDas.get("ranges"));
     if (!ranges) {
         return;
     }

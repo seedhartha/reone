@@ -27,12 +27,12 @@ namespace resource {
 
 static const char kSignature[] = "2DA V2.b";
 
-void TwoDaWriter::save(const std::filesystem::path &path) {
+void TwoDAWriter::save(const std::filesystem::path &path) {
     auto out = FileOutputStream(path);
     save(out);
 }
 
-void TwoDaWriter::save(IOutputStream &out) {
+void TwoDAWriter::save(IOutputStream &out) {
     _writer = std::make_unique<BinaryWriter>(out);
     _writer->writeString(kSignature);
     _writer->writeChar('\n');
@@ -45,7 +45,7 @@ void TwoDaWriter::save(IOutputStream &out) {
     writeData();
 }
 
-void TwoDaWriter::writeHeaders() {
+void TwoDAWriter::writeHeaders() {
     for (auto &column : _twoDa.columns()) {
         _writer->writeString(column);
         _writer->writeChar('\t');
@@ -53,14 +53,14 @@ void TwoDaWriter::writeHeaders() {
     _writer->writeChar('\0');
 }
 
-void TwoDaWriter::writeLabels() {
+void TwoDAWriter::writeLabels() {
     for (int i = 0; i < _twoDa.getRowCount(); ++i) {
         _writer->writeString(std::to_string(i));
         _writer->writeChar('\t');
     }
 }
 
-void TwoDaWriter::writeData() {
+void TwoDAWriter::writeData() {
     std::vector<std::pair<std::string, int>> data;
     int dataSize = 0;
 

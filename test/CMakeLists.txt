@@ -30,6 +30,7 @@ set(TESTS_HEADERS
     ${TESTS_SOURCE_DIR}/fixtures/graphics.h
     ${TESTS_SOURCE_DIR}/fixtures/gui.h
     ${TESTS_SOURCE_DIR}/fixtures/movie.h
+    ${TESTS_SOURCE_DIR}/fixtures/neogame.h
     ${TESTS_SOURCE_DIR}/fixtures/resource.h
     ${TESTS_SOURCE_DIR}/fixtures/scene.h
     ${TESTS_SOURCE_DIR}/fixtures/script.h
@@ -38,6 +39,10 @@ set(TESTS_HEADERS
 set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/audio/format/wavreader.cpp
     ${TESTS_SOURCE_DIR}/game/pathfinder.cpp
+    ${TESTS_SOURCE_DIR}/game/neo/game.cpp
+    ${TESTS_SOURCE_DIR}/game/neo/object.cpp
+    ${TESTS_SOURCE_DIR}/game/neo/object/area.cpp
+    ${TESTS_SOURCE_DIR}/game/neo/object/module.cpp
     ${TESTS_SOURCE_DIR}/graphics/aabb.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/bwmreader.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/mdlmdxreader.cpp

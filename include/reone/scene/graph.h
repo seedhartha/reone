@@ -91,6 +91,7 @@ public:
     virtual ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const = 0;
 
     virtual const std::string &name() const = 0;
+    virtual std::optional<std::reference_wrapper<CameraSceneNode>> camera() = 0;
 
     virtual void setAmbientLightColor(glm::vec3 color) = 0;
     virtual void setFog(FogProperties fog) = 0;
@@ -149,12 +150,11 @@ public:
         return _name;
     }
 
-    CameraSceneNode *activeCamera() const {
-        return _activeCamera;
-    }
-
-    std::shared_ptr<graphics::Camera> camera() const {
-        return _activeCamera ? _activeCamera->camera() : nullptr;
+    std::optional<std::reference_wrapper<CameraSceneNode>> camera() override {
+        if (!_activeCamera) {
+            return std::nullopt;
+        }
+        return *_activeCamera;
     }
 
     void setActiveCamera(CameraSceneNode *camera) override { _activeCamera = camera; }
@@ -219,7 +219,7 @@ public:
     bool hasShadowLight() const { return _shadowLight; }
     bool isShadowLightDirectional() const { return _shadowLight->isDirectional(); }
 
-    glm::vec3 shadowLightPosition() const { return _shadowLight->getOrigin(); }
+    glm::vec3 shadowLightPosition() const { return _shadowLight->origin(); }
     float shadowStrength() const { return _shadowStrength; }
     float shadowRadius() const { return _shadowLight->radius(); }
 

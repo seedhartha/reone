@@ -279,6 +279,23 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/selectoverlay.h
     ${GAME_INCLUDE_DIR}/gui/sounds.h
     ${GAME_INCLUDE_DIR}/location.h
+    ${GAME_INCLUDE_DIR}/neo/action.h
+    ${GAME_INCLUDE_DIR}/neo/effect.h
+    ${GAME_INCLUDE_DIR}/neo/game.h
+    ${GAME_INCLUDE_DIR}/neo/inventory.h
+    ${GAME_INCLUDE_DIR}/neo/object.h
+    ${GAME_INCLUDE_DIR}/neo/object/area.h
+    ${GAME_INCLUDE_DIR}/neo/object/camera.h
+    ${GAME_INCLUDE_DIR}/neo/object/creature.h
+    ${GAME_INCLUDE_DIR}/neo/object/door.h
+    ${GAME_INCLUDE_DIR}/neo/object/encounter.h
+    ${GAME_INCLUDE_DIR}/neo/object/item.h
+    ${GAME_INCLUDE_DIR}/neo/object/module.h
+    ${GAME_INCLUDE_DIR}/neo/object/placeable.h
+    ${GAME_INCLUDE_DIR}/neo/object/sound.h
+    ${GAME_INCLUDE_DIR}/neo/object/store.h
+    ${GAME_INCLUDE_DIR}/neo/object/trigger.h
+    ${GAME_INCLUDE_DIR}/neo/object/waypoint.h
     ${GAME_INCLUDE_DIR}/object.h
     ${GAME_INCLUDE_DIR}/object/area.h
     ${GAME_INCLUDE_DIR}/object/camera.h
@@ -470,6 +487,11 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/gui/saveload.cpp
     ${GAME_SOURCE_DIR}/gui/selectoverlay.cpp
     ${GAME_SOURCE_DIR}/gui/sounds.cpp
+    ${GAME_SOURCE_DIR}/neo/game.cpp
+    ${GAME_SOURCE_DIR}/neo/object.cpp
+    ${GAME_SOURCE_DIR}/neo/object/area.cpp
+    ${GAME_SOURCE_DIR}/neo/object/creature.cpp
+    ${GAME_SOURCE_DIR}/neo/object/module.cpp
     ${GAME_SOURCE_DIR}/object.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp
     ${GAME_SOURCE_DIR}/object/camera/animated.cpp

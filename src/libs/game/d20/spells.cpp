@@ -22,7 +22,6 @@
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/strings.h"
 
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -31,7 +30,7 @@ namespace reone {
 namespace game {
 
 void Spells::init() {
-    std::shared_ptr<TwoDa> spells(_twoDas.get("spells"));
+    std::shared_ptr<TwoDA> spells(_twoDas.get("spells"));
     if (!spells)
         return;
 

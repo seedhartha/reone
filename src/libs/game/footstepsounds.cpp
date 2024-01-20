@@ -31,7 +31,7 @@ namespace game {
 std::shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
     std::shared_ptr<FootstepTypeSounds> result;
 
-    std::shared_ptr<TwoDa> twoDa(_twoDas.get("footstepsounds"));
+    std::shared_ptr<TwoDA> twoDa(_twoDas.get("footstepsounds"));
     if (twoDa) {
         result = std::make_shared<FootstepTypeSounds>();
         std::map<std::string, std::vector<std::shared_ptr<AudioClip>> &> dict {

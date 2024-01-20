@@ -27,7 +27,7 @@ namespace reone {
 namespace game {
 
 void Surfaces::init() {
-    std::shared_ptr<TwoDa> surfacemat(_twoDas.get("surfacemat"));
+    std::shared_ptr<TwoDA> surfacemat(_twoDas.get("surfacemat"));
     if (!surfacemat) {
         return;
     }

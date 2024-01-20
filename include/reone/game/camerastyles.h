@@ -23,7 +23,7 @@ namespace reone {
 
 namespace resource {
 
-class TwoDas;
+class TwoDAs;
 
 }
 
@@ -39,7 +39,7 @@ public:
 
 class CameraStyles : public ICameraStyles, boost::noncopyable {
 public:
-    CameraStyles(resource::TwoDas &twoDas) :
+    CameraStyles(resource::TwoDAs &twoDas) :
         _twoDas(twoDas) {
     }
 
@@ -49,7 +49,7 @@ public:
     std::shared_ptr<CameraStyle> get(const std::string &name) const override;
 
 private:
-    resource::TwoDas &_twoDas;
+    resource::TwoDAs &_twoDas;
 
     std::vector<std::shared_ptr<CameraStyle>> _styles;
 };

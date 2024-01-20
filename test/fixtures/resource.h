@@ -72,10 +72,10 @@ public:
     MOCK_METHOD(std::string, getSound, (int strRef), (override));
 };
 
-class MockTwoDas : public ITwoDas, boost::noncopyable {
+class MockTwoDAs : public ITwoDAs, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
-    MOCK_METHOD(std::shared_ptr<TwoDa>, get, (const std::string &key), (override));
+    MOCK_METHOD(std::shared_ptr<TwoDA>, get, (const std::string &key), (override));
 };
 
 class MockScripts : public IScripts, boost::noncopyable {
@@ -182,7 +182,7 @@ public:
         _gffs = std::make_unique<MockGffs>();
         _resources = std::make_unique<MockResources>();
         _strings = std::make_unique<MockStrings>();
-        _twoDas = std::make_unique<MockTwoDas>();
+        _twoDas = std::make_unique<MockTwoDAs>();
         _scripts = std::make_unique<MockScripts>();
         _movies = std::make_unique<MockMovies>();
         _audioClips = std::make_unique<MockAudioClips>();
@@ -229,6 +229,10 @@ public:
         return *_gffs;
     }
 
+    MockTwoDAs &twoDas() {
+        return *_twoDas;
+    }
+
     MockStrings &strings() {
         return *_strings;
     }
@@ -257,7 +261,7 @@ private:
     std::unique_ptr<MockGffs> _gffs;
     std::unique_ptr<MockResources> _resources;
     std::unique_ptr<MockStrings> _strings;
-    std::unique_ptr<MockTwoDas> _twoDas;
+    std::unique_ptr<MockTwoDAs> _twoDas;
     std::unique_ptr<MockScripts> _scripts;
     std::unique_ptr<MockMovies> _movies;
     std::unique_ptr<MockAudioClips> _audioClips;

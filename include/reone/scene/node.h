@@ -62,7 +62,7 @@ public:
     bool isCulled() const { return _culled; }
     bool isPoint() const { return _point; }
 
-    glm::vec3 getOrigin() const;
+    glm::vec3 origin() const;
     glm::vec2 getOrigin2D() const;
 
     float getDistanceTo(const glm::vec3 &point) const;

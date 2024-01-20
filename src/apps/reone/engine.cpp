@@ -20,6 +20,7 @@
 #include "SDL2/SDL.h"
 
 #include "reone/graphics/window.h"
+#include "reone/resource/exception/notfound.h"
 #include "reone/resource/gameprobe.h"
 #include "reone/system/threadutil.h"
 
@@ -31,6 +32,8 @@ using namespace reone::movie;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
+
+#define R_NEO_GAME 0
 
 namespace reone {
 
@@ -99,8 +102,33 @@ void Engine::init() {
         _scriptModule->services(),
         _resourceModule->services(),
         _systemModule->services());
+
+#if R_NEO_GAME
+    _services->resource.director.onModuleLoad("end_m01aa");
+    _neoGame = std::make_unique<neo::Game>(_services->resource);
+    _neoGame->startModule("end_m01aa");
+    auto module = _neoGame->module();
+    if (module) {
+        auto &scene = _services->scene.graphs.get(kSceneMain);
+        auto camera = scene.newCamera();
+        float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
+        camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+        scene.setActiveCamera(camera.get());
+        auto &area = module->get().area();
+        for (auto &room : area.rooms()) {
+            auto model = _services->resource.models.get(room.model);
+            if (!model) {
+                throw ResourceNotFoundException("Room model not found: " + room.model);
+            }
+            auto sceneNode = scene.newModel(*model, ModelUsage::Room);
+            sceneNode->setLocalTransform(glm::translate(room.position));
+            scene.addRoot(std::move(sceneNode));
+        }
+    }
+#else
     _game = std::make_unique<Game>(gameId, _options.game.path, *_optionsView, *_services);
     _game->init();
+#endif
 
     _profiler = std::make_unique<Profiler>(
         _options.graphics,
@@ -112,7 +140,11 @@ void Engine::init() {
 
 void Engine::deinit() {
     _profiler.reset();
+#if R_NEO_GAME
+    _neoGame.reset();
+#else
     _game.reset();
+#endif
     _services.reset();
 
     _gameModule.reset();
@@ -160,12 +192,18 @@ int Engine::run() {
                 std::lock_guard<std::mutex> lock {_eventsMutex};
                 std::swap(events, _events);
             }
+            auto &scene = _services->scene.graphs.get(kSceneMain);
             while (!events.empty()) {
                 auto &event = events.front();
+#if R_NEO_GAME
+                if (event.type == input::EventType::MouseMotion) {
+                }
+#else
                 if (_game->handle(event) && _game->isQuitRequested()) {
                     quit = true;
                     break;
                 }
+#endif
                 _profiler->handle(event);
                 events.pop();
             }
@@ -175,11 +213,15 @@ int Engine::run() {
             break;
         }
         _profiler->timeUpdate([this, &frameTime]() {
+#if R_NEO_GAME
+            _services->scene.graphs.get(kSceneMain).update(frameTime);
+#else
             _game->update(frameTime);
             bool showcur = _game->cursorType() == CursorType::None;
             bool relmouse = _game->relativeMouseMode();
             showCursor(showcur);
             setRelativeMouseMode(relmouse);
+#endif
             _profiler->update(frameTime);
         });
         _profiler->timeRender([this]() {
@@ -189,7 +231,16 @@ int Engine::run() {
                 _services->graphics.pbrTextures.refresh();
             }
             _services->graphics.context.clearColorDepth();
+#if R_NEO_GAME
+            glm::ivec2 screenSize {_options.graphics.width, _options.graphics.height};
+            auto &output = _services->scene.graphs.get(kSceneMain).render(screenSize);
+            _services->graphics.context.bindTexture(output);
+            auto &program = _services->graphics.shaderRegistry.get(ShaderProgramId::ndcTexture);
+            _services->graphics.context.useProgram(program);
+            _services->graphics.meshRegistry.get(MeshName::quadNDC).draw();
+#else
             _game->render();
+#endif
             _profiler->render();
             _window->swap();
             _services->audio.mixer.render();

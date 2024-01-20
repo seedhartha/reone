@@ -39,7 +39,7 @@ static std::unordered_map<ResType, std::string> g_extByType {
     {ResType::Ifo, "ifo"},
     {ResType::Bic, "bic"},
     {ResType::Wok, "wok"},
-    {ResType::TwoDa, "2da"},
+    {ResType::TwoDA, "2da"},
     {ResType::Tlk, "tlk"},
     {ResType::Txi, "txi"},
     {ResType::Git, "git"},

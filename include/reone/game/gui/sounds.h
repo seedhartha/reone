@@ -22,8 +22,8 @@ namespace reone {
 namespace resource {
 
 class AudioClips;
-class TwoDa;
-class TwoDas;
+class TwoDA;
+class TwoDAs;
 
 } // namespace resource
 
@@ -45,7 +45,7 @@ public:
 
 class GUISounds : public IGUISounds, boost::noncopyable {
 public:
-    GUISounds(resource::AudioClips &audioClips, resource::TwoDas &twoDas) :
+    GUISounds(resource::AudioClips &audioClips, resource::TwoDAs &twoDas) :
         _audioClips(audioClips),
         _twoDas(twoDas) {
     }
@@ -60,12 +60,12 @@ public:
 
 private:
     resource::AudioClips &_audioClips;
-    resource::TwoDas &_twoDas;
+    resource::TwoDAs &_twoDas;
 
     std::shared_ptr<audio::AudioClip> _onClick;
     std::shared_ptr<audio::AudioClip> _onEnter;
 
-    void loadSound(const resource::TwoDa &twoDa, const std::string &label, std::shared_ptr<audio::AudioClip> &sound);
+    void loadSound(const resource::TwoDA &twoDa, const std::string &label, std::shared_ptr<audio::AudioClip> &sound);
 };
 
 } // namespace game

@@ -196,7 +196,7 @@ void EmitterSceneNode::spawnLightningParticles() {
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
     glm::vec3 origin(randomFloat(-halfW, halfW), randomFloat(-halfH, halfH), 0.0f);
-    glm::vec3 emitterSpaceRefPos(_absTransformInv * glm::vec4((*ref)->getOrigin(), 1.0f));
+    glm::vec3 emitterSpaceRefPos(_absTransformInv * glm::vec4((*ref)->origin(), 1.0f));
     glm::vec3 refToOrigin(emitterSpaceRefPos - origin);
     float distance = glm::abs(refToOrigin.z);
     float segmentLength = distance / static_cast<float>(_lightningSubDiv + 1);
@@ -263,7 +263,7 @@ void EmitterSceneNode::renderLeafs(IRenderPass &pass, const std::vector<SceneNod
     auto emitterUp = glm::vec3(_absTransform[1]);
     auto emitterForward = glm::vec3(_absTransform[2]);
 
-    auto view = _sceneGraph.activeCamera()->camera()->view();
+    auto view = _sceneGraph.camera()->get().camera()->view();
     auto cameraRight = glm::vec3(view[0][0], view[1][0], view[2][0]);
     auto cameraUp = glm::vec3(view[0][1], view[1][1], view[2][1]);
     auto cameraForward = glm::vec3(view[0][2], view[1][2], view[2][2]);
@@ -272,7 +272,7 @@ void EmitterSceneNode::renderLeafs(IRenderPass &pass, const std::vector<SceneNod
     for (size_t i = 0; i < leafs.size(); ++i) {
         const auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
         particles[i].frame = particle->frame();
-        particles[i].position = particle->getOrigin();
+        particles[i].position = particle->origin();
         particles[i].size = glm::vec2(particle->size());
         particles[i].color = glm::vec4(particle->color(), particle->alpha());
         switch (emitter->renderMode) {

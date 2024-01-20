@@ -37,7 +37,7 @@ bool CameraSceneNode::isInFrustum(const SceneNode &other) const {
         return false;
     }
     if (other.isPoint()) {
-        return _camera->isInFrustum(other.getOrigin());
+        return _camera->isInFrustum(other.origin());
     } else {
         return _camera->isInFrustum(other.aabb() * other.absoluteTransform());
     }

@@ -39,7 +39,7 @@ class IShaders;
 class ISoundSets;
 class IStrings;
 class ITextures;
-class ITwoDas;
+class ITwoDAs;
 class IVisibilities;
 class IWalkmeshes;
 
@@ -47,7 +47,7 @@ struct ResourceServices {
     IGffs &gffs;
     IResources &resources;
     IStrings &strings;
-    ITwoDas &twoDas;
+    ITwoDAs &twoDas;
     IScripts &scripts;
     IMovies &movies;
     IAudioClips &audioClips;
@@ -70,7 +70,7 @@ struct ResourceServices {
         IGffs &gffs,
         IResources &resources,
         IStrings &strings,
-        ITwoDas &twoDas,
+        ITwoDAs &twoDas,
         IScripts &scripts,
         IMovies &movies,
         IAudioClips &audioClips,

@@ -29,7 +29,7 @@ namespace reone {
 namespace resource {
 
 class Strings;
-class TwoDas;
+class TwoDAs;
 
 } // namespace resource
 
@@ -43,14 +43,14 @@ public:
         ClassType type,
         Classes &classes,
         resource::Strings &strings,
-        resource::TwoDas &twoDas) :
+        resource::TwoDAs &twoDas) :
         _type(type),
         _classes(classes),
         _strings(strings),
         _twoDas(twoDas) {
     }
 
-    void load(const resource::TwoDa &twoDa, int row);
+    void load(const resource::TwoDA &twoDa, int row);
 
     bool isClassSkill(SkillType skill) const;
 
@@ -87,7 +87,7 @@ private:
     Classes &_classes;
 
     resource::Strings &_strings;
-    resource::TwoDas &_twoDas;
+    resource::TwoDAs &_twoDas;
 
     // END Services
 

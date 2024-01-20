@@ -110,7 +110,7 @@ void TableResourcePanel::BindEvents() {
         });
         PopupMenu(&menu, event.GetPosition());
     });
-    if (m_viewModel.resType() == ResType::TwoDa) {
+    if (m_viewModel.resType() == ResType::TwoDA) {
         m_tableCtrl->Bind(wxEVT_DATAVIEW_COLUMN_HEADER_RIGHT_CLICK, [this](const auto &event) {
             enum class MenuItemId {
                 RenameColumn = 1,

@@ -65,13 +65,13 @@ void GrassSceneNode::update(float dt) {
     if (!_enabled) {
         return;
     }
-    auto camera = _sceneGraph.activeCamera();
+    auto camera = _sceneGraph.camera();
     if (!camera) {
         return;
     }
     auto mesh = _aabbNode.mesh()->mesh;
     auto &faces = mesh->faces();
-    auto cameraPos = camera->getOrigin();
+    auto cameraPos = camera->get().origin();
     glm::vec3 meshSpaceCameraPos(_absTransformInv * glm::vec4(cameraPos, 1.0f));
 
     // Return grass clusters in out-of-distance faces, to the pool
@@ -150,7 +150,7 @@ void GrassSceneNode::renderLeafs(IRenderPass &pass, const std::vector<SceneNode 
     auto instances = std::vector<GrassInstance>(leafs.size());
     for (size_t i = 0; i < leafs.size(); ++i) {
         const auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
-        instances[i].position = cluster->getOrigin();
+        instances[i].position = cluster->origin();
         instances[i].variant = cluster->variant();
         instances[i].lightmapUV = cluster->lightmapUV();
     }

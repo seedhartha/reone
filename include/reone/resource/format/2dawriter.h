@@ -25,11 +25,11 @@ class IOutputStream;
 
 namespace resource {
 
-class TwoDa;
+class TwoDA;
 
-class TwoDaWriter {
+class TwoDAWriter {
 public:
-    TwoDaWriter(TwoDa &twoDa) :
+    TwoDAWriter(TwoDA &twoDa) :
         _twoDa(twoDa) {
     }
 
@@ -37,7 +37,7 @@ public:
     void save(IOutputStream &out);
 
 private:
-    TwoDa &_twoDa;
+    TwoDA &_twoDa;
 
     std::unique_ptr<BinaryWriter> _writer;
 

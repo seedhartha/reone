@@ -67,7 +67,7 @@ void SceneNode::update(float dt) {
     }
 }
 
-glm::vec3 SceneNode::getOrigin() const {
+glm::vec3 SceneNode::origin() const {
     return glm::vec3(_absTransform[3]);
 }
 
@@ -76,19 +76,19 @@ glm::vec2 SceneNode::getOrigin2D() const {
 }
 
 float SceneNode::getDistanceTo(const glm::vec3 &point) const {
-    return glm::distance(getOrigin(), point);
+    return glm::distance(origin(), point);
 }
 
 float SceneNode::getDistanceTo(const SceneNode &other) const {
-    return glm::distance(getOrigin(), other.getOrigin());
+    return glm::distance(origin(), other.origin());
 }
 
 float SceneNode::getSquareDistanceTo(const glm::vec3 &point) const {
-    return glm::distance2(getOrigin(), point);
+    return glm::distance2(origin(), point);
 }
 
 float SceneNode::getSquareDistanceTo(const SceneNode &other) const {
-    return glm::distance2(getOrigin(), other.getOrigin());
+    return glm::distance2(origin(), other.origin());
 }
 
 float SceneNode::getSquareDistanceTo2D(const glm::vec2 &point) const {

@@ -47,7 +47,7 @@ TEST(two_da_reader, should_read_two_da) {
                      .string();
 
     auto stream = MemoryInputStream(input);
-    auto reader = TwoDaReader(stream);
+    auto reader = TwoDAReader(stream);
 
     // when
 

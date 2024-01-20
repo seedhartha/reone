@@ -43,7 +43,7 @@ enum class ResType : uint16_t {
     Ifo = 2014,
     Bic = 2015,
     Wok = 2016,
-    TwoDa = 2017,
+    TwoDA = 2017,
     Tlk = 2018,
     Txi = 2022,
     Git = 2023,

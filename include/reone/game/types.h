@@ -1255,7 +1255,9 @@ enum class InvisibilityType {
     Improved = 4
 };
 
-struct InventorySlot {
+using InventorySlot = int;
+
+struct InventorySlots {
     static constexpr int head = 0;
     static constexpr int body = 1;
     static constexpr int hands = 3;

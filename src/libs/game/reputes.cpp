@@ -34,7 +34,7 @@ static std::vector<std::string> g_factionLabels;
 static std::vector<std::vector<int>> g_factionValues;
 
 void Reputes::init() {
-    std::shared_ptr<TwoDa> repute(_twoDas.get("repute"));
+    std::shared_ptr<TwoDA> repute(_twoDas.get("repute"));
     if (!repute) {
         return;
     }

@@ -23,7 +23,7 @@ namespace reone {
 
 namespace resource {
 
-class TwoDas;
+class TwoDAs;
 class Textures;
 
 } // namespace resource
@@ -49,7 +49,7 @@ public:
 
 class Portraits : public IPortraits, boost::noncopyable {
 public:
-    Portraits(resource::Textures &textures, resource::TwoDas &twoDas) :
+    Portraits(resource::Textures &textures, resource::TwoDAs &twoDas) :
         _textures(textures), _twoDas(twoDas) {
     }
 
@@ -62,7 +62,7 @@ public:
 
 private:
     resource::Textures &_textures;
-    resource::TwoDas &_twoDas;
+    resource::TwoDAs &_twoDas;
 
     std::vector<Portrait> _portraits;
 

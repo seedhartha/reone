@@ -54,6 +54,7 @@ public:
     MOCK_METHOD(ModelSceneNode *, pickModelAt, (int, int, IUser *), (const override));
 
     MOCK_METHOD(const std::string &, name, (), (const override));
+    MOCK_METHOD(std::optional<std::reference_wrapper<CameraSceneNode>>, camera, (), (override));
 
     MOCK_METHOD(void, setAmbientLightColor, (glm::vec3), (override));
     MOCK_METHOD(void, setFog, (FogProperties fog), (override));

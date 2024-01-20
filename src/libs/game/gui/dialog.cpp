@@ -300,7 +300,7 @@ std::string DialogGUI::getStuntAnimationName(int ordinal) const {
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    std::shared_ptr<TwoDa> animations(_services.resource.twoDas.get("dialoganimations"));
+    std::shared_ptr<TwoDA> animations(_services.resource.twoDas.get("dialoganimations"));
     int index = ordinal - 10000;
 
     if (index < 0 || index >= animations->getRowCount()) {

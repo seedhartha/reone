@@ -80,7 +80,7 @@ TEST(key_reader, should_read_key) {
     EXPECT_EQ("Bb", files[1].filename);
     EXPECT_EQ(2ll, keys.size());
     EXPECT_EQ("cc", keys[0].resId.resRef.value());
-    EXPECT_EQ(static_cast<int>(ResType::TwoDa), static_cast<int>(keys[0].resId.type));
+    EXPECT_EQ(static_cast<int>(ResType::TwoDA), static_cast<int>(keys[0].resId.type));
     EXPECT_EQ(12, keys[0].bifIdx);
     EXPECT_EQ(2003, keys[0].resIdx);
     EXPECT_EQ("dd", keys[1].resId.resRef.value());

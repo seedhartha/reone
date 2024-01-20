@@ -246,7 +246,7 @@ AttackResultType Combat::determineAttackResult(const Attack &attack, bool offHan
     // Critical threat
     if (isAttackSuccessful(result)) {
         int criticalThreat;
-        std::shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+        std::shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlots::leftWeapon : InventorySlots::rightWeapon));
         if (weapon) {
             criticalThreat = weapon->criticalThreat();
         } else {
@@ -334,7 +334,7 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
 void Combat::applyAttackResult(const Attack &attack, bool offHand) {
     // Determine critical hit multiplier
     int criticalHitMultiplier = 2;
-    std::shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+    std::shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlots::leftWeapon : InventorySlots::rightWeapon));
     if (weapon) {
         criticalHitMultiplier = weapon->criticalHitMultiplier();
     }
@@ -384,7 +384,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
 }
 
 std::vector<std::shared_ptr<DamageEffect>> Combat::getDamageEffects(std::shared_ptr<Creature> damager, bool offHand, int multiplier) const {
-    std::shared_ptr<Item> weapon(damager->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+    std::shared_ptr<Item> weapon(damager->getEquippedItem(offHand ? InventorySlots::leftWeapon : InventorySlots::rightWeapon));
     int amount = 0;
     auto type = DamageType::Bludgeoning;
 
@@ -406,7 +406,7 @@ void Combat::fireProjectile(const std::shared_ptr<Creature> &attacker, const std
     if (!attackerModel || !targetModel)
         return;
 
-    std::shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::rightWeapon));
+    std::shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlots::rightWeapon));
     if (!weapon)
         return;
 
@@ -422,18 +422,18 @@ void Combat::fireProjectile(const std::shared_ptr<Creature> &attacker, const std
     glm::vec3 projectilePos;
     auto bulletHook = weaponModel->getNodeByName("bullethook");
     if (bulletHook) {
-        projectilePos = bulletHook->getOrigin();
+        projectilePos = bulletHook->origin();
     } else {
-        projectilePos = weaponModel->getOrigin();
+        projectilePos = weaponModel->origin();
     }
 
     // Determine projectile direction
     glm::vec3 projectileTarget;
     auto impact = targetModel->getNodeByName("impact");
     if (impact) {
-        projectileTarget = impact->getOrigin();
+        projectileTarget = impact->origin();
     } else {
-        projectileTarget = targetModel->getOrigin();
+        projectileTarget = targetModel->origin();
     }
     round.projectileDir = glm::normalize(projectileTarget - projectilePos);
 
@@ -449,7 +449,7 @@ void Combat::fireProjectile(const std::shared_ptr<Creature> &attacker, const std
 }
 
 void Combat::updateProjectile(Round &round, float dt) {
-    auto position = round.projectile->getOrigin();
+    auto position = round.projectile->origin();
     position += kProjectileSpeed * round.projectileDir * dt;
 
     float facing = glm::half_pi<float>() - glm::atan(round.projectileDir.x, round.projectileDir.y);

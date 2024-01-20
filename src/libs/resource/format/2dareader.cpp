@@ -26,7 +26,7 @@ namespace reone {
 
 namespace resource {
 
-void TwoDaReader::load() {
+void TwoDAReader::load() {
     checkEqual("2DA signature", _reader.readString(8), std::string("2DA V2.b", 8));
 
     _reader.skipBytes(1); // newline
@@ -38,7 +38,7 @@ void TwoDaReader::load() {
     loadTable();
 }
 
-void TwoDaReader::loadRows() {
+void TwoDAReader::loadRows() {
     _rows.reserve(_rowCount);
 
     int columnCount = static_cast<int>(_columns.size());
@@ -52,7 +52,7 @@ void TwoDaReader::loadRows() {
     size_t pos = _reader.position();
 
     for (int i = 0; i < _rowCount; ++i) {
-        TwoDa::Row row;
+        TwoDA::Row row;
         for (int j = 0; j < columnCount; ++j) {
             int cellIdx = i * columnCount + j;
             size_t off = pos + offsets[cellIdx];
@@ -62,11 +62,11 @@ void TwoDaReader::loadRows() {
     }
 }
 
-void TwoDaReader::loadTable() {
-    _twoDa = std::make_shared<TwoDa>(_columns, _rows);
+void TwoDAReader::loadTable() {
+    _twoDa = std::make_shared<TwoDA>(_columns, _rows);
 }
 
-std::vector<std::string> TwoDaReader::readTokens(int maxCount) {
+std::vector<std::string> TwoDAReader::readTokens(int maxCount) {
     std::vector<std::string> tokens;
     StringBuilder str;
     for (auto ch = _reader.readChar();; ch = _reader.readChar()) {

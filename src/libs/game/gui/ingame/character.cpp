@@ -205,7 +205,7 @@ std::shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(ISceneGraph &sceneG
 
     for (auto &item : partyLeader->equipment()) {
         switch (item.first) {
-        case InventorySlot::body:
+        case InventorySlots::body:
             character->equip(item.first, item.second);
             break;
         default:

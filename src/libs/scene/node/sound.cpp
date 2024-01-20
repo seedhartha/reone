@@ -36,7 +36,7 @@ void SoundSceneNode::playSound(const std::string &resRef, float gain, bool posit
     auto clip = _resourceSvc.audioClips.get(resRef);
     std::optional<glm::vec3> position;
     if (positional) {
-        position = getOrigin();
+        position = origin();
     }
     _source = _audioSvc.mixer.play(
         std::move(clip),
