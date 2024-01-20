@@ -21,20 +21,7 @@ namespace reone {
 
 namespace graphics {
 
-template <class T>
-struct MixInterpolator {
-    T operator()(const T &lhs, const T &rhs, float factor) const {
-        return glm::mix(lhs, rhs, factor);
-    }
-};
-
-struct SlerpInterpolator {
-    glm::quat operator()(const glm::quat &lhs, const glm::quat &rhs, float factor) const {
-        return glm::slerp(lhs, rhs, factor);
-    }
-};
-
-template <class Value, class Interpolator = MixInterpolator<Value>>
+template <class Value>
 class KeyframeTrack {
 public:
     struct Keyframe {
@@ -93,7 +80,7 @@ private:
         if (lhs.time == rhs.time) {
             return lhs.value;
         }
-        return Interpolator()(lhs.value, rhs.value, factor);
+        return glm::mix(lhs.value, rhs.value, factor);
     }
 };
 

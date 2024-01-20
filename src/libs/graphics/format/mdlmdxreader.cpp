@@ -682,7 +682,7 @@ void MdlMdxReader::readControllers(uint32_t keyOffset,
 
         int numColumnsBase = numColumns & ~kFlagBezier;
         if (type == ControllerTypes::orientation) {
-            KeyframeTrack<glm::quat, SlerpInterpolator> track;
+            KeyframeTrack<glm::quat> track;
             readQuaternionController(key, data, node, track);
             node.quaternionTracks().insert({type, std::move(track)});
         } else if (numColumnsBase == 3) {
@@ -820,7 +820,7 @@ void MdlMdxReader::readVectorController(const ControllerKey &key,
 void MdlMdxReader::readQuaternionController(const ControllerKey &key,
                                             const std::vector<float> &data,
                                             ModelNode &node,
-                                            KeyframeTrack<glm::quat, SlerpInterpolator> &track) {
+                                            KeyframeTrack<glm::quat> &track) {
     switch (key.numColumns) {
     case 2:
         for (uint16_t i = 0; i < key.numRows; ++i) {

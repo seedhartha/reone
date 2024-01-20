@@ -104,7 +104,7 @@ private:
     static void readQuaternionController(const ControllerKey &key,
                                          const std::vector<float> &data,
                                          ModelNode &node,
-                                         KeyframeTrack<glm::quat, SlerpInterpolator> &track);
+                                         KeyframeTrack<glm::quat> &track);
 
     // END Controllers
 };

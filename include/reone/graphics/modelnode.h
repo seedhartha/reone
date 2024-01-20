@@ -30,8 +30,8 @@ class Model;
 
 class ModelNode : boost::noncopyable {
 public:
-    template <class Value, class Interpolator = MixInterpolator<Value>>
-    using KeyframeTrackMap = std::unordered_map<ControllerType, KeyframeTrack<Value, Interpolator>>;
+    template <class Value>
+    using KeyframeTrackMap = std::unordered_map<ControllerType, KeyframeTrack<Value>>;
 
     struct Skin {
         std::vector<uint32_t> boneSerial;     /**< node index per bone in depth-first order */
@@ -237,7 +237,7 @@ public:
 
     KeyframeTrackMap<float> &floatTracks() { return _floatTracks; }
     KeyframeTrackMap<glm::vec3> &vectorTracks() { return _vectorTracks; }
-    KeyframeTrackMap<glm::quat, SlerpInterpolator> &quaternionTracks() { return _quaternionTracks; }
+    KeyframeTrackMap<glm::quat> &quaternionTracks() { return _quaternionTracks; }
 
     // END Keyframe Tracks
 
@@ -272,7 +272,7 @@ private:
     // Keyframe Tracks
 
     KeyframeTrackMap<glm::vec3> _vectorTracks;
-    KeyframeTrackMap<glm::quat, SlerpInterpolator> _quaternionTracks;
+    KeyframeTrackMap<glm::quat> _quaternionTracks;
     KeyframeTrackMap<float> _floatTracks;
 
     // END Keyframe Tracks
