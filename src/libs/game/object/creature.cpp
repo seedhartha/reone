@@ -18,7 +18,7 @@
 #include "reone/game/object/creature.h"
 
 #include "reone/audio/di/services.h"
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 #include "reone/game/action.h"
 #include "reone/game/action/attackobject.h"
 #include "reone/game/animationutil.h"
@@ -184,13 +184,6 @@ void Creature::update(float dt) {
     updateModelAnimation();
     updateHealth();
     updateCombat(dt);
-
-    if (_audioSourceVoice) {
-        _audioSourceVoice->update();
-    }
-    if (_audioSourceFootstep) {
-        _audioSourceFootstep->update();
-    }
 }
 
 void Creature::updateModelAnimation() {
@@ -482,8 +475,16 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
     if (maybeSound == _soundSet->end()) {
         return;
     }
-    glm::vec3 position(_position + 1.7f);
-    _audioSourceVoice = _services.audio.player.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+    std::optional<glm::vec3> position;
+    if (positional) {
+        position = _position + glm::vec3 {0.0f, 0.0f, 1.7f};
+    }
+    _audioSourceVoice = _services.audio.mixer.play(
+        maybeSound->second,
+        AudioType::Sound,
+        1.0f,
+        false,
+        std::move(position));
 }
 
 void Creature::die() {
@@ -698,9 +699,14 @@ void Creature::onEventSignalled(const std::string &name) {
     if (index >= static_cast<int>(materialSounds.size())) {
         return;
     }
-    std::shared_ptr<AudioClip> sound(materialSounds[index]);
-    if (sound) {
-        _audioSourceFootstep = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, _position);
+    auto clip = materialSounds[index];
+    if (clip) {
+        _audioSourceFootstep = _services.audio.mixer.play(
+            std::move(clip),
+            AudioType::Sound,
+            1.0f,
+            false,
+            _position);
     }
 }
 

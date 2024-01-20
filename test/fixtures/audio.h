@@ -22,7 +22,7 @@
 #include "reone/audio/context.h"
 #include "reone/audio/di/services.h"
 #include "reone/audio/format/mp3reader.h"
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 
 namespace reone {
 
@@ -40,21 +40,22 @@ public:
 
 class MockContext : public IContext, boost::noncopyable {
 public:
-    MOCK_METHOD(void, setListenerPosition, (glm::vec3 position), (override));
+    MOCK_METHOD(void, setListenerPosition, (glm::vec3), (override));
 };
 
-class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
+class MockAudioMixer : public IAudioMixer, boost::noncopyable {
 public:
-    MOCK_METHOD(std::shared_ptr<AudioSource>, play, (std::shared_ptr<AudioClip> clip, AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
+    MOCK_METHOD(void, render, (), (override));
+    MOCK_METHOD(std::shared_ptr<AudioSource>, play, (std::shared_ptr<AudioClip>, AudioType, float, bool, std::optional<glm::vec3>), (override));
 };
 
 class TestAudioModule : boost::noncopyable {
 public:
     void init() {
         _context = std::make_unique<MockContext>();
-        _player = std::make_unique<MockAudioPlayer>();
+        _mixer = std::make_unique<MockAudioMixer>();
 
-        _services = std::make_unique<AudioServices>(*_context, *_player);
+        _services = std::make_unique<AudioServices>(*_context, *_mixer);
     }
 
     AudioServices &services() {
@@ -63,7 +64,7 @@ public:
 
 private:
     std::unique_ptr<MockContext> _context;
-    std::unique_ptr<MockAudioPlayer> _player;
+    std::unique_ptr<MockAudioMixer> _mixer;
 
     std::unique_ptr<AudioServices> _services;
 };

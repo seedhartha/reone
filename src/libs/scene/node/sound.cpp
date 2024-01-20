@@ -18,7 +18,7 @@
 #include "reone/scene/node/sound.h"
 
 #include "reone/audio/di/services.h"
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/provider/audioclips.h"
 
@@ -30,13 +30,20 @@ namespace scene {
 
 void SoundSceneNode::update(float dt) {
     SceneNode::update(dt);
-    if (_source) {
-        _source->update();
-    }
 }
 
 void SoundSceneNode::playSound(const std::string &resRef, float gain, bool positional, bool loop) {
-    _source = _audioSvc.player.play(_resourceSvc.audioClips.get(resRef), AudioType::Sound, loop, gain, positional, getOrigin());
+    auto clip = _resourceSvc.audioClips.get(resRef);
+    std::optional<glm::vec3> position;
+    if (positional) {
+        position = getOrigin();
+    }
+    _source = _audioSvc.mixer.play(
+        std::move(clip),
+        AudioType::Sound,
+        gain,
+        loop,
+        std::move(position));
 }
 
 bool SoundSceneNode::isSoundPlaying() const {

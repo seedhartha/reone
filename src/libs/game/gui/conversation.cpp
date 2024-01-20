@@ -18,7 +18,7 @@
 #include "reone/game/gui/conversation.h"
 
 #include "reone/audio/di/services.h"
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/di/services.h"
 #include "reone/gui/control/listbox.h"
@@ -175,7 +175,8 @@ void Conversation::loadVoiceOver() {
         }
     }
     if (!voiceResRef.empty()) {
-        _currentVoice = _services.audio.player.play(_services.resource.audioClips.get(voiceResRef), AudioType::Voice);
+        auto clip = _services.resource.audioClips.get(voiceResRef);
+        _currentVoice = _services.audio.mixer.play(std::move(clip), AudioType::Voice);
     }
 }
 
@@ -315,9 +316,6 @@ bool Conversation::handleKeyUp(const input::KeyEvent &event) {
 
 void Conversation::update(float dt) {
     GameGUI::update(dt);
-    if (_currentVoice) {
-        _currentVoice->update();
-    }
     if (!_entryEnded) {
         _endEntryTimer.update(dt);
         if (_endEntryTimer.elapsed() || (_currentVoice && !_currentVoice->isPlaying())) {

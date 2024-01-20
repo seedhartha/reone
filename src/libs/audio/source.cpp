@@ -66,8 +66,8 @@ void AudioSource::init() {
     alGenSources(1, &_source);
     alSourcef(_source, AL_GAIN, _gain);
 
-    if (_positional) {
-        alSource3f(_source, AL_POSITION, _position.x, _position.y, _position.z);
+    if (_position) {
+        alSource3f(_source, AL_POSITION, _position->x, _position->y, _position->z);
     } else {
         alSourcei(_source, AL_SOURCE_RELATIVE, AL_TRUE);
     }
@@ -104,7 +104,7 @@ void AudioSource::deinit() {
     _inited = false;
 }
 
-void AudioSource::update() {
+void AudioSource::render() {
     if (!_source) {
         return;
     }
@@ -164,7 +164,7 @@ void AudioSource::setPosition(glm::vec3 position) {
     if (_position == position) {
         return;
     }
-    if (_source && _positional) {
+    if (_source) {
         checkMainThread();
         alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
     }

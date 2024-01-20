@@ -40,7 +40,7 @@ public:
     }
 
     void UpdateAudioSource() {
-        m_audioSource->update();
+        m_audioSource->render();
     }
 
 private:

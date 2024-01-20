@@ -17,7 +17,7 @@
 
 #include "reone/game/gui/dialog.h"
 
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 #include "reone/audio/source.h"
 #include "reone/graphics/di/services.h"
 #include "reone/gui/control/panel.h"

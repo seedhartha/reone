@@ -27,25 +27,41 @@ namespace audio {
 
 class AudioClip;
 
-class IAudioPlayer {
+class IAudioMixer {
 public:
-    virtual ~IAudioPlayer() = default;
+    virtual ~IAudioMixer() = default;
 
-    virtual std::shared_ptr<AudioSource> play(std::shared_ptr<AudioClip> clip, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) = 0;
+    virtual void render() = 0;
+
+    virtual std::shared_ptr<AudioSource> play(
+        std::shared_ptr<AudioClip> clip,
+        AudioType type,
+        float gain = 1.0f,
+        bool loop = false,
+        std::optional<glm::vec3> position = std::nullopt) = 0;
 };
 
-class AudioPlayer : public IAudioPlayer, boost::noncopyable {
+class AudioMixer : public IAudioMixer, boost::noncopyable {
 public:
-    AudioPlayer(AudioOptions &options) :
+    AudioMixer(AudioOptions &options) :
         _options(options) {
     }
 
-    std::shared_ptr<AudioSource> play(std::shared_ptr<AudioClip> clip, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) override;
+    void render() override;
+
+    std::shared_ptr<AudioSource> play(
+        std::shared_ptr<AudioClip> clip,
+        AudioType type,
+        float gain = 1.0f,
+        bool loop = false,
+        std::optional<glm::vec3> = std::nullopt) override;
 
 private:
     AudioOptions &_options;
 
-    float getGain(AudioType type, float gain) const;
+    std::vector<std::shared_ptr<AudioSource>> _sources;
+
+    float gainByType(AudioType type, float gain) const;
 };
 
 } // namespace audio

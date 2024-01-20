@@ -18,7 +18,7 @@
 #include "reone/movie/movie.h"
 
 #include "reone/audio/di/services.h"
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
@@ -83,10 +83,6 @@ void Movie::update(float dt) {
     _videoStream->seek(_time);
     if (_videoStream->hasEnded()) {
         _finished = true;
-        return;
-    }
-    if (_audioSource) {
-        _audioSource->update();
     }
 }
 

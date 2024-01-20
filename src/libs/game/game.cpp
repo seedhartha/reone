@@ -19,7 +19,7 @@
 
 #include "reone/audio/context.h"
 #include "reone/audio/di/services.h"
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 #include "reone/game/combat.h"
 #include "reone/game/debug.h"
 #include "reone/game/di/services.h"
@@ -500,10 +500,10 @@ void Game::updateMusic() {
         return;
     }
     if (_music && _music->isPlaying()) {
-        _music->update();
-    } else {
-        _music = _services.audio.player.play(_services.resource.audioClips.get(_musicResRef), AudioType::Music);
+        return;
     }
+    auto clip = _services.resource.audioClips.get(_musicResRef);
+    _music = _services.audio.mixer.play(std::move(clip), AudioType::Music);
 }
 
 void Game::loadNextModule() {
@@ -553,7 +553,7 @@ void Game::updateCamera(float dt) {
         if (_cameraType == CameraType::ThirdPerson) {
             std::shared_ptr<Creature> partyLeader(_party.getLeader());
             if (partyLeader) {
-                listenerPosition = partyLeader->position() + 1.7f; // TODO: height based on appearance
+                listenerPosition = partyLeader->position() + glm::vec3 {0.0f, 0.0f, 1.7f}; // TODO: height based on appearance
             }
         } else {
             listenerPosition = camera->sceneNode()->getOrigin();

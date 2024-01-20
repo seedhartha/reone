@@ -24,7 +24,7 @@ namespace reone {
 
 namespace audio {
 
-class IAudioPlayer;
+class IAudioMixer;
 
 }
 
@@ -43,7 +43,7 @@ class Movies : public IMovies, boost::noncopyable {
 public:
     Movies(std::filesystem::path gamePath,
            graphics::GraphicsServices &graphicsSvc,
-           audio::IAudioPlayer &audioPlayer) :
+           audio::IAudioMixer &audioPlayer) :
         _gamePath(gamePath),
         _graphicsSvc(graphicsSvc),
         _audioPlayer(audioPlayer) {
@@ -65,7 +65,7 @@ public:
 private:
     std::filesystem::path _gamePath;
     graphics::GraphicsServices &_graphicsSvc;
-    audio::IAudioPlayer &_audioPlayer;
+    audio::IAudioMixer &_audioPlayer;
 
     std::unordered_map<std::string, std::shared_ptr<movie::IMovie>> _objects;
 

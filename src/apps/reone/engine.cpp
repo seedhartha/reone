@@ -192,6 +192,7 @@ int Engine::run() {
             _game->render();
             _profiler->render();
             _window->swap();
+            _services->audio.mixer.render();
         });
         _frameState.store(FrameStates::rendered, std::memory_order_release);
     }

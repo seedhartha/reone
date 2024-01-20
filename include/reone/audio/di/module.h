@@ -18,8 +18,8 @@
 #pragma once
 
 #include "../context.h"
+#include "../mixer.h"
 #include "../options.h"
-#include "../player.h"
 
 #include "services.h"
 
@@ -39,7 +39,7 @@ public:
     void deinit();
 
     Context &context() { return *_context; }
-    AudioPlayer &player() { return *_player; }
+    AudioMixer &mixer() { return *_mixer; }
 
     AudioServices &services() { return *_services; }
 
@@ -47,7 +47,7 @@ private:
     AudioOptions &_options;
 
     std::unique_ptr<Context> _context;
-    std::unique_ptr<AudioPlayer> _player;
+    std::unique_ptr<AudioMixer> _mixer;
 
     std::unique_ptr<AudioServices> _services;
 };

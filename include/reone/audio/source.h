@@ -23,39 +23,37 @@ namespace audio {
 
 class AudioClip;
 
-class AudioSource {
+class AudioSource : boost::noncopyable {
 public:
-    AudioSource(std::shared_ptr<AudioClip> stream, bool loop, float gain, bool positional, glm::vec3 position) :
-        _stream(std::move(stream)),
-        _loop(loop),
+    AudioSource(std::shared_ptr<AudioClip> clip,
+                float gain = 1.0f,
+                bool loop = false,
+                std::optional<glm::vec3> position = std::nullopt) :
+        _stream(std::move(clip)),
         _gain(gain),
-        _positional(positional),
+        _loop(loop),
         _position(std::move(position)) {
     }
 
-    AudioSource(AudioSource &&) = default;
     ~AudioSource() { deinit(); }
 
-    AudioSource &operator=(AudioSource &&) = default;
-
     void init();
-    void update();
+    void render();
 
     void play();
     void stop();
+
+    void setPosition(glm::vec3 position);
 
     bool isPlaying() const { return _playing; }
 
     float duration() const;
 
-    void setPosition(glm::vec3 position);
-
 private:
     std::shared_ptr<AudioClip> _stream;
-    bool _loop;
     float _gain;
-    bool _positional;
-    glm::vec3 _position;
+    bool _loop;
+    std::optional<glm::vec3> _position;
 
     bool _inited {false};
     bool _playing {false};
@@ -65,6 +63,9 @@ private:
     uint32_t _source {0};
     int _nextFrame {0};
     int _nextBuffer {0};
+
+    bool _playingDirty {false};
+    bool _positionDirty {false};
 
     void deinit();
 };

@@ -18,7 +18,7 @@
 #include "reone/game/gui.h"
 
 #include "reone/audio/di/services.h"
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/gui/sounds.h"
@@ -86,9 +86,6 @@ void GameGUI::update(float dt) {
     if (_gui) {
         _gui->update(dt);
     }
-    if (_audioSource) {
-        _audioSource->update();
-    }
 }
 
 void GameGUI::render() {
@@ -148,12 +145,14 @@ std::string GameGUI::guiResRef(const std::string &base) const {
 }
 
 void GameGUI::onClick(const std::string &control) {
-    _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
+    auto clip = _services.game.guiSounds.getOnClick();
+    _audioSource = _services.audio.mixer.play(std::move(clip), AudioType::Sound);
 }
 
 void GameGUI::onSelectionChanged(const std::string &control, bool selected) {
     if (selected) {
-        _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
+        auto clip = _services.game.guiSounds.getOnEnter();
+        _audioSource = _services.audio.mixer.play(std::move(clip), AudioType::Sound);
     }
 }
 

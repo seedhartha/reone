@@ -48,7 +48,7 @@ void AudioResourcePanel::BindEvents() {
 void AudioResourcePanel::BindViewModel() {
     m_viewModel.audioStream().addChangedHandler([this](const auto &stream) {
         if (stream) {
-            m_audioSource = std::make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
+            m_audioSource = std::make_unique<AudioSource>(stream);
             m_audioSource->init();
             m_audioSource->play();
             wxWakeUpIdle();

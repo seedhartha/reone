@@ -18,7 +18,7 @@
 #include "reone/game/object/item.h"
 
 #include "reone/audio/di/services.h"
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/graphics/di/services.h"
@@ -49,18 +49,20 @@ void Item::loadFromBlueprint(const std::string &resRef) {
 }
 
 void Item::update(float dt) {
-    if (_audioSource) {
-        _audioSource->update();
-    }
 }
 
 void Item::playShotSound(int variant, glm::vec3 position) {
     if (!_ammunitionType) {
         return;
     }
-    std::shared_ptr<AudioClip> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
-    if (sound) {
-        _audioSource = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
+    auto clip = variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1;
+    if (clip) {
+        _audioSource = _services.audio.mixer.play(
+            std::move(clip),
+            AudioType::Sound,
+            1.0f,
+            false,
+            std::move(position));
     }
 }
 
@@ -68,9 +70,14 @@ void Item::playImpactSound(int variant, glm::vec3 position) {
     if (!_ammunitionType) {
         return;
     }
-    std::shared_ptr<AudioClip> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
-    if (sound) {
-        _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
+    auto clip = variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1;
+    if (clip) {
+        _services.audio.mixer.play(
+            std::move(clip),
+            AudioType::Sound,
+            1.0f,
+            false,
+            std::move(position));
     }
 }
 

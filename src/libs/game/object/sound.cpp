@@ -17,7 +17,7 @@
 
 #include "reone/game/object/sound.h"
 
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/resource/2da.h"

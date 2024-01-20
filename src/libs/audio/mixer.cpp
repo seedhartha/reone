@@ -15,20 +15,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/audio/player.h"
+#include "reone/audio/mixer.h"
 
 namespace reone {
 
 namespace audio {
 
-std::shared_ptr<AudioSource> AudioPlayer::play(std::shared_ptr<AudioClip> clip, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    auto source = std::make_shared<AudioSource>(std::move(clip), loop, getGain(type, gain), positional, std::move(position));
+void AudioMixer::render() {
+    for (auto it = _sources.begin(); it != _sources.end();) {
+        auto &source = *it;
+        source->render();
+        if (!source->isPlaying()) {
+            it = _sources.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+std::shared_ptr<AudioSource> AudioMixer::play(std::shared_ptr<AudioClip> clip,
+                                              AudioType type,
+                                              float gain,
+                                              bool loop,
+                                              std::optional<glm::vec3> position) {
+    auto source = std::make_shared<AudioSource>(
+        std::move(clip),
+        gainByType(type, gain),
+        loop,
+        std::move(position));
     source->init();
     source->play();
+    _sources.push_back(source);
     return source;
 }
 
-float AudioPlayer::getGain(AudioType type, float gain) const {
+float AudioMixer::gainByType(AudioType type, float gain) const {
     int volume;
     switch (type) {
     case AudioType::Music:
