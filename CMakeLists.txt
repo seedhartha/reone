@@ -24,7 +24,7 @@ set(CLANG_FORMAT_PATH ${CMAKE_SOURCE_DIR}/.clang-format)
 option(BUILD_TESTS "build tests" ON)
 option(BUILD_LAUNCHER "build launcher application" ON)
 option(BUILD_TOOLKIT "build toolkit application" ON)
-option(BUILD_ANALYZER "build analyzer application" ON)
+option(BUILD_DATAMINER "build dataminer application" ON)
 
 option(ENABLE_MOVIE "enable movie playback" ON)
 option(ENABLE_ASAN "enable address sanitizer" OFF)
@@ -116,8 +116,8 @@ if(BUILD_TOOLKIT)
     add_subdirectory(src/apps/toolkit) # toolkit application
 endif()
 
-if(BUILD_ANALYZER)
-    add_subdirectory(src/apps/analyzer) # analyzer application
+if(BUILD_DATAMINER)
+    add_subdirectory(src/apps/dataminer) # dataminer application
 endif()
 
 if(BUILD_TESTS)
