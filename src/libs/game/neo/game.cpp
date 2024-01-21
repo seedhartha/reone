@@ -57,6 +57,8 @@
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/system/checkutil.h"
+#include "reone/system/clock.h"
+#include "reone/system/di/services.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/threadutil.h"
@@ -330,9 +332,6 @@ bool Game::handle(const input::Event &event) {
 
 void Game::update(float dt) {
     _cameraController.update(dt);
-    if (_module) {
-        _module->get().update(dt);
-    }
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     scene.update(dt);
     if (_cameraSceneNode) {
@@ -362,11 +361,19 @@ void Game::quit() {
 void Game::logicThreadFunc() {
     setThreadName("game");
 
+    _ticks = _systemSvc.clock.millis();
+
     while (!_quit.load(std::memory_order::memory_order_acquire)) {
         bool paused = _paused.load(std::memory_order::memory_order_acquire);
         if (paused) {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
             continue;
+        }
+        uint32_t ticks = _systemSvc.clock.millis();
+        float dt = (ticks - _ticks) / 1000.0f;
+        _ticks = ticks;
+        if (_module) {
+            _module->get().update(dt);
         }
     }
 }

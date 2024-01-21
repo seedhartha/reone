@@ -22,6 +22,7 @@
 #include "../../fixtures/graphics.h"
 #include "../../fixtures/resource.h"
 #include "../../fixtures/scene.h"
+#include "../../fixtures/system.h"
 
 #include "reone/game/neo/game.h"
 #include "reone/game/neo/object/area.h"
@@ -37,6 +38,7 @@
 #include "reone/game/neo/object/waypoint.h"
 #include "reone/resource/provider/gffs.h"
 
+using namespace reone;
 using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::game::neo;
@@ -77,6 +79,7 @@ protected:
         _sceneModule.init();
         _game = std::make_unique<Game>(
             _options,
+            _systemModule.services(),
             _graphicsModule.services(),
             _resourceModule.services(),
             _sceneModule.services(),
@@ -84,6 +87,7 @@ protected:
     }
 
     TestOptions _options;
+    TestSystemModule _systemModule;
     TestGraphicsModule _graphicsModule;
     TestResourceModule _resourceModule;
     TestSceneModule _sceneModule;

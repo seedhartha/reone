@@ -30,7 +30,7 @@ public:
     void init() override {
     }
 
-    uint64_t millis() const override {
+    uint32_t millis() const override {
         return 0;
     }
 

@@ -28,6 +28,8 @@
 
 namespace reone {
 
+struct SystemServices;
+
 namespace graphics {
 
 struct GraphicsServices;
@@ -99,11 +101,13 @@ private:
 class Game : public IAreaLoader, public IAreaObjectLoader, boost::noncopyable {
 public:
     Game(OptionsView &options,
+         SystemServices &systemSvc,
          graphics::GraphicsServices &graphicsSvc,
          resource::ResourceServices &resourceSvc,
          scene::SceneServices &sceneSvc,
          IConsole &console) :
         _options(options),
+        _systemSvc(systemSvc),
         _graphicsSvc(graphicsSvc),
         _resourceSvc(resourceSvc),
         _sceneSvc(sceneSvc),
@@ -175,6 +179,7 @@ public:
 
 private:
     OptionsView &_options;
+    SystemServices &_systemSvc;
     graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;
     scene::SceneServices &_sceneSvc;
@@ -185,6 +190,7 @@ private:
     std::atomic_bool _quit {false};
     std::atomic_bool _paused {false};
     std::thread _logicThread;
+    uint32_t _ticks {0};
 
     ObjectId _nextObjectId {2};
     std::list<std::unique_ptr<Object>> _objects;

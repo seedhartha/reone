@@ -119,6 +119,7 @@ void Engine::init() {
     _services->resource.director.onModuleLoad("end_m01aa");
     _neoGame = std::make_unique<neo::Game>(
         *_optionsView,
+        _services->system,
         _services->graphics,
         _services->resource,
         _services->scene,
