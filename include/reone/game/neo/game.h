@@ -181,6 +181,8 @@ public:
     // END Object factory methods
 
 private:
+    using AsyncTask = std::function<void()>;
+
     OptionsView &_options;
     SystemServices &_systemSvc;
     graphics::GraphicsServices &_graphicsSvc;
@@ -191,13 +193,19 @@ private:
 
     bool _inited {false};
 
+    uint32_t _ticks {0};
     std::atomic_bool _quit {false};
     std::atomic_bool _paused {false};
     std::thread _logicThread;
-    uint32_t _ticks {0};
+    std::queue<AsyncTask> _logicTasks;
+    std::mutex _logicTasksMutex;
+
+    std::list<Event> _events;
+    std::mutex _eventsMutex;
 
     ObjectId _nextObjectId {2};
     std::list<std::unique_ptr<Object>> _objects;
+    std::map<ObjectId, std::reference_wrapper<Object>> _idToObject;
     std::optional<std::reference_wrapper<Module>> _module;
 
     CameraController _cameraController;
@@ -205,6 +213,7 @@ private:
     std::optional<std::reference_wrapper<scene::ModelSceneNode>> _pickedModel;
 
     void logicThreadFunc();
+    void runOnLogicThread(AsyncTask task);
 };
 
 } // namespace neo

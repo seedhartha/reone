@@ -72,18 +72,6 @@ public:
 
     virtual void clear() = 0;
 
-    virtual void addRoot(std::shared_ptr<ModelSceneNode> node) = 0;
-    virtual void addRoot(std::shared_ptr<WalkmeshSceneNode> node) = 0;
-    virtual void addRoot(std::shared_ptr<TriggerSceneNode> node) = 0;
-    virtual void addRoot(std::shared_ptr<GrassSceneNode> node) = 0;
-    virtual void addRoot(std::shared_ptr<SoundSceneNode> node) = 0;
-
-    virtual void removeRoot(ModelSceneNode &node) = 0;
-    virtual void removeRoot(WalkmeshSceneNode &node) = 0;
-    virtual void removeRoot(TriggerSceneNode &node) = 0;
-    virtual void removeRoot(GrassSceneNode &node) = 0;
-    virtual void removeRoot(SoundSceneNode &node) = 0;
-
     virtual bool testElevation(const glm::vec2 &position, Collision &outCollision) const = 0;
     virtual bool testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const = 0;
     virtual bool testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const = 0;
@@ -108,6 +96,26 @@ public:
     virtual void setRenderWalkmeshes(bool render) = 0;
     virtual void setRenderTriggers(bool render) = 0;
 
+    // Roots
+
+    virtual void addRoot(std::shared_ptr<ModelSceneNode> node) = 0;
+    virtual void addRoot(std::shared_ptr<WalkmeshSceneNode> node) = 0;
+    virtual void addRoot(std::shared_ptr<TriggerSceneNode> node) = 0;
+    virtual void addRoot(std::shared_ptr<GrassSceneNode> node) = 0;
+    virtual void addRoot(std::shared_ptr<SoundSceneNode> node) = 0;
+
+    virtual void removeRoot(ModelSceneNode &node) = 0;
+    virtual void removeRoot(WalkmeshSceneNode &node) = 0;
+    virtual void removeRoot(TriggerSceneNode &node) = 0;
+    virtual void removeRoot(GrassSceneNode &node) = 0;
+    virtual void removeRoot(SoundSceneNode &node) = 0;
+
+    virtual std::optional<std::reference_wrapper<ModelSceneNode>> modelByExternalRef(void *externalRef) = 0;
+
+    // END Roots
+
+    // Factory methods
+
     virtual std::shared_ptr<CameraSceneNode> newCamera() = 0;
     virtual std::shared_ptr<ModelSceneNode> newModel(graphics::Model &model, ModelUsage usage) = 0;
     virtual std::shared_ptr<WalkmeshSceneNode> newWalkmesh(graphics::Walkmesh &walkmesh) = 0;
@@ -120,6 +128,8 @@ public:
     virtual std::shared_ptr<ParticleSceneNode> newParticle(EmitterSceneNode &emitter) = 0;
     virtual std::shared_ptr<GrassSceneNode> newGrass(GrassProperties properties, graphics::ModelNode &aabbNode) = 0;
     virtual std::shared_ptr<GrassClusterSceneNode> newGrassCluster(GrassSceneNode &grass) = 0;
+
+    // END Factory methods
 };
 
 class SceneGraph : public ISceneGraph, boost::noncopyable {
@@ -180,6 +190,8 @@ public:
     void removeRoot(TriggerSceneNode &node) override;
     void removeRoot(GrassSceneNode &node) override;
     void removeRoot(SoundSceneNode &node) override;
+
+    std::optional<std::reference_wrapper<ModelSceneNode>> modelByExternalRef(void *externalRef) override;
 
     // END Roots
 
@@ -289,6 +301,8 @@ private:
     std::list<std::shared_ptr<TriggerSceneNode>> _triggerRoots;
     std::list<std::shared_ptr<GrassSceneNode>> _grassRoots;
     std::list<std::shared_ptr<SoundSceneNode>> _soundRoots;
+
+    std::map<void *, std::reference_wrapper<SceneNode>> _externalRefToNode;
 
     // END Roots
 

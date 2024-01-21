@@ -98,6 +98,7 @@ static const std::vector<float> g_shadowCascadeDivisors {
     0.135f};
 
 void SceneGraph::clear() {
+    _externalRefToNode.clear();
     _modelRoots.clear();
     _walkmeshRoots.clear();
     _soundRoots.clear();
@@ -107,6 +108,10 @@ void SceneGraph::clear() {
 
 void SceneGraph::addRoot(std::shared_ptr<ModelSceneNode> node) {
     _modelRoots.push_back(node);
+    auto externalRef = node->externalRef();
+    if (externalRef) {
+        _externalRefToNode.insert({externalRef, *_modelRoots.back()});
+    }
 }
 
 void SceneGraph::addRoot(std::shared_ptr<WalkmeshSceneNode> node) {
@@ -137,7 +142,10 @@ void SceneGraph::removeRoot(ModelSceneNode &node) {
             ++it;
         }
     }
-
+    auto externalRef = node.externalRef();
+    if (externalRef) {
+        _externalRefToNode.erase(externalRef);
+    }
     auto it = std::remove_if(
         _modelRoots.begin(),
         _modelRoots.end(),
@@ -175,6 +183,17 @@ void SceneGraph::removeRoot(SoundSceneNode &node) {
         _soundRoots.end(),
         [&node](auto &root) { return root.get() == &node; });
     _soundRoots.erase(it, _soundRoots.end());
+}
+
+std::optional<std::reference_wrapper<ModelSceneNode>> SceneGraph::modelByExternalRef(void *externalRef) {
+    if (_externalRefToNode.count(externalRef) == 0) {
+        return std::nullopt;
+    }
+    auto &node = _externalRefToNode.at(externalRef);
+    if (node.get().type() != SceneNodeType::Model) {
+        return std::nullopt;
+    }
+    return static_cast<ModelSceneNode &>(node.get());
 }
 
 void SceneGraph::update(float dt) {

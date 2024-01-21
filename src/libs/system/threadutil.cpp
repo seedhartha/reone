@@ -36,27 +36,6 @@ void checkMainThread() {
     }
 }
 
-void runOnMainThread(std::function<void()> task) {
-    if (isMainThread()) {
-        task();
-        return;
-    }
-    std::lock_guard<std::mutex> lock {g_mainThreadTasksMutex};
-    g_mainThreadTasks.push(std::move(task));
-}
-
-void runMainThreadTasks() {
-    std::queue<std::function<void()>> tasks;
-    {
-        std::lock_guard<std::mutex> lock {g_mainThreadTasksMutex};
-        std::swap(tasks, g_mainThreadTasks);
-    }
-    while (!tasks.empty()) {
-        tasks.front()();
-        tasks.pop();
-    }
-}
-
 bool isMainThread() {
     return std::this_thread::get_id() == g_mainThreadId;
 }

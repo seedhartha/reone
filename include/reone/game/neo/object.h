@@ -21,6 +21,8 @@
 
 #include "action.h"
 #include "effect.h"
+#include "event.h"
+#include "types.h"
 
 namespace reone {
 
@@ -34,8 +36,6 @@ enum class ObjectState {
     Destroyed
 };
 
-using ObjectId = uint32_t;
-using ObjectTag = std::string;
 using ActionQueue = std::queue<Action>;
 using EffectList = std::vector<Effect>;
 
@@ -91,6 +91,18 @@ public:
 
     // END Effects
 
+    // Events
+
+    void clearEvents() {
+        _events.clear();
+    }
+
+    const EventList &events() const {
+        return _events;
+    }
+
+    // END Events
+
 protected:
     ObjectId _id;
     ObjectTag _tag;
@@ -100,6 +112,7 @@ protected:
 
     ActionQueue _actions;
     EffectList _effects;
+    EventList _events;
 
     Object(ObjectId id,
            ObjectTag tag,
@@ -118,6 +131,11 @@ public:
 
     void setPosition(glm::vec3 position) {
         _position = std::move(position);
+
+        Event event;
+        event.type = EventType::ObjectLocationChanged;
+        event.object.objectId = _id;
+        _events.push_back(std::move(event));
     }
 
     float facing() const {
@@ -126,6 +144,11 @@ public:
 
     void setFacing(float facing) {
         _facing = facing;
+
+        Event event;
+        event.type = EventType::ObjectLocationChanged;
+        event.object.objectId = _id;
+        _events.push_back(std::move(event));
     }
 
     void setFacingPoint(const glm::vec3 &target);

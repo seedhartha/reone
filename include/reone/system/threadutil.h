@@ -21,8 +21,6 @@ namespace reone {
 
 void markMainThread();
 void checkMainThread();
-void runOnMainThread(std::function<void()> task);
-void runMainThreadTasks();
 
 bool isMainThread();
 

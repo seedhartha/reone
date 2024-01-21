@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/neo/object.h"
+#pragma once
 
 namespace reone {
 
@@ -23,10 +23,8 @@ namespace game {
 
 namespace neo {
 
-void SpatialObject::setFacingPoint(const glm::vec3 &target) {
-    glm::vec2 dir = glm::normalize(target - _position);
-    setFacing(glm::atan(dir.y, dir.x));
-}
+using ObjectId = uint32_t;
+using ObjectTag = std::string;
 
 } // namespace neo
 

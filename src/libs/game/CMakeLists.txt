@@ -280,6 +280,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/location.h
     ${GAME_INCLUDE_DIR}/neo/action.h
     ${GAME_INCLUDE_DIR}/neo/effect.h
+    ${GAME_INCLUDE_DIR}/neo/event.h
     ${GAME_INCLUDE_DIR}/neo/game.h
     ${GAME_INCLUDE_DIR}/neo/inventory.h
     ${GAME_INCLUDE_DIR}/neo/object.h
@@ -295,6 +296,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/neo/object/store.h
     ${GAME_INCLUDE_DIR}/neo/object/trigger.h
     ${GAME_INCLUDE_DIR}/neo/object/waypoint.h
+    ${GAME_INCLUDE_DIR}/neo/types.h
     ${GAME_INCLUDE_DIR}/object.h
     ${GAME_INCLUDE_DIR}/object/area.h
     ${GAME_INCLUDE_DIR}/object/camera.h

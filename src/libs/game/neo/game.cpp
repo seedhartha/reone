@@ -319,11 +319,14 @@ bool Game::handle(const input::Event &event) {
             if (!externalRef) {
                 message = str(boost::format(kPickedModelFormat) % _pickedModel->get().model().name());
             } else {
-                auto &object = *reinterpret_cast<Object *>(externalRef);
+                auto &object = *reinterpret_cast<SpatialObject *>(externalRef);
                 message = str(boost::format(kPickedObjectFormat) %
                               object.id() %
                               static_cast<int>(object.type()) %
                               object.tag());
+                runOnLogicThread([&object]() {
+                    object.setFacing(object.facing() + glm::half_pi<float>());
+                });
             }
             _console.printLine(message);
             return true;
@@ -336,8 +339,25 @@ bool Game::handle(const input::Event &event) {
 }
 
 void Game::update(float dt) {
-    _cameraController.update(dt);
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    {
+        std::lock_guard<std::mutex> lock {_eventsMutex};
+        for (auto &event : _events) {
+            if (event.type == EventType::ObjectLocationChanged) {
+                auto &object = static_cast<SpatialObject &>(_idToObject.at(event.object.objectId).get());
+                auto sceneNode = scene.modelByExternalRef(&object);
+                if (sceneNode) {
+                    auto transform = glm::rotate(
+                        glm::translate(object.position()),
+                        object.facing(),
+                        glm::vec3 {0.0f, 0.0f, 1.0f});
+                    sceneNode->get().setLocalTransform(std::move(transform));
+                }
+            }
+        }
+        _events.clear();
+    }
+    _cameraController.update(dt);
     scene.update(dt);
     if (_cameraSceneNode) {
         auto &camera = *_cameraSceneNode->get().camera();
@@ -379,9 +399,31 @@ void Game::logicThreadFunc() {
         _profiler.measure(kLogicThreadName, 0, [this, &dt]() {
             if (_module) {
                 _module->get().update(dt);
+                std::lock_guard<std::mutex> lock {_eventsMutex};
+                for (auto &object : _module->get().area().objects()) {
+                    for (auto &event : object.get().events()) {
+                        _events.push_back(std::move(event));
+                    }
+                    object.get().clearEvents();
+                }
+            }
+            std::queue<AsyncTask> tasks;
+            {
+                std::lock_guard<std::mutex> lock {_logicTasksMutex};
+                std::swap(tasks, _logicTasks);
+            }
+            while (!tasks.empty()) {
+                auto task = tasks.front();
+                tasks.pop();
+                task();
             }
         });
     }
+}
+
+void Game::runOnLogicThread(AsyncTask task) {
+    std::lock_guard<std::mutex> lock {_logicTasksMutex};
+    _logicTasks.push(std::move(task));
 }
 
 void Game::startModule(const std::string &name) {
@@ -533,6 +575,8 @@ Area &Game::newArea(ObjectTag tag) {
     auto object = std::make_unique<Area>(_nextObjectId++, std::move(tag), *this);
     auto &area = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return area;
 }
 
@@ -540,6 +584,8 @@ Camera &Game::newCamera(ObjectTag tag) {
     auto object = std::make_unique<Camera>(_nextObjectId++, std::move(tag));
     auto &camera = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return camera;
 }
 
@@ -547,6 +593,8 @@ Creature &Game::newCreature(ObjectTag tag) {
     auto object = std::make_unique<Creature>(_nextObjectId++, std::move(tag));
     auto &creature = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return creature;
 }
 
@@ -554,6 +602,8 @@ Door &Game::newDoor(ObjectTag tag) {
     auto object = std::make_unique<Door>(_nextObjectId++, std::move(tag));
     auto &door = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return door;
 }
 
@@ -561,6 +611,8 @@ Encounter &Game::newEncounter(ObjectTag tag) {
     auto object = std::make_unique<Encounter>(_nextObjectId++, std::move(tag));
     auto &encounter = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return encounter;
 }
 
@@ -568,6 +620,8 @@ Item &Game::newItem(ObjectTag tag) {
     auto object = std::make_unique<Item>(_nextObjectId++, std::move(tag));
     auto &item = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return item;
 }
 
@@ -575,6 +629,8 @@ Module &Game::newModule(ObjectTag tag) {
     auto object = std::make_unique<Module>(_nextObjectId++, std::move(tag), *this);
     auto &module = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return module;
 }
 
@@ -582,6 +638,8 @@ Placeable &Game::newPlaceable(ObjectTag tag) {
     auto object = std::make_unique<Placeable>(_nextObjectId++, std::move(tag));
     auto &placeable = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return placeable;
 }
 
@@ -589,6 +647,8 @@ Sound &Game::newSound(ObjectTag tag) {
     auto object = std::make_unique<Sound>(_nextObjectId++, std::move(tag));
     auto &sound = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return sound;
 }
 
@@ -596,6 +656,8 @@ Store &Game::newStore(ObjectTag tag) {
     auto object = std::make_unique<Store>(_nextObjectId++, std::move(tag));
     auto &store = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return store;
 }
 
@@ -603,6 +665,8 @@ Trigger &Game::newTrigger(ObjectTag tag) {
     auto object = std::make_unique<Trigger>(_nextObjectId++, std::move(tag));
     auto &trigger = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return trigger;
 }
 
@@ -610,6 +674,8 @@ Waypoint &Game::newWaypoint(ObjectTag tag) {
     auto object = std::make_unique<Waypoint>(_nextObjectId++, std::move(tag));
     auto &waypoint = *object;
     _objects.push_back(std::move(object));
+    auto &inserted = *_objects.back();
+    _idToObject.insert({inserted.id(), inserted});
     return waypoint;
 }
 
