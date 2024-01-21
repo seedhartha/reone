@@ -1083,9 +1083,9 @@ void Creature::finalizeModel(ModelSceneNode &body) {
     }
     std::string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        std::shared_ptr<Texture> texture(_services.resource.textures.get(bodyTextureName, TextureUsage::Diffuse));
+        std::shared_ptr<Texture> texture(_services.resource.textures.get(bodyTextureName, TextureUsage::MainTex));
         if (texture) {
-            body.setDiffuseMap(texture.get());
+            body.setMainTexture(texture.get());
         }
     }
 
@@ -1194,7 +1194,7 @@ std::string Creature::getBodyTextureName() const {
         bool texFound = false;
         if (bodyItem) {
             std::string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
-            std::shared_ptr<Texture> texture(_services.resource.textures.get(tmp, TextureUsage::Diffuse));
+            std::shared_ptr<Texture> texture(_services.resource.textures.get(tmp, TextureUsage::MainTex));
             if (texture) {
                 texName = std::move(tmp);
                 texFound = true;

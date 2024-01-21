@@ -21,6 +21,8 @@
 
 #include "reone/input/event.h"
 
+#include "../options.h"
+
 #include "object/area.h"
 #include "object/module.h"
 
@@ -31,6 +33,14 @@ namespace resource {
 struct ResourceServices;
 
 }
+
+namespace scene {
+
+struct SceneServices;
+
+class CameraSceneNode;
+
+} // namespace scene
 
 namespace game {
 
@@ -47,11 +57,52 @@ class Store;
 class Trigger;
 class Waypoint;
 
+class CameraController : boost::noncopyable {
+public:
+    bool handle(const input::Event &event);
+    void update(float dt);
+
+    void setSceneNode(scene::CameraSceneNode &sceneNode) {
+        _sceneNode = sceneNode;
+    }
+
+    void refreshSceneNode();
+
+private:
+    struct MovementDirections {
+        static constexpr int None = 0;
+        static constexpr int Right = 1 << 0;
+        static constexpr int Left = 1 << 1;
+        static constexpr int Front = 1 << 2;
+        static constexpr int Back = 1 << 3;
+        static constexpr int Up = 1 << 4;
+        static constexpr int Down = 1 << 5;
+    };
+
+    glm::vec3 _position {0.0f};
+    float _facing {0.0f};
+    float _pitch {glm::half_pi<float>()};
+    int _movementDir {0};
+
+    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _sceneNode;
+};
+
 class Game : public IAreaLoader, public IAreaObjectLoader, boost::noncopyable {
 public:
-    Game(resource::ResourceServices &resourceSvc) :
-        _resourceSvc(resourceSvc) {
+    Game(OptionsView &options,
+         resource::ResourceServices &resourceSvc,
+         scene::SceneServices &sceneSvc) :
+        _options(options),
+        _resourceSvc(resourceSvc),
+        _sceneSvc(sceneSvc) {
     }
+
+    ~Game() {
+        deinit();
+    }
+
+    void init();
+    void deinit();
 
     bool handle(const input::Event &event);
     void update(float dt);
@@ -106,12 +157,18 @@ public:
     // END Object factory methods
 
 private:
+    OptionsView &_options;
     resource::ResourceServices &_resourceSvc;
+    scene::SceneServices &_sceneSvc;
 
-    std::optional<std::reference_wrapper<Module>> _module;
+    bool _inited {false};
+
+    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
+    CameraController _cameraController;
 
     ObjectId _nextObjectId {2};
     std::list<std::unique_ptr<Object>> _objects;
+    std::optional<std::reference_wrapper<Module>> _module;
 };
 
 } // namespace neo

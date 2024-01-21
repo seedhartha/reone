@@ -33,7 +33,9 @@
 #include "reone/resource/provider/2das.h"
 #include "reone/resource/provider/gffs.h"
 #include "reone/resource/provider/layouts.h"
+#include "reone/resource/provider/models.h"
 #include "reone/resource/provider/paths.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/provider/visibilities.h"
 #include "reone/resource/template/generated/are.h"
 #include "reone/resource/template/generated/git.h"
@@ -46,11 +48,16 @@
 #include "reone/resource/template/generated/uts.h"
 #include "reone/resource/template/generated/utt.h"
 #include "reone/resource/template/generated/utw.h"
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
+#include "reone/system/checkutil.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/exception/validation.h"
 
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::resource::generated;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -58,18 +65,195 @@ namespace game {
 
 namespace neo {
 
-void Game::startModule(const std::string &name) {
-    _module = loadModule(name);
+static constexpr float kCameraMouseSensitity = 0.001f;
+static constexpr float kCameraMoveRate = 8.0f;
+
+bool CameraController::handle(const input::Event &event) {
+    switch (event.type) {
+    case input::EventType::MouseMotion: {
+        _pitch += -kCameraMouseSensitity * event.motion.yrel;
+        _facing += -kCameraMouseSensitity * event.motion.xrel;
+        refreshSceneNode();
+        break;
+    }
+    case input::EventType::KeyDown: {
+        switch (event.key.code) {
+        case input::KeyCode::W:
+            _movementDir |= MovementDirections::Front;
+            break;
+        case input::KeyCode::A:
+            _movementDir |= MovementDirections::Left;
+            break;
+        case input::KeyCode::S:
+            _movementDir |= MovementDirections::Back;
+            break;
+        case input::KeyCode::D:
+            _movementDir |= MovementDirections::Right;
+            break;
+        case input::KeyCode::Q:
+            _movementDir |= MovementDirections::Up;
+            break;
+        case input::KeyCode::Z:
+            _movementDir |= MovementDirections::Down;
+            break;
+        default:
+            return false;
+        }
+        break;
+    }
+    case input::EventType::KeyUp:
+        switch (event.key.code) {
+        case input::KeyCode::W:
+            _movementDir &= ~MovementDirections::Front;
+            break;
+        case input::KeyCode::A:
+            _movementDir &= ~MovementDirections::Left;
+            break;
+        case input::KeyCode::S:
+            _movementDir &= ~MovementDirections::Back;
+            break;
+        case input::KeyCode::D:
+            _movementDir &= ~MovementDirections::Right;
+            break;
+        case input::KeyCode::Q:
+            _movementDir &= ~MovementDirections::Up;
+            break;
+        case input::KeyCode::Z:
+            _movementDir &= ~MovementDirections::Down;
+            break;
+        default:
+            return false;
+        }
+    default:
+        return false;
+    }
+    return true;
+}
+
+void CameraController::update(float dt) {
+    if (!_movementDir) {
+        return;
+    }
+    float sinFacing = glm::sin(_facing);
+    float cosFacing = glm::cos(_facing);
+    if (_movementDir & MovementDirections::Right) {
+        _position.x += kCameraMoveRate * cosFacing * dt;
+        _position.y += kCameraMoveRate * sinFacing * dt;
+        _position.z += 0.0f;
+    } else if (_movementDir & MovementDirections::Left) {
+        _position.x += -kCameraMoveRate * cosFacing * dt;
+        _position.y += -kCameraMoveRate * sinFacing * dt;
+        _position.z += 0.0f;
+    } else if (_movementDir & MovementDirections::Front) {
+        _position.x -= kCameraMoveRate * sinFacing * dt;
+        _position.y += kCameraMoveRate * cosFacing * dt;
+        _position.z += 0.0f;
+    } else if (_movementDir & MovementDirections::Back) {
+        _position.x += kCameraMoveRate * sinFacing * dt;
+        _position.y -= kCameraMoveRate * cosFacing * dt;
+        _position.z += 0.0f;
+    } else if (_movementDir & MovementDirections::Up) {
+        _position.x += 0.0f;
+        _position.y += 0.0f;
+        _position.z += kCameraMoveRate * dt;
+    } else if (_movementDir & MovementDirections::Down) {
+        _position.x += 0.0f;
+        _position.y += 0.0f;
+        _position.z -= kCameraMoveRate * dt;
+    }
+    refreshSceneNode();
+}
+
+void CameraController::refreshSceneNode() {
+    auto transform = glm::translate(_position);
+    transform *= glm::eulerAngleZX(_facing, _pitch);
+    _sceneNode->get().setLocalTransform(std::move(transform));
+}
+
+void Game::init() {
+    checkThat(!_inited, "Must not be initialized");
+
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+
+    auto camera = scene.newCamera();
+    float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
+    camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+    scene.setActiveCamera(camera.get());
+    _cameraSceneNode = *camera;
+    _cameraController.setSceneNode(*camera);
+    _cameraController.refreshSceneNode();
+
+    startModule("end_m01aa");
+    if (_module) {
+        auto &area = _module->get().area();
+        for (auto &room : area.rooms()) {
+            auto model = _resourceSvc.models.get(room.model);
+            if (!model) {
+                throw ResourceNotFoundException("Room model not found: " + room.model);
+            }
+            auto sceneNode = scene.newModel(*model, ModelUsage::Room);
+            sceneNode->setLocalTransform(glm::translate(room.position));
+            scene.addRoot(std::move(sceneNode));
+        }
+        for (auto &creature : area.creatures()) {
+            const auto &appearance = creature.get().appearance();
+            auto modelName = appearance.model.value();
+            auto model = _resourceSvc.models.get(modelName);
+            if (!model) {
+                throw ResourceNotFoundException("Creature model not found: " + modelName);
+            }
+            Texture *mainTex;
+            auto transform = glm::translate(creature.get().position());
+            transform *= glm::eulerAngleZ(glm::radians(creature.get().facing()));
+            auto sceneNode = scene.newModel(*model, ModelUsage::Creature);
+            if (appearance.texture) {
+                auto &texName = appearance.texture->value();
+                auto texture = _resourceSvc.textures.get(texName, TextureUsage::MainTex);
+                if (!texture) {
+                    throw ResourceNotFoundException("Creature texture not found: " + texName);
+                }
+                // sceneNode->setMainTexture(texture.get());
+            }
+            if (appearance.normalHeadModel) {
+                auto headModel = _resourceSvc.models.get(appearance.normalHeadModel->value());
+                if (!headModel) {
+                    throw ResourceNotFoundException("Creature head model not found: " + modelName);
+                }
+                auto headSceneNode = scene.newModel(*headModel, ModelUsage::Creature);
+                sceneNode->attach("headhook", *headSceneNode);
+            }
+            sceneNode->setLocalTransform(std::move(transform));
+            scene.addRoot(std::move(sceneNode));
+        }
+    }
+
+    _inited = true;
+}
+
+void Game::deinit() {
+    if (!_inited) {
+        return;
+    }
+    _inited = false;
 }
 
 bool Game::handle(const input::Event &event) {
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    if (_cameraController.handle(event)) {
+        return true;
+    }
     return false;
 }
 
 void Game::update(float dt) {
+    _cameraController.update(dt);
     if (_module) {
         _module->get().update(dt);
     }
+}
+
+void Game::startModule(const std::string &name) {
+    _module = loadModule(name);
 }
 
 Module &Game::loadModule(const std::string &name) {

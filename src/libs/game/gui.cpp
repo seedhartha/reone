@@ -136,7 +136,7 @@ void GameGUI::loadBackground(BackgroundType type) {
     }
 
     if (_gui) {
-        _gui->setBackground(_services.resource.textures.get(resRef, TextureUsage::Diffuse));
+        _gui->setBackground(_services.resource.textures.get(resRef, TextureUsage::MainTex));
     }
 }
 

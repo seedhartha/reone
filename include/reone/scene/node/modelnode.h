@@ -40,7 +40,7 @@ public:
         _static = stat;
     }
 
-    virtual void setDiffuseMap(graphics::Texture *texture);
+    virtual void setMainTexture(graphics::Texture *texture);
     virtual void setEnvironmentMap(graphics::Texture *texture);
 
 protected:

@@ -59,7 +59,7 @@ void MeshSceneNode::initTextures() {
         return;
     }
     if (!mesh->diffuseMap.empty()) {
-        auto diffuseMap = _resourceSvc.textures.get(mesh->diffuseMap, TextureUsage::Diffuse);
+        auto diffuseMap = _resourceSvc.textures.get(mesh->diffuseMap, TextureUsage::MainTex);
         _nodeTextures.diffuse = diffuseMap.get();
     }
     if (!mesh->lightmap.empty()) {
@@ -356,8 +356,8 @@ bool MeshSceneNode::isLightingEnabled() const {
     return true;
 }
 
-void MeshSceneNode::setDiffuseMap(Texture *texture) {
-    ModelNodeSceneNode::setDiffuseMap(texture);
+void MeshSceneNode::setMainTexture(Texture *texture) {
+    ModelNodeSceneNode::setMainTexture(texture);
     _nodeTextures.diffuse = texture;
     refreshAdditionalTextures();
 }

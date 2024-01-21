@@ -183,7 +183,7 @@ void Area::loadStealthXP(const resource::generated::ARE &are) {
 void Area::loadGrass(const resource::generated::ARE &are) {
     std::string texName(boost::to_lower_copy(are.Grass_TexName));
     if (!texName.empty()) {
-        _grass.texture = _services.resource.textures.get(texName, TextureUsage::Diffuse);
+        _grass.texture = _services.resource.textures.get(texName, TextureUsage::MainTex);
     }
     _grass.density = are.Grass_Density;
     _grass.quadSize = are.Grass_QuadSize;

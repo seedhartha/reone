@@ -193,10 +193,10 @@ SceneNode *ModelSceneNode::getAttachment(const std::string &parentName) {
     return it != _attachments.end() ? it->second : nullptr;
 }
 
-void ModelSceneNode::setDiffuseMap(Texture *texture) {
+void ModelSceneNode::setMainTexture(Texture *texture) {
     for (auto &child : _children) {
         if (child->type() == SceneNodeType::Dummy || child->type() == SceneNodeType::Mesh) {
-            static_cast<ModelNodeSceneNode *>(child)->setDiffuseMap(texture);
+            static_cast<ModelNodeSceneNode *>(child)->setMainTexture(texture);
         }
     }
 }

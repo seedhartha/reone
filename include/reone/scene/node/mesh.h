@@ -61,7 +61,7 @@ public:
     ModelSceneNode &model() { return _model; }
     const ModelSceneNode &model() const { return _model; }
 
-    void setDiffuseMap(graphics::Texture *texture) override;
+    void setMainTexture(graphics::Texture *texture) override;
     void setEnvironmentMap(graphics::Texture *texture) override;
     void setAlpha(float alpha) { _alpha = alpha; }
     void setSelfIllumColor(glm::vec3 color) { _selfIllumColor = std::move(color); }

@@ -111,7 +111,7 @@ public:
 
     void setModel(graphics::Model &model);
     void setDrawDistance(float distance) { _drawDistance = distance; }
-    void setDiffuseMap(graphics::Texture *texture);
+    void setMainTexture(graphics::Texture *texture);
     void setEnvironmentMap(graphics::Texture *texture);
     void setPickable(bool pickable) { _pickable = pickable; }
 

@@ -45,7 +45,7 @@ enum class TextureUsage {
     Default,
     ColorBuffer,
     DepthBuffer,
-    Diffuse,
+    MainTex,
     Lightmap,
     EnvironmentMap,
     BumpMap,

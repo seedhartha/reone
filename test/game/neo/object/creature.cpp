@@ -37,7 +37,7 @@ TEST(creature, should_load_utc) {
     TwoDA appearance2da {
         {"race", "racetex"},
         {TwoDA::newRow({"n_mandalorian", "n_mandalorian01"})}};
-    TwoDA head2da {
+    TwoDA heads2da {
         {"head"},
         {}};
 
@@ -60,9 +60,9 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
     TwoDA appearance2da {
         {"modela", "texa"},
         {TwoDA::newRow({"pmbal", "pmbal"})}};
-    TwoDA head2da {
+    TwoDA heads2da {
         {"head"},
-        {TwoDA::newRow("pmhc01")}};
+        {TwoDA::newRow({"pmhc01"})}};
 
     // when
     creature.load(utc, appearance2da, heads2da);

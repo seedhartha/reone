@@ -65,17 +65,19 @@ void Creature::load(const UTC &utc,
         std::string texColumn {"tex"};
         texColumn.push_back(bodyVarChar);
         texture = appearance2da.getString(utc.Appearance_Type, texColumn);
-        texture.append(str(boost::format("%02d") % std::max(1, static_cast<int>(utc.TextureVar))));
+        if (!texture.empty()) {
+            texture.append(str(boost::format("%02d") % std::max(1, static_cast<int>(utc.TextureVar))));
+        }
 
-        uint32_t normalhead = appearance2da.getUint(utc.Appearance_Type, "normalhead");
+        uint32_t normalhead = appearance2da.getInt(utc.Appearance_Type, "normalhead");
         auto normalHeadModel = heads2da.getString(normalhead, "head");
         if (normalHeadModel.empty()) {
             throw ValidationException("Empty normal head model name");
         }
         _appearance.normalHeadModel = std::move(normalHeadModel);
 
-        uint32_t backuphead = appearance2da.getUint(utc.Appearance_Type, "backuphead");
-        if (backuphead != 0) {
+        uint32_t backuphead = appearance2da.getInt(utc.Appearance_Type, "backuphead", -1);
+        if (backuphead != -1) {
             auto backupHeadModel = heads2da.getString(backuphead, "head");
             if (backupHeadModel.empty()) {
                 throw ValidationException("Empty backup head model name");
@@ -91,7 +93,9 @@ void Creature::load(const UTC &utc,
         throw ValidationException("Empty model name");
     }
     _appearance.model = std::move(model);
-    _appearance.texture = std::move(texture);
+    if (!texture.empty()) {
+        _appearance.texture = std::move(texture);
+    }
 
     _state = ObjectState::Loaded;
 }

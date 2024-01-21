@@ -68,6 +68,8 @@ void Area::load(const ARE &are,
     }
     for (auto &gitCreature : git.Creature_List) {
         auto &creature = _areaObjectLoader.loadCreature(gitCreature.TemplateResRef);
+        creature.setPosition({gitCreature.XPosition, gitCreature.YPosition, gitCreature.ZPosition});
+        creature.setFacing(-glm::degrees(glm::atan(gitCreature.XOrientation, gitCreature.YOrientation)));
         add(creature);
     }
     for (auto &gitDoor : git.Door_List) {

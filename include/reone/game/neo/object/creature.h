@@ -42,7 +42,7 @@ namespace neo {
 
 struct Appearance {
     resource::ResRef model;
-    resource::ResRef texture;
+    std::optional<resource::ResRef> texture;
     std::optional<resource::ResRef> normalHeadModel;
     std::optional<resource::ResRef> backupHeadModel;
     // TODO: evil head textures

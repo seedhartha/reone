@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "../../fixtures/resource.h"
+#include "../../fixtures/scene.h"
 
 #include "reone/game/neo/game.h"
 #include "reone/game/neo/object/area.h"
@@ -34,12 +35,27 @@
 #include "reone/game/neo/object/waypoint.h"
 #include "reone/resource/provider/gffs.h"
 
+using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::game::neo;
+using namespace reone::graphics;
 using namespace reone::resource;
+using namespace reone::scene;
 
 using testing::_;
 using testing::Return;
+
+class TestOptions : public OptionsView {
+public:
+    TestOptions() :
+        OptionsView(_game, _graphics, _audio) {
+    }
+
+private:
+    GameOptions _game;
+    GraphicsOptions _graphics;
+    AudioOptions _audio;
+};
 
 class TestModule : public Module {
 public:
@@ -52,9 +68,12 @@ public:
 
 TEST(game, should_return_nullopt_for_current_module) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
 
     // when
     auto module = game.module();
@@ -65,9 +84,12 @@ TEST(game, should_return_nullopt_for_current_module) {
 
 TEST(game, should_start_module) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
     auto ifo = Gff::Builder().build();
 
     // when
@@ -81,9 +103,12 @@ TEST(game, should_start_module) {
 
 TEST(game, should_load_camera) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
 
     // when
     auto &camera = game.loadCamera();
@@ -91,9 +116,12 @@ TEST(game, should_load_camera) {
 
 TEST(game, should_load_creature) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utc = Gff::Builder().build();
     auto appearance2da = std::make_shared<TwoDA>(
         std::vector<std::string> {
@@ -111,9 +139,12 @@ TEST(game, should_load_creature) {
 
 TEST(game, should_load_door) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utd = Gff::Builder().build();
 
     // expect
@@ -123,9 +154,12 @@ TEST(game, should_load_door) {
 
 TEST(game, should_load_encounter) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
     auto ute = Gff::Builder().build();
 
     // expect
@@ -135,9 +169,12 @@ TEST(game, should_load_encounter) {
 
 TEST(game, should_load_placeable) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utp = Gff::Builder().build();
 
     // expect
@@ -147,9 +184,12 @@ TEST(game, should_load_placeable) {
 
 TEST(game, should_load_sound) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
     auto uts = Gff::Builder().build();
 
     // expect
@@ -159,9 +199,12 @@ TEST(game, should_load_sound) {
 
 TEST(game, should_load_store) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utm = Gff::Builder().build();
 
     // expect
@@ -171,9 +214,12 @@ TEST(game, should_load_store) {
 
 TEST(game, should_load_trigger) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utt = Gff::Builder().build();
 
     // expect
@@ -183,9 +229,12 @@ TEST(game, should_load_trigger) {
 
 TEST(game, should_load_waypoint) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utw = Gff::Builder().build();
 
     // expect
@@ -195,9 +244,12 @@ TEST(game, should_load_waypoint) {
 
 TEST(game, should_instantiate_objects_with_incrementing_id) {
     // given
+    TestOptions options;
     TestResourceModule resourceModule;
     resourceModule.init();
-    Game game {resourceModule.services()};
+    TestSceneModule sceneModule;
+    sceneModule.init();
+    Game game {options, resourceModule.services(), sceneModule.services()};
 
     // when
     auto &area = game.newArea("");

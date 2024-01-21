@@ -105,26 +105,10 @@ void Engine::init() {
 
 #if R_NEO_GAME
     _services->resource.director.onModuleLoad("end_m01aa");
-    _neoGame = std::make_unique<neo::Game>(_services->resource);
-    _neoGame->startModule("end_m01aa");
-    auto module = _neoGame->module();
-    if (module) {
-        auto &scene = _services->scene.graphs.get(kSceneMain);
-        auto camera = scene.newCamera();
-        float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
-        camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
-        scene.setActiveCamera(camera.get());
-        auto &area = module->get().area();
-        for (auto &room : area.rooms()) {
-            auto model = _services->resource.models.get(room.model);
-            if (!model) {
-                throw ResourceNotFoundException("Room model not found: " + room.model);
-            }
-            auto sceneNode = scene.newModel(*model, ModelUsage::Room);
-            sceneNode->setLocalTransform(glm::translate(room.position));
-            scene.addRoot(std::move(sceneNode));
-        }
-    }
+    _neoGame = std::make_unique<neo::Game>(*_optionsView, _services->resource, _services->scene);
+    _neoGame->init();
+    showCursor(false);
+    setRelativeMouseMode(true);
 #else
     _game = std::make_unique<Game>(gameId, _options.game.path, *_optionsView, *_services);
     _game->init();
@@ -192,20 +176,23 @@ int Engine::run() {
                 std::lock_guard<std::mutex> lock {_eventsMutex};
                 std::swap(events, _events);
             }
-            auto &scene = _services->scene.graphs.get(kSceneMain);
             while (!events.empty()) {
-                auto &event = events.front();
+                auto event = events.front();
+                events.pop();
 #if R_NEO_GAME
-                if (event.type == input::EventType::MouseMotion) {
+                if (_neoGame->handle(event)) {
+                    continue;
                 }
 #else
-                if (_game->handle(event) && _game->isQuitRequested()) {
-                    quit = true;
-                    break;
+                if (_game->handle(event)) {
+                    if (_game->isQuitRequested()) {
+                        quit = true;
+                        break;
+                    }
+                    continue;
                 }
 #endif
                 _profiler->handle(event);
-                events.pop();
             }
         });
         if (quit) {
@@ -214,6 +201,7 @@ int Engine::run() {
         }
         _profiler->timeUpdate([this, &frameTime]() {
 #if R_NEO_GAME
+            _neoGame->update(frameTime);
             _services->scene.graphs.get(kSceneMain).update(frameTime);
 #else
             _game->update(frameTime);

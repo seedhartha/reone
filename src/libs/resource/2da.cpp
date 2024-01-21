@@ -117,7 +117,7 @@ int TwoDA::getInt(int row, const std::string &column, int defValue) const {
     return stoi(value);
 }
 
-uint32_t TwoDA::getUint(int row, const std::string &column, uint32_t defValue) const {
+uint32_t TwoDA::getHexUint(int row, const std::string &column, uint32_t defValue) const {
     const std::string &value = getString(row, column);
     if (value.empty())
         return defValue;

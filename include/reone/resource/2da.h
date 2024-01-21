@@ -49,7 +49,7 @@ public:
 
     std::string getString(int row, const std::string &column, std::string defValue = "") const;
     int getInt(int row, const std::string &column, int defValue = 0) const;
-    uint32_t getUint(int row, const std::string &column, uint32_t defValue = 0) const;
+    uint32_t getHexUint(int row, const std::string &column, uint32_t defValue = 0) const;
     float getFloat(int row, const std::string &column, float defValue = 0.0f) const;
     bool getBool(int row, const std::string &column, bool defValue = false) const;
 
