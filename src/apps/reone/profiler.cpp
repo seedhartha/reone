@@ -133,15 +133,15 @@ void Profiler::renderBackground() {
 void Profiler::renderFrameTimes(const TimedThread &thread, int xOffset) {
     auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::profiler);
     _graphicsSvc.context.useProgram(program);
+
+    std::vector<glm::vec4> seriesColors {4, glm::vec4 {1.0f}};
     for (size_t i = 0; i < 4; ++i) {
-        glm::vec3 color;
-        if (thread.colors.size() > i) {
-            color = thread.colors[i];
-        } else {
-            color = glm::vec3(1.0f);
+        if (thread.colors.size() <= i) {
+            break;
         }
-        program.setUniform("uSeriesColor" + std::to_string(i + 1), color);
+        seriesColors[i] = glm::vec4 {thread.colors[i], 1.0f};
     }
+    program.setUniform("uSeriesColors", seriesColors);
 
     std::vector<glm::vec4> vecTimes;
     vecTimes.resize(kNumTimedFrames / 4, glm::vec4 {0.0f});
