@@ -45,14 +45,6 @@ static constexpr float kFrameTimesScale = 2.0f;
 void Profiler::init() {
     checkThat(!_inited, "Must not be initialized");
     _font = _resourceSvc.fonts.get(kFontResRef);
-
-    auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::profiler);
-    _graphicsSvc.context.useProgram(program);
-    program.setUniform("uSeriesColor1", glm::vec3 {0.0f, 0.0f, 1.0f});
-    program.setUniform("uSeriesColor2", glm::vec3 {0.0f, 1.0f, 0.0f});
-    program.setUniform("uSeriesColor3", glm::vec3 {0.0f, 1.0f, 1.0f});
-    program.setUniform("uSeriesColor4", glm::vec3 {1.0f, 0.0f, 0.0f});
-
     _inited = true;
 }
 
@@ -120,27 +112,36 @@ void Profiler::render() {
             renderFrameTimes(thread, xOffset);
             xOffset += kNumTimedFrames * kFrameTimesScale + kTextOffset;
         }
+        renderStatistic(xOffset);
     });
 }
 
 void Profiler::renderBackground() {
+    auto &shader = _graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpColor);
+    _graphicsSvc.context.useProgram(shader);
     float height = kNumTimedFrames * kFrameTimesScale + 2 * kTextOffset;
-    glm::mat4 transform {1.0f};
-    transform = glm::scale(transform, glm::vec3(_graphicsOpt.width, height, 1.0f));
+    auto transform = glm::scale(glm::vec3(_graphicsOpt.width, height, 1.0f));
     _graphicsSvc.uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);
         locals.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         locals.color.a = 0.5f;
     });
-    auto &shader = _graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpColor);
-    _graphicsSvc.context.useProgram(shader);
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
 void Profiler::renderFrameTimes(const TimedThread &thread, int xOffset) {
     auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::profiler);
     _graphicsSvc.context.useProgram(program);
+    for (size_t i = 0; i < 4; ++i) {
+        glm::vec3 color;
+        if (thread.colors.size() > i) {
+            color = thread.colors[i];
+        } else {
+            color = glm::vec3(1.0f);
+        }
+        program.setUniform("uSeriesColor" + std::to_string(i + 1), color);
+    }
 
     std::vector<glm::vec4> vecTimes;
     vecTimes.resize(kNumTimedFrames / 4, glm::vec4 {0.0f});
@@ -182,16 +183,26 @@ void Profiler::renderFrameTimes(const TimedThread &thread, int xOffset) {
     _font->render(
         halfTargetTime,
         glm::vec3 {kTextOffset + xOffset, kTextOffset + 0.5f * size, 0.0f},
+        glm::vec3 {0.5f},
+        TextGravity::RightBottom);
+}
+
+void Profiler::renderStatistic(int xOffset) {
+    auto text = str(boost::format("%d draw calls") % _graphicsSvc.statistic.numDrawCalls());
+    _font->render(
+        text,
+        glm::vec3 {kTextOffset + xOffset, kTextOffset, 0.0f},
         glm::vec3 {1.0f},
         TextGravity::RightBottom);
 }
 
-void Profiler::reserveThread(std::string name) {
+void Profiler::reserveThread(std::string name, std::vector<glm::vec3> colors) {
     if (_nameToTimedThread.count(name) > 0) {
         return;
     }
     checkLessOrEqual("timed thread count", _numTimedThreads, kMaxTimedThreads);
     _timedThreads[_numTimedThreads].name = std::move(name);
+    _timedThreads[_numTimedThreads].colors = std::move(colors);
     auto &reserved = _timedThreads[_numTimedThreads];
     _nameToTimedThread.insert({reserved.name, reserved});
     ++_numTimedThreads;

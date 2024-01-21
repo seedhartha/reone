@@ -288,6 +288,7 @@ void Game::init() {
     }
 
     _profiler.reserveThread(kLogicThreadName);
+
     _logicThread = std::thread {std::bind(&Game::logicThreadFunc, this)};
     _inited = true;
 }

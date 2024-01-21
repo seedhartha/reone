@@ -65,7 +65,8 @@ public:
     void update(float dt);
     void render();
 
-    void reserveThread(std::string name) override;
+    void reserveThread(std::string name,
+                       std::vector<glm::vec3> colors = {}) override;
 
     void measure(const std::string &threadName,
                  int timeIndex,
@@ -74,6 +75,7 @@ public:
 private:
     struct TimedThread {
         std::string name;
+        std::vector<glm::vec3> colors;
         std::array<std::deque<float>, 4> times;
         std::mutex mutex;
     };
@@ -95,6 +97,7 @@ private:
 
     void renderBackground();
     void renderFrameTimes(const TimedThread &thread, int xOffset);
+    void renderStatistic(int xOffset);
 };
 
 } // namespace reone

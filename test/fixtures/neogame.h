@@ -67,7 +67,7 @@ public:
 
 class MockProfiler : public IProfiler, boost::noncopyable {
 public:
-    MOCK_METHOD(void, reserveThread, (std::string), (override));
+    MOCK_METHOD(void, reserveThread, (std::string, std::vector<glm::vec3>), (override));
     MOCK_METHOD(void, measure, (const std::string &, int, const std::function<void()> &), (override));
 };
 

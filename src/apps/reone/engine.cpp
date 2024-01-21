@@ -115,7 +115,12 @@ void Engine::init() {
         _services->resource,
         _services->system);
     _profiler->init();
-    _profiler->reserveThread(kMainThreadName);
+    _profiler->reserveThread(
+        kMainThreadName,
+        {glm::vec3 {0.0f, 1.0f, 1.0f},
+         glm::vec3 {0.0f, 1.0f, 0.0f},
+         glm::vec3 {1.0f, 0.0f, 0.0f},
+         glm::vec3 {1.0f, 1.0f, 0.0f}});
 
     _console = std::make_unique<Console>(
         _options.graphics,

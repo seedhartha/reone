@@ -25,7 +25,8 @@ class IProfiler {
 public:
     virtual ~IProfiler() = default;
 
-    virtual void reserveThread(std::string name) = 0;
+    virtual void reserveThread(std::string name,
+                               std::vector<glm::vec3> colors = {}) = 0;
 
     virtual void measure(const std::string &threadName,
                          int timeIndex,
