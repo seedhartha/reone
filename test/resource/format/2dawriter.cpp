@@ -48,15 +48,15 @@ TEST(two_da_writer, should_write_two_da) {
                               .append("same\x00", 5)
                               .string();
 
-    auto twoDa = TwoDA(
-        {"key", "value"},
-        std::vector<TwoDA::Row> {
-            TwoDA::newRow({"unique", "same"}),
-            TwoDA::newRow({"same", "same"})});
+    auto twoDa = TwoDA::Builder()
+                     .columns({"key", "value"})
+                     .row({"unique", "same"})
+                     .row({"same", "same"})
+                     .build();
 
     auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
-    auto writer = TwoDAWriter(twoDa);
+    auto writer = TwoDAWriter(*twoDa);
 
     // when
 

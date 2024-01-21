@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/system/exception/validation.h"
+
 namespace reone {
 
 namespace resource {
@@ -29,9 +31,37 @@ public:
         std::vector<std::string> values;
     };
 
+    class Builder {
+    public:
+        Builder &columns(std::vector<std::string> columns) {
+            _columns = std::move(columns);
+            return *this;
+        }
+
+        Builder &row(std::vector<std::string> values) {
+            _rows.push_back({std::move(values)});
+            return *this;
+        }
+
+        std::unique_ptr<TwoDA> build() {
+            return std::make_unique<TwoDA>(_columns, _rows);
+        }
+
+    private:
+        std::vector<std::string> _columns;
+        std::vector<Row> _rows;
+    };
+
     TwoDA(std::vector<std::string> columns, std::vector<Row> rows) :
         _columns(std::move(columns)),
         _rows(std::move(rows)) {
+        size_t numColumns = _columns.size();
+        for (size_t row = 0; row < _rows.size(); ++row) {
+            size_t numValues = _rows[row].values.size();
+            if (numValues != numColumns) {
+                throw ValidationException(str(boost::format("Expected %d columns in 2DA row %d, was %d") % numColumns % row % numValues));
+            }
+        }
     }
 
     /**

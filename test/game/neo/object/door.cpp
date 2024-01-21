@@ -31,12 +31,13 @@ TEST(door, should_load_utd) {
     Door door {0, ""};
     UTD utd;
     utd.GenericType = 0;
-    TwoDA genericdoors {
-        {"modelname"},
-        {TwoDA::newRow({"dor_lhr01"})}};
+    auto genericdoors = TwoDA::Builder()
+                            .columns({"modelname"})
+                            .row({"dor_lhr01"})
+                            .build();
 
     // when
-    door.load(utd, genericdoors);
+    door.load(utd, *genericdoors);
 
     // then
     EXPECT_TRUE(door.is(ObjectState::Loaded));

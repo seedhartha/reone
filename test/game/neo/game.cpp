@@ -118,12 +118,11 @@ TEST_F(GameFixture, should_load_camera) {
 TEST_F(GameFixture, should_load_creature) {
     // given
     auto utc = Gff::Builder().build();
-    auto appearance = std::make_shared<TwoDA>(
-        std::vector<std::string> {
-            "modeltype", "race", "racetex"},
-        std::vector<TwoDA::Row> {
-            TwoDA::Row {std::vector<std::string> {"F", "n_mandalorian", ""}}});
-    auto heads = std::make_shared<TwoDA>(std::vector<std::string> {}, std::vector<TwoDA::Row> {});
+    std::shared_ptr<TwoDA> appearance = TwoDA::Builder()
+                                            .columns({"modeltype", "race", "racetex"})
+                                            .row({"F", "n_mandalorian", ""})
+                                            .build();
+    std::shared_ptr<TwoDA> heads = TwoDA::Builder().build();
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utc));
@@ -135,11 +134,10 @@ TEST_F(GameFixture, should_load_creature) {
 TEST_F(GameFixture, should_load_door) {
     // given
     auto utd = Gff::Builder().build();
-    auto genericDoors = std::make_shared<TwoDA>(
-        std::vector<std::string> {
-            "modelname"},
-        std::vector<TwoDA::Row> {
-            TwoDA::Row {std::vector<std::string> {"dor_lhr01"}}});
+    std::shared_ptr<TwoDA> genericDoors = TwoDA::Builder()
+                                              .columns({"modelname"})
+                                              .row({"dor_lhr01"})
+                                              .build();
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utd));
@@ -162,11 +160,10 @@ TEST_F(GameFixture, should_load_placeable) {
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utp));
-    auto placeables = std::make_shared<TwoDA>(
-        std::vector<std::string> {
-            "modelname"},
-        std::vector<TwoDA::Row> {
-            TwoDA::Row {std::vector<std::string> {"plc_footlker"}}});
+    std::shared_ptr<TwoDA> placeables = TwoDA::Builder()
+                                            .columns({"modelname"})
+                                            .row({"plc_footlker"})
+                                            .build();
     EXPECT_CALL(_resourceModule.twoDas(), get("placeables")).WillOnce(Return(placeables));
     auto &placeable = _game->loadPlaceable({"tmplt"});
 }

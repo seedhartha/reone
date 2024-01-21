@@ -31,12 +31,13 @@ TEST(placeable, should_load_utp) {
     Placeable placeable {0, ""};
     UTP utp;
     utp.Appearance = 0;
-    TwoDA placeables {
-        {"modelname"},
-        {TwoDA::newRow({"plc_footlker"})}};
+    auto placeables = TwoDA::Builder()
+                          .columns({"modelname"})
+                          .row({"plc_footlker"})
+                          .build();
 
     // when
-    placeable.load(utp, placeables);
+    placeable.load(utp, *placeables);
 
     // then
     EXPECT_TRUE(placeable.is(ObjectState::Loaded));
