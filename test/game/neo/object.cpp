@@ -103,11 +103,11 @@ TEST(spatial_object, should_set_facing) {
     TestSpatialObject object;
 
     // when
-    object.setFacing(270.0f);
+    object.setFacing(glm::radians(270.0f));
 
     // then
     auto facing = object.facing();
-    EXPECT_EQ(facing, 270.0f);
+    EXPECT_EQ(facing, glm::radians(270.0f));
 }
 
 TEST(spatial_object, should_set_facing_point) {
@@ -120,5 +120,5 @@ TEST(spatial_object, should_set_facing_point) {
 
     // then
     auto facing = object.facing();
-    EXPECT_EQ(facing, -135.0f);
+    EXPECT_EQ(facing, glm::radians(-135.0f));
 }

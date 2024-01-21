@@ -37,9 +37,9 @@ void Module::load(const IFO &ifo) {
     _entryPosition = {ifo.Mod_Entry_X,
                       ifo.Mod_Entry_Y,
                       ifo.Mod_Entry_Z};
-    _entryFacing = glm::degrees(-glm::atan(
+    _entryFacing = -glm::atan(
         ifo.Mod_Entry_Dir_X,
-        ifo.Mod_Entry_Dir_Y));
+        ifo.Mod_Entry_Dir_Y);
     _state = ObjectState::Loaded;
 }
 

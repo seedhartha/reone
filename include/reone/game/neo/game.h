@@ -28,6 +28,12 @@
 
 namespace reone {
 
+namespace graphics {
+
+struct GraphicsServices;
+
+}
+
 namespace resource {
 
 struct ResourceServices;
@@ -90,9 +96,11 @@ private:
 class Game : public IAreaLoader, public IAreaObjectLoader, boost::noncopyable {
 public:
     Game(OptionsView &options,
+         graphics::GraphicsServices &graphicsSvc,
          resource::ResourceServices &resourceSvc,
          scene::SceneServices &sceneSvc) :
         _options(options),
+        _graphicsSvc(graphicsSvc),
         _resourceSvc(resourceSvc),
         _sceneSvc(sceneSvc) {
     }
@@ -106,6 +114,7 @@ public:
 
     bool handle(const input::Event &event);
     void update(float dt);
+    void render();
 
     // Module
 
@@ -158,6 +167,7 @@ public:
 
 private:
     OptionsView &_options;
+    graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;
     scene::SceneServices &_sceneSvc;
 

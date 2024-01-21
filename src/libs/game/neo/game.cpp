@@ -28,6 +28,10 @@
 #include "reone/game/neo/object/store.h"
 #include "reone/game/neo/object/trigger.h"
 #include "reone/game/neo/object/waypoint.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
+#include "reone/graphics/meshregistry.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/provider/2das.h"
@@ -202,7 +206,6 @@ void Game::init() {
             if (!model) {
                 throw ResourceNotFoundException("Creature model not found: " + modelName);
             }
-            Texture *mainTex;
             auto transform = glm::translate(creature.get().position());
             transform *= glm::eulerAngleZ(glm::radians(creature.get().facing()));
             auto sceneNode = scene.newModel(*model, ModelUsage::Creature);
@@ -212,7 +215,7 @@ void Game::init() {
                 if (!texture) {
                     throw ResourceNotFoundException("Creature texture not found: " + texName);
                 }
-                // sceneNode->setMainTexture(texture.get());
+                sceneNode->setMainTexture(texture.get());
             }
             if (appearance.normalHeadModel) {
                 auto headModel = _resourceSvc.models.get(appearance.normalHeadModel->value());
@@ -250,6 +253,16 @@ void Game::update(float dt) {
     if (_module) {
         _module->get().update(dt);
     }
+}
+
+void Game::render() {
+    glm::ivec2 screenSize {_options.graphics.width, _options.graphics.height};
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    auto &output = scene.render(screenSize);
+    auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::ndcTexture);
+    _graphicsSvc.context.useProgram(program);
+    _graphicsSvc.context.bindTexture(output);
+    _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Game::startModule(const std::string &name) {

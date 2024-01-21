@@ -62,7 +62,7 @@ TEST(module, should_load_ifo) {
     EXPECT_EQ(module.area(), area);
     EXPECT_EQ(module.entryArea(), "m01aa");
     EXPECT_EQ(module.entryPosition(), (glm::vec3 {1.0f, 2.0f, 3.0f}));
-    EXPECT_EQ(module.entryFacing(), -135.0f);
+    EXPECT_EQ(module.entryFacing(), glm::radians(-135.0f));
 }
 
 TEST(module, should_throw_for_current_area_when_has_no_areas) {

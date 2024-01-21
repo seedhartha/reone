@@ -18,6 +18,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../../fixtures/graphics.h"
 #include "../../fixtures/resource.h"
 #include "../../fixtures/scene.h"
 
@@ -44,6 +45,7 @@ using namespace reone::scene;
 
 using testing::_;
 using testing::Return;
+using testing::Test;
 
 class TestOptions : public OptionsView {
 public:
@@ -57,71 +59,64 @@ private:
     AudioOptions _audio;
 };
 
-class TestModule : public Module {
+class MockModule : public Module {
 public:
-    TestModule(IAreaLoader &areaLoader) :
+    MockModule(IAreaLoader &areaLoader) :
         Module(0, "", areaLoader) {
     }
 
     MOCK_METHOD(void, update, (float), (override));
 };
 
-TEST(game, should_return_nullopt_for_current_module) {
-    // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
+class GameFixture : public Test {
+protected:
+    void SetUp() override {
+        _graphicsModule.init();
+        _resourceModule.init();
+        _sceneModule.init();
+        _game = std::make_unique<Game>(
+            _options,
+            _graphicsModule.services(),
+            _resourceModule.services(),
+            _sceneModule.services());
+    }
 
+    TestOptions _options;
+    TestGraphicsModule _graphicsModule;
+    TestResourceModule _resourceModule;
+    TestSceneModule _sceneModule;
+
+    std::unique_ptr<Game> _game;
+};
+
+TEST_F(GameFixture, should_return_nullopt_for_current_module) {
     // when
-    auto module = game.module();
+    auto module = _game->module();
 
     // then
     EXPECT_FALSE(module.has_value());
 }
 
-TEST(game, should_start_module) {
+TEST_F(GameFixture, should_start_module) {
     // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
     auto ifo = Gff::Builder().build();
 
     // when
-    EXPECT_CALL(resourceModule.gffs(), get(_, _)).WillOnce(Return(ifo));
-    game.startModule("end_m01aa");
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(ifo));
+    _game->startModule("end_m01aa");
 
     // then
-    auto currentModule = game.module();
+    auto currentModule = _game->module();
     EXPECT_TRUE(currentModule.has_value());
 }
 
-TEST(game, should_load_camera) {
-    // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
-
+TEST_F(GameFixture, should_load_camera) {
     // when
-    auto &camera = game.loadCamera();
+    auto &camera = _game->loadCamera();
 }
 
-TEST(game, should_load_creature) {
+TEST_F(GameFixture, should_load_creature) {
     // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utc = Gff::Builder().build();
     auto appearance2da = std::make_shared<TwoDA>(
         std::vector<std::string> {
@@ -131,138 +126,88 @@ TEST(game, should_load_creature) {
     auto heads2da = std::make_shared<TwoDA>(std::vector<std::string> {}, std::vector<TwoDA::Row> {});
 
     // expect
-    EXPECT_CALL(resourceModule.gffs(), get(_, _)).WillOnce(Return(utc));
-    EXPECT_CALL(resourceModule.twoDas(), get("appearance")).WillOnce(Return(appearance2da));
-    EXPECT_CALL(resourceModule.twoDas(), get("heads")).WillOnce(Return(heads2da));
-    auto &creature = game.loadCreature({"tmplt"});
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utc));
+    EXPECT_CALL(_resourceModule.twoDas(), get("appearance")).WillOnce(Return(appearance2da));
+    EXPECT_CALL(_resourceModule.twoDas(), get("heads")).WillOnce(Return(heads2da));
+    auto &creature = _game->loadCreature({"tmplt"});
 }
 
-TEST(game, should_load_door) {
+TEST_F(GameFixture, should_load_door) {
     // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utd = Gff::Builder().build();
 
     // expect
-    EXPECT_CALL(resourceModule.gffs(), get(_, _)).WillOnce(Return(utd));
-    auto &door = game.loadDoor({"tmplt"});
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utd));
+    auto &door = _game->loadDoor({"tmplt"});
 }
 
-TEST(game, should_load_encounter) {
+TEST_F(GameFixture, should_load_encounter) {
     // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
     auto ute = Gff::Builder().build();
 
     // expect
-    EXPECT_CALL(resourceModule.gffs(), get(_, _)).WillOnce(Return(ute));
-    auto &encounter = game.loadEncounter({"tmplt"});
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(ute));
+    auto &encounter = _game->loadEncounter({"tmplt"});
 }
 
-TEST(game, should_load_placeable) {
+TEST_F(GameFixture, should_load_placeable) {
     // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utp = Gff::Builder().build();
 
     // expect
-    EXPECT_CALL(resourceModule.gffs(), get(_, _)).WillOnce(Return(utp));
-    auto &placeable = game.loadPlaceable({"tmplt"});
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utp));
+    auto &placeable = _game->loadPlaceable({"tmplt"});
 }
 
-TEST(game, should_load_sound) {
+TEST_F(GameFixture, should_load_sound) {
     // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
     auto uts = Gff::Builder().build();
 
     // expect
-    EXPECT_CALL(resourceModule.gffs(), get(_, _)).WillOnce(Return(uts));
-    auto &sound = game.loadSound({"tmplt"});
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(uts));
+    auto &sound = _game->loadSound({"tmplt"});
 }
 
-TEST(game, should_load_store) {
+TEST_F(GameFixture, should_load_store) {
     // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utm = Gff::Builder().build();
 
     // expect
-    EXPECT_CALL(resourceModule.gffs(), get(_, _)).WillOnce(Return(utm));
-    auto &store = game.loadStore({"tmplt"});
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utm));
+    auto &store = _game->loadStore({"tmplt"});
 }
 
-TEST(game, should_load_trigger) {
+TEST_F(GameFixture, should_load_trigger) {
     // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utt = Gff::Builder().build();
 
     // expect
-    EXPECT_CALL(resourceModule.gffs(), get(_, _)).WillOnce(Return(utt));
-    auto &trigger = game.loadTrigger({"tmplt"});
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utt));
+    auto &trigger = _game->loadTrigger({"tmplt"});
 }
 
-TEST(game, should_load_waypoint) {
+TEST_F(GameFixture, should_load_waypoint) {
     // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
     auto utw = Gff::Builder().build();
 
     // expect
-    EXPECT_CALL(resourceModule.gffs(), get(_, _)).WillOnce(Return(utw));
-    auto &waypoint = game.loadWaypoint({"tmplt"});
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utw));
+    auto &waypoint = _game->loadWaypoint({"tmplt"});
 }
 
-TEST(game, should_instantiate_objects_with_incrementing_id) {
-    // given
-    TestOptions options;
-    TestResourceModule resourceModule;
-    resourceModule.init();
-    TestSceneModule sceneModule;
-    sceneModule.init();
-    Game game {options, resourceModule.services(), sceneModule.services()};
-
+TEST_F(GameFixture, should_instantiate_objects_with_incrementing_id) {
     // when
-    auto &area = game.newArea("");
-    auto &camera = game.newCamera("");
-    auto &creature = game.newCreature("");
-    auto &door = game.newDoor("");
-    auto &encounter = game.newEncounter("");
-    auto &item = game.newItem("");
-    auto &placeable = game.newPlaceable("");
-    auto &sound = game.newSound("");
-    auto &store = game.newStore("");
-    auto &trigger = game.newTrigger("");
-    auto &waypoint = game.newWaypoint("");
+    auto &area = _game->newArea("");
+    auto &camera = _game->newCamera("");
+    auto &creature = _game->newCreature("");
+    auto &door = _game->newDoor("");
+    auto &encounter = _game->newEncounter("");
+    auto &item = _game->newItem("");
+    auto &placeable = _game->newPlaceable("");
+    auto &sound = _game->newSound("");
+    auto &store = _game->newStore("");
+    auto &trigger = _game->newTrigger("");
+    auto &waypoint = _game->newWaypoint("");
 
     // then
     EXPECT_EQ(area.id(), 2);

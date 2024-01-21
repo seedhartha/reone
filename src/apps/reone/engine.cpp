@@ -33,7 +33,7 @@ using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
 
-#define R_NEO_GAME 0
+#define R_NEO_GAME 1
 
 namespace reone {
 
@@ -105,7 +105,11 @@ void Engine::init() {
 
 #if R_NEO_GAME
     _services->resource.director.onModuleLoad("end_m01aa");
-    _neoGame = std::make_unique<neo::Game>(*_optionsView, _services->resource, _services->scene);
+    _neoGame = std::make_unique<neo::Game>(
+        *_optionsView,
+        _services->graphics,
+        _services->resource,
+        _services->scene);
     _neoGame->init();
     showCursor(false);
     setRelativeMouseMode(true);
@@ -220,12 +224,7 @@ int Engine::run() {
             }
             _services->graphics.context.clearColorDepth();
 #if R_NEO_GAME
-            glm::ivec2 screenSize {_options.graphics.width, _options.graphics.height};
-            auto &output = _services->scene.graphs.get(kSceneMain).render(screenSize);
-            _services->graphics.context.bindTexture(output);
-            auto &program = _services->graphics.shaderRegistry.get(ShaderProgramId::ndcTexture);
-            _services->graphics.context.useProgram(program);
-            _services->graphics.meshRegistry.get(MeshName::quadNDC).draw();
+            _neoGame->render();
 #else
             _game->render();
 #endif

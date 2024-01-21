@@ -25,7 +25,7 @@ namespace neo {
 
 void SpatialObject::setFacingPoint(const glm::vec3 &target) {
     glm::vec2 dir = glm::normalize(target - _position);
-    _facing = glm::degrees(glm::atan(dir.y, dir.x));
+    _facing = glm::atan(dir.y, dir.x);
 }
 
 } // namespace neo
