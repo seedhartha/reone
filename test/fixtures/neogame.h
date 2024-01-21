@@ -20,7 +20,16 @@
 #include <gmock/gmock.h>
 
 #include "reone/game/neo/object/area.h"
+#include "reone/game/neo/object/camera.h"
+#include "reone/game/neo/object/creature.h"
+#include "reone/game/neo/object/door.h"
+#include "reone/game/neo/object/encounter.h"
 #include "reone/game/neo/object/module.h"
+#include "reone/game/neo/object/placeable.h"
+#include "reone/game/neo/object/sound.h"
+#include "reone/game/neo/object/store.h"
+#include "reone/game/neo/object/trigger.h"
+#include "reone/game/neo/object/waypoint.h"
 
 using namespace reone::resource;
 
