@@ -19,7 +19,21 @@
 
 #include "../object.h"
 
+#include "reone/resource/resref.h"
+
 namespace reone {
+
+namespace resource {
+
+class TwoDA;
+
+namespace generated {
+
+struct UTP;
+
+}
+
+} // namespace resource
 
 namespace game {
 
@@ -33,6 +47,16 @@ public:
             std::move(tag),
             ObjectType::Placeable) {
     }
+
+    void load(const resource::generated::UTP &utp,
+              const resource::TwoDA &placeables);
+
+    const resource::ResRef &modelName() const {
+        return _modelName;
+    }
+
+private:
+    resource::ResRef _modelName;
 };
 
 } // namespace neo

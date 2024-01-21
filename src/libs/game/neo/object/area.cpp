@@ -74,6 +74,8 @@ void Area::load(const ARE &are,
     }
     for (auto &gitDoor : git.Door_List) {
         auto &door = _areaObjectLoader.loadDoor(gitDoor.TemplateResRef);
+        door.setPosition({gitDoor.X, gitDoor.Y, gitDoor.Z});
+        door.setFacing(gitDoor.Bearing);
         add(door);
     }
     for (auto &gitEncounter : git.Encounter_List) {
@@ -82,6 +84,8 @@ void Area::load(const ARE &are,
     }
     for (auto &gitPlaceable : git.Placeable_List) {
         auto &placeable = _areaObjectLoader.loadPlaceable(gitPlaceable.TemplateResRef);
+        placeable.setPosition({gitPlaceable.X, gitPlaceable.Y, gitPlaceable.Z});
+        placeable.setFacing(gitPlaceable.Bearing);
         add(placeable);
     }
     for (auto &gitTrigger : git.TriggerList) {

@@ -15,52 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <gtest/gtest.h>
 
-#include "reone/resource/resref.h"
+#include "reone/game/neo/object/door.h"
+#include "reone/resource/2da.h"
+#include "reone/resource/template/generated/utd.h"
 
-#include "../object.h"
+using namespace reone::game;
+using namespace reone::game::neo;
+using namespace reone::resource;
+using namespace reone::resource::generated;
 
-namespace reone {
+TEST(door, should_load_utd) {
+    // given
+    Door door {0, ""};
+    UTD utd;
+    utd.GenericType = 0;
+    TwoDA genericdoors {
+        {"modelname"},
+        {TwoDA::newRow({"dor_lhr01"})}};
 
-namespace resource {
+    // when
+    door.load(utd, genericdoors);
 
-class TwoDA;
-
-namespace generated {
-
-struct UTD;
-
+    // then
+    EXPECT_TRUE(door.is(ObjectState::Loaded));
+    EXPECT_EQ(door.modelName().value(), "dor_lhr01");
 }
-
-} // namespace resource
-
-namespace game {
-
-namespace neo {
-
-class Door : public SpatialObject {
-public:
-    Door(ObjectId id, ObjectTag tag) :
-        SpatialObject(
-            id,
-            std::move(tag),
-            ObjectType::Door) {
-    }
-
-    void load(const resource::generated::UTD &utd,
-              const resource::TwoDA &genericDoors);
-
-    const resource::ResRef &modelName() const {
-        return _modelName;
-    }
-
-private:
-    resource::ResRef _modelName;
-};
-
-} // namespace neo
-
-} // namespace game
-
-} // namespace reone

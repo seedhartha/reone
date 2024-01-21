@@ -39,10 +39,10 @@ enum class ModelType {
 };
 
 void Creature::load(const UTC &utc,
-                    const TwoDA &appearance2da,
-                    const TwoDA &heads2da) {
+                    const TwoDA &appearance,
+                    const TwoDA &heads) {
     ModelType modelType;
-    auto modelTypeStr = appearance2da.getString(utc.Appearance_Type, "modeltype");
+    auto modelTypeStr = appearance.getString(utc.Appearance_Type, "modeltype");
     if (modelTypeStr == "F") {
         modelType = ModelType::FullBody;
     } else if (modelTypeStr == "B") {
@@ -52,7 +52,7 @@ void Creature::load(const UTC &utc,
     } else if (modelTypeStr == "L") {
         modelType = ModelType::L;
     } else {
-        throw ValidationException("Unexpected model type: " + modelTypeStr);
+        throw ValidationException("Unexpected creature model type: " + modelTypeStr);
     }
 
     std::string modelColumn;
@@ -64,21 +64,21 @@ void Creature::load(const UTC &utc,
 
         std::string texColumn {"tex"};
         texColumn.push_back(bodyVarChar);
-        texture = appearance2da.getString(utc.Appearance_Type, texColumn);
+        texture = appearance.getString(utc.Appearance_Type, texColumn);
         if (!texture.empty()) {
             texture.append(str(boost::format("%02d") % std::max(1, static_cast<int>(utc.TextureVar))));
         }
 
-        uint32_t normalhead = appearance2da.getInt(utc.Appearance_Type, "normalhead");
-        auto normalHeadModel = heads2da.getString(normalhead, "head");
+        uint32_t normalhead = appearance.getInt(utc.Appearance_Type, "normalhead");
+        auto normalHeadModel = heads.getString(normalhead, "head");
         if (normalHeadModel.empty()) {
             throw ValidationException("Empty normal head model name");
         }
         _appearance.normalHeadModel = std::move(normalHeadModel);
 
-        uint32_t backuphead = appearance2da.getInt(utc.Appearance_Type, "backuphead", -1);
+        uint32_t backuphead = appearance.getInt(utc.Appearance_Type, "backuphead", -1);
         if (backuphead != -1) {
-            auto backupHeadModel = heads2da.getString(backuphead, "head");
+            auto backupHeadModel = heads.getString(backuphead, "head");
             if (backupHeadModel.empty()) {
                 throw ValidationException("Empty backup head model name");
             }
@@ -86,11 +86,11 @@ void Creature::load(const UTC &utc,
         }
     } else {
         modelColumn = "race";
-        texture = appearance2da.getString(utc.Appearance_Type, "racetex");
+        texture = appearance.getString(utc.Appearance_Type, "racetex");
     }
-    auto model = appearance2da.getString(utc.Appearance_Type, modelColumn);
+    auto model = appearance.getString(utc.Appearance_Type, modelColumn);
     if (model.empty()) {
-        throw ValidationException("Empty model name");
+        throw ValidationException("Empty creature model name");
     }
     _appearance.model = std::move(model);
     if (!texture.empty()) {

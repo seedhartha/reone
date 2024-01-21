@@ -60,12 +60,11 @@ TEST(module, should_load_ifo) {
     module.load(ifo);
     EXPECT_TRUE(module.is(ObjectState::Loaded));
     EXPECT_EQ(module.area(), area);
-    EXPECT_EQ(module.entryArea(), "m01aa");
     EXPECT_EQ(module.entryPosition(), (glm::vec3 {1.0f, 2.0f, 3.0f}));
     EXPECT_EQ(module.entryFacing(), glm::radians(-135.0f));
 }
 
-TEST(module, should_throw_for_current_area_when_has_no_areas) {
+TEST(module, should_throw_for_area_when_has_no_areas) {
     // given
     MockAreaLoader areaLoader;
     Module module {0, "", areaLoader};
@@ -74,28 +73,17 @@ TEST(module, should_throw_for_current_area_when_has_no_areas) {
     EXPECT_THROW(module.area(), std::logic_error);
 }
 
-TEST(module, should_add_area) {
-    // given
-    MockAreaLoader areaLoader;
-    Module module {0, "", areaLoader};
-    MockAreaObjectLoader areaObjectLoader;
-    MockArea area {areaObjectLoader};
-
-    // when
-    module.add(area);
-
-    // then
-    auto &currentArea = module.area();
-    EXPECT_EQ(currentArea, area);
-}
-
 TEST(module, should_update_current_area_on_update) {
     // given
-    MockAreaLoader areaLoader;
-    Module module {0, "", areaLoader};
     MockAreaObjectLoader areaObjectLoader;
     MockArea area {areaObjectLoader};
-    module.add(area);
+    MockAreaLoader areaLoader;
+    EXPECT_CALL(areaLoader, loadArea(_)).WillOnce(ReturnRef(area));
+    Module module {0, "", areaLoader};
+    IFO ifo;
+    ifo.Mod_Area_list.push_back({"m01aa"});
+    ifo.Mod_Entry_Area = "m01aa";
+    module.load(ifo);
 
     // expect
     EXPECT_CALL(area, update(_));

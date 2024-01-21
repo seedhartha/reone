@@ -15,49 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "reone/game/neo/object/door.h"
 
-#include "reone/resource/resref.h"
+#include "reone/resource/2da.h"
+#include "reone/resource/template/generated/utd.h"
+#include "reone/system/exception/validation.h"
 
-#include "../object.h"
+using namespace reone::resource;
+using namespace reone::resource::generated;
 
 namespace reone {
-
-namespace resource {
-
-class TwoDA;
-
-namespace generated {
-
-struct UTD;
-
-}
-
-} // namespace resource
 
 namespace game {
 
 namespace neo {
 
-class Door : public SpatialObject {
-public:
-    Door(ObjectId id, ObjectTag tag) :
-        SpatialObject(
-            id,
-            std::move(tag),
-            ObjectType::Door) {
+void Door::load(const UTD &utd,
+                const TwoDA &genericDoors) {
+    auto modelName = genericDoors.getString(utd.GenericType, "modelname");
+    if (modelName.empty()) {
+        throw ValidationException("Empty door model name");
     }
-
-    void load(const resource::generated::UTD &utd,
-              const resource::TwoDA &genericDoors);
-
-    const resource::ResRef &modelName() const {
-        return _modelName;
-    }
-
-private:
-    resource::ResRef _modelName;
-};
+    _modelName = std::move(modelName);
+    _state = ObjectState::Loaded;
+}
 
 } // namespace neo
 

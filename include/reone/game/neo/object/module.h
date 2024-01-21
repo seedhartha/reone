@@ -60,11 +60,14 @@ public:
 
     void update(float dt) override;
 
-    // Entry
-
-    const std::string &entryArea() const {
-        return _entryArea;
+    const Area &area() const {
+        if (!_area) {
+            throw std::logic_error("Module has no current area");
+        }
+        return *_area;
     }
+
+    // Entry
 
     const glm::vec3 &entryPosition() const {
         return _entryPosition;
@@ -76,29 +79,18 @@ public:
 
     // END Entry
 
-    // Areas
-
-    void add(Area &area) {
-        _areas.push_back(area);
-    }
-
-    const Area &area() const {
-        if (_areas.empty()) {
-            throw std::logic_error("Module has no areas");
-        }
-        return _areas.front();
-    }
-
-    // END Areas
-
 private:
     IAreaLoader &_areaLoader;
 
-    std::string _entryArea;
     glm::vec3 _entryPosition {0.0f};
     float _entryFacing {0.0f};
 
     std::list<std::reference_wrapper<Area>> _areas;
+    std::optional<std::reference_wrapper<Area>> _area;
+
+    void add(Area &area) {
+        _areas.push_back(area);
+    }
 };
 
 } // namespace neo

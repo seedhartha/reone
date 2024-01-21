@@ -140,6 +140,8 @@ void CameraController::update(float dt) {
     }
     float sinFacing = glm::sin(_facing);
     float cosFacing = glm::cos(_facing);
+    float sinPitch = glm::sin(_pitch - glm::half_pi<float>());
+    float cosPitch = glm::cos(_pitch - glm::half_pi<float>());
     if (_movementDir & MovementDirections::Right) {
         _position.x += kCameraMoveRate * cosFacing * dt;
         _position.y += kCameraMoveRate * sinFacing * dt;
@@ -151,11 +153,11 @@ void CameraController::update(float dt) {
     } else if (_movementDir & MovementDirections::Front) {
         _position.x -= kCameraMoveRate * sinFacing * dt;
         _position.y += kCameraMoveRate * cosFacing * dt;
-        _position.z += 0.0f;
+        _position.z += kCameraMoveRate * sinPitch * dt;
     } else if (_movementDir & MovementDirections::Back) {
         _position.x += kCameraMoveRate * sinFacing * dt;
         _position.y -= kCameraMoveRate * cosFacing * dt;
-        _position.z += 0.0f;
+        _position.z -= kCameraMoveRate * sinPitch * dt;
     } else if (_movementDir & MovementDirections::Up) {
         _position.x += 0.0f;
         _position.y += 0.0f;
@@ -207,7 +209,7 @@ void Game::init() {
                 throw ResourceNotFoundException("Creature model not found: " + modelName);
             }
             auto transform = glm::translate(creature.get().position());
-            transform *= glm::eulerAngleZ(glm::radians(creature.get().facing()));
+            transform *= glm::eulerAngleZ(creature.get().facing());
             auto sceneNode = scene.newModel(*model, ModelUsage::Creature);
             if (appearance.texture) {
                 auto &texName = appearance.texture->value();
@@ -225,6 +227,30 @@ void Game::init() {
                 auto headSceneNode = scene.newModel(*headModel, ModelUsage::Creature);
                 sceneNode->attach("headhook", *headSceneNode);
             }
+            sceneNode->setLocalTransform(std::move(transform));
+            scene.addRoot(std::move(sceneNode));
+        }
+        for (auto &door : area.doors()) {
+            auto modelName = door.get().modelName().value();
+            auto model = _resourceSvc.models.get(modelName);
+            if (!model) {
+                throw ResourceNotFoundException("Door model not found: " + modelName);
+            }
+            auto transform = glm::translate(door.get().position());
+            transform *= glm::eulerAngleZ(door.get().facing());
+            auto sceneNode = scene.newModel(*model, ModelUsage::Door);
+            sceneNode->setLocalTransform(std::move(transform));
+            scene.addRoot(std::move(sceneNode));
+        }
+        for (auto &placeable : area.placeables()) {
+            auto modelName = placeable.get().modelName().value();
+            auto model = _resourceSvc.models.get(modelName);
+            if (!model) {
+                throw ResourceNotFoundException("Placeable model not found: " + modelName);
+            }
+            auto transform = glm::translate(placeable.get().position());
+            transform *= glm::eulerAngleZ(placeable.get().facing());
+            auto sceneNode = scene.newModel(*model, ModelUsage::Placeable);
             sceneNode->setLocalTransform(std::move(transform));
             scene.addRoot(std::move(sceneNode));
         }
@@ -318,15 +344,15 @@ Creature &Game::loadCreature(const resource::ResRef &tmplt) {
     }
     auto parsedUTC = parseUTC(*utc);
     auto &creature = newCreature(parsedUTC.Tag);
-    auto appearance2da = _resourceSvc.twoDas.get("appearance");
-    if (!appearance2da) {
-        throw ResourceNotFoundException("Apperance 2DA not found");
+    auto appearance = _resourceSvc.twoDas.get("appearance");
+    if (!appearance) {
+        throw ResourceNotFoundException("appearance 2DA not found");
     }
-    auto heads2da = _resourceSvc.twoDas.get("heads");
-    if (!heads2da) {
-        throw ResourceNotFoundException("Heads 2DA not found");
+    auto heads = _resourceSvc.twoDas.get("heads");
+    if (!heads) {
+        throw ResourceNotFoundException("heads 2DA not found");
     }
-    creature.load(parsedUTC, *appearance2da, *heads2da);
+    creature.load(parsedUTC, *appearance, *heads);
     return creature;
 }
 
@@ -337,6 +363,11 @@ Door &Game::loadDoor(const resource::ResRef &tmplt) {
     }
     auto parsedUTD = parseUTD(*utd);
     auto &door = newDoor(parsedUTD.Tag);
+    auto genericDoors = _resourceSvc.twoDas.get("genericdoors");
+    if (!genericDoors) {
+        throw ResourceNotFoundException("genericdoors 2DA not found");
+    }
+    door.load(parsedUTD, *genericDoors);
     return door;
 }
 
@@ -357,6 +388,11 @@ Placeable &Game::loadPlaceable(const resource::ResRef &tmplt) {
     }
     auto parsedUTP = parseUTP(*utp);
     auto &placeable = newPlaceable(parsedUTP.Tag);
+    auto placeables = _resourceSvc.twoDas.get("placeables");
+    if (!placeables) {
+        throw ResourceNotFoundException("placeables 2DA not found");
+    }
+    placeable.load(parsedUTP, *placeables);
     return placeable;
 }
 

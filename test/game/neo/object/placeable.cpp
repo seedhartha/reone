@@ -15,52 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <gtest/gtest.h>
 
-#include "reone/resource/resref.h"
+#include "reone/game/neo/object/placeable.h"
+#include "reone/resource/2da.h"
+#include "reone/resource/template/generated/utp.h"
 
-#include "../object.h"
+using namespace reone::game;
+using namespace reone::game::neo;
+using namespace reone::resource;
+using namespace reone::resource::generated;
 
-namespace reone {
+TEST(placeable, should_load_utp) {
+    // given
+    Placeable placeable {0, ""};
+    UTP utp;
+    utp.Appearance = 0;
+    TwoDA placeables {
+        {"modelname"},
+        {TwoDA::newRow({"plc_footlker"})}};
 
-namespace resource {
+    // when
+    placeable.load(utp, placeables);
 
-class TwoDA;
-
-namespace generated {
-
-struct UTD;
-
+    // then
+    EXPECT_TRUE(placeable.is(ObjectState::Loaded));
+    EXPECT_EQ(placeable.modelName().value(), "plc_footlker");
 }
-
-} // namespace resource
-
-namespace game {
-
-namespace neo {
-
-class Door : public SpatialObject {
-public:
-    Door(ObjectId id, ObjectTag tag) :
-        SpatialObject(
-            id,
-            std::move(tag),
-            ObjectType::Door) {
-    }
-
-    void load(const resource::generated::UTD &utd,
-              const resource::TwoDA &genericDoors);
-
-    const resource::ResRef &modelName() const {
-        return _modelName;
-    }
-
-private:
-    resource::ResRef _modelName;
-};
-
-} // namespace neo
-
-} // namespace game
-
-} // namespace reone

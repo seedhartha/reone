@@ -118,26 +118,32 @@ TEST_F(GameFixture, should_load_camera) {
 TEST_F(GameFixture, should_load_creature) {
     // given
     auto utc = Gff::Builder().build();
-    auto appearance2da = std::make_shared<TwoDA>(
+    auto appearance = std::make_shared<TwoDA>(
         std::vector<std::string> {
             "modeltype", "race", "racetex"},
         std::vector<TwoDA::Row> {
             TwoDA::Row {std::vector<std::string> {"F", "n_mandalorian", ""}}});
-    auto heads2da = std::make_shared<TwoDA>(std::vector<std::string> {}, std::vector<TwoDA::Row> {});
+    auto heads = std::make_shared<TwoDA>(std::vector<std::string> {}, std::vector<TwoDA::Row> {});
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utc));
-    EXPECT_CALL(_resourceModule.twoDas(), get("appearance")).WillOnce(Return(appearance2da));
-    EXPECT_CALL(_resourceModule.twoDas(), get("heads")).WillOnce(Return(heads2da));
+    EXPECT_CALL(_resourceModule.twoDas(), get("appearance")).WillOnce(Return(appearance));
+    EXPECT_CALL(_resourceModule.twoDas(), get("heads")).WillOnce(Return(heads));
     auto &creature = _game->loadCreature({"tmplt"});
 }
 
 TEST_F(GameFixture, should_load_door) {
     // given
     auto utd = Gff::Builder().build();
+    auto genericDoors = std::make_shared<TwoDA>(
+        std::vector<std::string> {
+            "modelname"},
+        std::vector<TwoDA::Row> {
+            TwoDA::Row {std::vector<std::string> {"dor_lhr01"}}});
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utd));
+    EXPECT_CALL(_resourceModule.twoDas(), get("genericdoors")).WillOnce(Return(genericDoors));
     auto &door = _game->loadDoor({"tmplt"});
 }
 
@@ -156,6 +162,12 @@ TEST_F(GameFixture, should_load_placeable) {
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utp));
+    auto placeables = std::make_shared<TwoDA>(
+        std::vector<std::string> {
+            "modelname"},
+        std::vector<TwoDA::Row> {
+            TwoDA::Row {std::vector<std::string> {"plc_footlker"}}});
+    EXPECT_CALL(_resourceModule.twoDas(), get("placeables")).WillOnce(Return(placeables));
     auto &placeable = _game->loadPlaceable({"tmplt"});
 }
 

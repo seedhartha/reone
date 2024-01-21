@@ -34,15 +34,15 @@ TEST(creature, should_load_utc) {
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
     utc.TextureVar = 1;
-    TwoDA appearance2da {
+    TwoDA appearance {
         {"race", "racetex"},
         {TwoDA::newRow({"n_mandalorian", "n_mandalorian01"})}};
-    TwoDA heads2da {
+    TwoDA heads {
         {"head"},
         {}};
 
     // when
-    creature.load(utc, appearance2da, heads2da);
+    creature.load(utc, appearance, heads);
 
     // then
     EXPECT_TRUE(creature.is(ObjectState::Loaded));
@@ -57,15 +57,15 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
     utc.TextureVar = 1;
-    TwoDA appearance2da {
+    TwoDA appearance {
         {"modela", "texa"},
         {TwoDA::newRow({"pmbal", "pmbal"})}};
-    TwoDA heads2da {
+    TwoDA heads {
         {"head"},
         {TwoDA::newRow({"pmhc01"})}};
 
     // when
-    creature.load(utc, appearance2da, heads2da);
+    creature.load(utc, appearance, heads);
 
     // then
     EXPECT_EQ(creature.appearance().model, "pmbal");

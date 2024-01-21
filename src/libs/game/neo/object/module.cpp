@@ -32,8 +32,10 @@ void Module::load(const IFO &ifo) {
     for (const auto &ifoArea : ifo.Mod_Area_list) {
         auto &area = _areaLoader.loadArea(ifoArea.Area_Name);
         _areas.push_back(area);
+        if (ifoArea.Area_Name == ifo.Mod_Entry_Area) {
+            _area = area;
+        }
     }
-    _entryArea = ifo.Mod_Entry_Area;
     _entryPosition = {ifo.Mod_Entry_X,
                       ifo.Mod_Entry_Y,
                       ifo.Mod_Entry_Z};
@@ -44,10 +46,10 @@ void Module::load(const IFO &ifo) {
 }
 
 void Module::update(float dt) {
-    if (_areas.empty()) {
+    if (!_area) {
         return;
     }
-    _areas.front().get().update(dt);
+    _area->get().update(dt);
 }
 
 } // namespace neo

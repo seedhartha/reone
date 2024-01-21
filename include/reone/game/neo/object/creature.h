@@ -30,7 +30,7 @@ class TwoDA;
 
 namespace generated {
 
-class UTC;
+struct UTC;
 
 }
 
@@ -62,8 +62,8 @@ public:
     }
 
     void load(const resource::generated::UTC &utc,
-              const resource::TwoDA &appearance2da,
-              const resource::TwoDA &heads2da);
+              const resource::TwoDA &appearance,
+              const resource::TwoDA &heads);
 
     const Appearance &appearance() const {
         return _appearance;
