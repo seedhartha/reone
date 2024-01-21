@@ -32,9 +32,9 @@ struct Variable;
 
 class ScriptProgram;
 
-class ScriptExecution : boost::noncopyable {
+class VirtualMachine : boost::noncopyable {
 public:
-    ScriptExecution(std::shared_ptr<ScriptProgram> program, std::unique_ptr<ExecutionContext> context);
+    VirtualMachine(std::shared_ptr<ScriptProgram> program, std::unique_ptr<ExecutionContext> context);
 
     int run();
 
@@ -55,7 +55,7 @@ private:
     int _globalCount {0};
     ExecutionState _savedState;
 
-    void registerHandler(InstructionType type, std::function<void(ScriptExecution *, const Instruction &)> handler) {
+    void registerHandler(InstructionType type, std::function<void(VirtualMachine *, const Instruction &)> handler) {
         _handlers.insert(std::make_pair(type, std::bind(handler, this, std::placeholders::_1)));
     }
 

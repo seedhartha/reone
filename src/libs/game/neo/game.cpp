@@ -17,6 +17,7 @@
 
 #include "reone/game/neo/game.h"
 
+#include "reone/game/console.h"
 #include "reone/game/neo/object/area.h"
 #include "reone/game/neo/object/camera.h"
 #include "reone/game/neo/object/creature.h"
@@ -58,6 +59,7 @@
 #include "reone/system/checkutil.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/exception/validation.h"
+#include "reone/system/stringbuilder.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -72,6 +74,18 @@ namespace neo {
 
 static constexpr float kCameraMouseSensitity = 0.001f;
 static constexpr float kCameraMoveRate = 8.0f;
+
+static const std::string kPickedModelFormat = R"END(
+Picked model:
+  name: '%s'
+)END";
+
+static const std::string kPickedObjectFormat = R"END(
+Picked object:
+  id: %d
+  type: %d
+  tag: '%s'
+)END";
 
 bool CameraController::handle(const input::Event &event) {
     switch (event.type) {
@@ -233,6 +247,7 @@ void Game::init() {
             sceneNode->setLocalTransform(std::move(transform));
             sceneNode->setDrawDistance(_options.graphics.drawDistance);
             sceneNode->setPickable(true);
+            sceneNode->setExternalRef(&creature.get());
             scene.addRoot(std::move(sceneNode));
         }
         for (auto &door : area.doors()) {
@@ -247,6 +262,7 @@ void Game::init() {
             sceneNode->setLocalTransform(std::move(transform));
             // sceneNode->setDrawDistance(_options.graphics.drawDistance);
             sceneNode->setPickable(true);
+            sceneNode->setExternalRef(&door.get());
             scene.addRoot(std::move(sceneNode));
         }
         for (auto &placeable : area.placeables()) {
@@ -261,6 +277,7 @@ void Game::init() {
             sceneNode->setLocalTransform(std::move(transform));
             sceneNode->setDrawDistance(_options.graphics.drawDistance);
             sceneNode->setPickable(true);
+            sceneNode->setExternalRef(&placeable.get());
             scene.addRoot(std::move(sceneNode));
         }
     }
@@ -286,7 +303,18 @@ bool Game::handle(const input::Event &event) {
             break;
         }
         if (_pickedModel) {
-            _pickedModel->get().setEnabled(false);
+            std::string message;
+            void *externalRef = _pickedModel->get().externalRef();
+            if (!externalRef) {
+                message = str(boost::format(kPickedModelFormat) % _pickedModel->get().model().name());
+            } else {
+                auto &object = *reinterpret_cast<Object *>(externalRef);
+                message = str(boost::format(kPickedObjectFormat) %
+                              object.id() %
+                              static_cast<int>(object.type()) %
+                              object.tag());
+            }
+            _console.printLine(message);
             return true;
         }
         break;

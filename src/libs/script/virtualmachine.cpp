@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/script/execution.h"
+#include "reone/script/virtualmachine.h"
 
 #include "reone/script/executioncontext.h"
 #include "reone/script/instrutil.h"
@@ -33,103 +33,103 @@ namespace script {
 static constexpr int kStartInstructionOffset = 13;
 static constexpr float kFloatTolerance = 1e-5;
 
-ScriptExecution::ScriptExecution(std::shared_ptr<ScriptProgram> program, std::unique_ptr<ExecutionContext> context) :
+VirtualMachine::VirtualMachine(std::shared_ptr<ScriptProgram> program, std::unique_ptr<ExecutionContext> context) :
     _context(std::move(context)),
     _program(std::move(program)) {
 
-    static std::unordered_map<InstructionType, std::function<void(ScriptExecution *, const Instruction &)>> g_handlers {
-        {InstructionType::CPDOWNSP, &ScriptExecution::executeCPDOWNSP},
-        {InstructionType::RSADDI, &ScriptExecution::executeRSADDI},
-        {InstructionType::RSADDF, &ScriptExecution::executeRSADDF},
-        {InstructionType::RSADDS, &ScriptExecution::executeRSADDS},
-        {InstructionType::RSADDO, &ScriptExecution::executeRSADDO},
-        {InstructionType::RSADDEFF, &ScriptExecution::executeRSADDEFF},
-        {InstructionType::RSADDEVT, &ScriptExecution::executeRSADDEVT},
-        {InstructionType::RSADDLOC, &ScriptExecution::executeRSADDLOC},
-        {InstructionType::RSADDTAL, &ScriptExecution::executeRSADDTAL},
-        {InstructionType::CPTOPSP, &ScriptExecution::executeCPTOPSP},
-        {InstructionType::CONSTI, &ScriptExecution::executeCONSTI},
-        {InstructionType::CONSTF, &ScriptExecution::executeCONSTF},
-        {InstructionType::CONSTS, &ScriptExecution::executeCONSTS},
-        {InstructionType::CONSTO, &ScriptExecution::executeCONSTO},
-        {InstructionType::ACTION, &ScriptExecution::executeACTION},
-        {InstructionType::LOGANDII, &ScriptExecution::executeLOGANDII},
-        {InstructionType::LOGORII, &ScriptExecution::executeLOGORII},
-        {InstructionType::INCORII, &ScriptExecution::executeINCORII},
-        {InstructionType::EXCORII, &ScriptExecution::executeEXCORII},
-        {InstructionType::BOOLANDII, &ScriptExecution::executeBOOLANDII},
-        {InstructionType::EQUALII, &ScriptExecution::executeEQUALII},
-        {InstructionType::EQUALFF, &ScriptExecution::executeEQUALFF},
-        {InstructionType::EQUALSS, &ScriptExecution::executeEQUALSS},
-        {InstructionType::EQUALOO, &ScriptExecution::executeEQUALOO},
-        {InstructionType::EQUALTT, &ScriptExecution::executeEQUALTT},
-        {InstructionType::EQUALEFFEFF, &ScriptExecution::executeEQUALEFFEFF},
-        {InstructionType::EQUALEVTEVT, &ScriptExecution::executeEQUALEVTEVT},
-        {InstructionType::EQUALLOCLOC, &ScriptExecution::executeEQUALLOCLOC},
-        {InstructionType::EQUALTALTAL, &ScriptExecution::executeEQUALTALTAL},
-        {InstructionType::NEQUALII, &ScriptExecution::executeNEQUALII},
-        {InstructionType::NEQUALFF, &ScriptExecution::executeNEQUALFF},
-        {InstructionType::NEQUALSS, &ScriptExecution::executeNEQUALSS},
-        {InstructionType::NEQUALOO, &ScriptExecution::executeNEQUALOO},
-        {InstructionType::NEQUALTT, &ScriptExecution::executeNEQUALTT},
-        {InstructionType::NEQUALEFFEFF, &ScriptExecution::executeNEQUALEFFEFF},
-        {InstructionType::NEQUALEVTEVT, &ScriptExecution::executeNEQUALEVTEVT},
-        {InstructionType::NEQUALLOCLOC, &ScriptExecution::executeNEQUALLOCLOC},
-        {InstructionType::NEQUALTALTAL, &ScriptExecution::executeNEQUALTALTAL},
-        {InstructionType::GEQII, &ScriptExecution::executeGEQII},
-        {InstructionType::GEQFF, &ScriptExecution::executeGEQFF},
-        {InstructionType::GTII, &ScriptExecution::executeGTII},
-        {InstructionType::GTFF, &ScriptExecution::executeGTFF},
-        {InstructionType::LTII, &ScriptExecution::executeLTII},
-        {InstructionType::LTFF, &ScriptExecution::executeLTFF},
-        {InstructionType::LEQII, &ScriptExecution::executeLEQII},
-        {InstructionType::LEQFF, &ScriptExecution::executeLEQFF},
-        {InstructionType::SHLEFTII, &ScriptExecution::executeSHLEFTII},
-        {InstructionType::SHRIGHTII, &ScriptExecution::executeSHRIGHTII},
-        {InstructionType::USHRIGHTII, &ScriptExecution::executeUSHRIGHTII},
-        {InstructionType::ADDII, &ScriptExecution::executeADDII},
-        {InstructionType::ADDIF, &ScriptExecution::executeADDIF},
-        {InstructionType::ADDFI, &ScriptExecution::executeADDFI},
-        {InstructionType::ADDFF, &ScriptExecution::executeADDFF},
-        {InstructionType::ADDSS, &ScriptExecution::executeADDSS},
-        {InstructionType::ADDVV, &ScriptExecution::executeADDVV},
-        {InstructionType::SUBII, &ScriptExecution::executeSUBII},
-        {InstructionType::SUBIF, &ScriptExecution::executeSUBIF},
-        {InstructionType::SUBFI, &ScriptExecution::executeSUBFI},
-        {InstructionType::SUBFF, &ScriptExecution::executeSUBFF},
-        {InstructionType::SUBVV, &ScriptExecution::executeSUBVV},
-        {InstructionType::MULII, &ScriptExecution::executeMULII},
-        {InstructionType::MULIF, &ScriptExecution::executeMULIF},
-        {InstructionType::MULFI, &ScriptExecution::executeMULFI},
-        {InstructionType::MULFF, &ScriptExecution::executeMULFF},
-        {InstructionType::MULVF, &ScriptExecution::executeMULVF},
-        {InstructionType::MULFV, &ScriptExecution::executeMULFV},
-        {InstructionType::DIVII, &ScriptExecution::executeDIVII},
-        {InstructionType::DIVIF, &ScriptExecution::executeDIVIF},
-        {InstructionType::DIVFI, &ScriptExecution::executeDIVFI},
-        {InstructionType::DIVFF, &ScriptExecution::executeDIVFF},
-        {InstructionType::DIVVF, &ScriptExecution::executeDIVVF},
-        {InstructionType::DIVFV, &ScriptExecution::executeDIVFV},
-        {InstructionType::MODII, &ScriptExecution::executeMODII},
-        {InstructionType::NEGI, &ScriptExecution::executeNEGI},
-        {InstructionType::NEGF, &ScriptExecution::executeNEGF},
-        {InstructionType::MOVSP, &ScriptExecution::executeMOVSP},
-        {InstructionType::JMP, &ScriptExecution::executeJMP},
-        {InstructionType::JSR, &ScriptExecution::executeJSR},
-        {InstructionType::JZ, &ScriptExecution::executeJZ},
-        {InstructionType::RETN, &ScriptExecution::executeRETN},
-        {InstructionType::DESTRUCT, &ScriptExecution::executeDESTRUCT},
-        {InstructionType::NOTI, &ScriptExecution::executeNOTI},
-        {InstructionType::DECISP, &ScriptExecution::executeDECISP},
-        {InstructionType::INCISP, &ScriptExecution::executeINCISP},
-        {InstructionType::JNZ, &ScriptExecution::executeJNZ},
-        {InstructionType::CPDOWNBP, &ScriptExecution::executeCPDOWNBP},
-        {InstructionType::CPTOPBP, &ScriptExecution::executeCPTOPBP},
-        {InstructionType::DECIBP, &ScriptExecution::executeDECIBP},
-        {InstructionType::INCIBP, &ScriptExecution::executeINCIBP},
-        {InstructionType::SAVEBP, &ScriptExecution::executeSAVEBP},
-        {InstructionType::RESTOREBP, &ScriptExecution::executeRESTOREBP},
-        {InstructionType::STORE_STATE, &ScriptExecution::executeSTORE_STATE}};
+    static std::unordered_map<InstructionType, std::function<void(VirtualMachine *, const Instruction &)>> g_handlers {
+        {InstructionType::CPDOWNSP, &VirtualMachine::executeCPDOWNSP},
+        {InstructionType::RSADDI, &VirtualMachine::executeRSADDI},
+        {InstructionType::RSADDF, &VirtualMachine::executeRSADDF},
+        {InstructionType::RSADDS, &VirtualMachine::executeRSADDS},
+        {InstructionType::RSADDO, &VirtualMachine::executeRSADDO},
+        {InstructionType::RSADDEFF, &VirtualMachine::executeRSADDEFF},
+        {InstructionType::RSADDEVT, &VirtualMachine::executeRSADDEVT},
+        {InstructionType::RSADDLOC, &VirtualMachine::executeRSADDLOC},
+        {InstructionType::RSADDTAL, &VirtualMachine::executeRSADDTAL},
+        {InstructionType::CPTOPSP, &VirtualMachine::executeCPTOPSP},
+        {InstructionType::CONSTI, &VirtualMachine::executeCONSTI},
+        {InstructionType::CONSTF, &VirtualMachine::executeCONSTF},
+        {InstructionType::CONSTS, &VirtualMachine::executeCONSTS},
+        {InstructionType::CONSTO, &VirtualMachine::executeCONSTO},
+        {InstructionType::ACTION, &VirtualMachine::executeACTION},
+        {InstructionType::LOGANDII, &VirtualMachine::executeLOGANDII},
+        {InstructionType::LOGORII, &VirtualMachine::executeLOGORII},
+        {InstructionType::INCORII, &VirtualMachine::executeINCORII},
+        {InstructionType::EXCORII, &VirtualMachine::executeEXCORII},
+        {InstructionType::BOOLANDII, &VirtualMachine::executeBOOLANDII},
+        {InstructionType::EQUALII, &VirtualMachine::executeEQUALII},
+        {InstructionType::EQUALFF, &VirtualMachine::executeEQUALFF},
+        {InstructionType::EQUALSS, &VirtualMachine::executeEQUALSS},
+        {InstructionType::EQUALOO, &VirtualMachine::executeEQUALOO},
+        {InstructionType::EQUALTT, &VirtualMachine::executeEQUALTT},
+        {InstructionType::EQUALEFFEFF, &VirtualMachine::executeEQUALEFFEFF},
+        {InstructionType::EQUALEVTEVT, &VirtualMachine::executeEQUALEVTEVT},
+        {InstructionType::EQUALLOCLOC, &VirtualMachine::executeEQUALLOCLOC},
+        {InstructionType::EQUALTALTAL, &VirtualMachine::executeEQUALTALTAL},
+        {InstructionType::NEQUALII, &VirtualMachine::executeNEQUALII},
+        {InstructionType::NEQUALFF, &VirtualMachine::executeNEQUALFF},
+        {InstructionType::NEQUALSS, &VirtualMachine::executeNEQUALSS},
+        {InstructionType::NEQUALOO, &VirtualMachine::executeNEQUALOO},
+        {InstructionType::NEQUALTT, &VirtualMachine::executeNEQUALTT},
+        {InstructionType::NEQUALEFFEFF, &VirtualMachine::executeNEQUALEFFEFF},
+        {InstructionType::NEQUALEVTEVT, &VirtualMachine::executeNEQUALEVTEVT},
+        {InstructionType::NEQUALLOCLOC, &VirtualMachine::executeNEQUALLOCLOC},
+        {InstructionType::NEQUALTALTAL, &VirtualMachine::executeNEQUALTALTAL},
+        {InstructionType::GEQII, &VirtualMachine::executeGEQII},
+        {InstructionType::GEQFF, &VirtualMachine::executeGEQFF},
+        {InstructionType::GTII, &VirtualMachine::executeGTII},
+        {InstructionType::GTFF, &VirtualMachine::executeGTFF},
+        {InstructionType::LTII, &VirtualMachine::executeLTII},
+        {InstructionType::LTFF, &VirtualMachine::executeLTFF},
+        {InstructionType::LEQII, &VirtualMachine::executeLEQII},
+        {InstructionType::LEQFF, &VirtualMachine::executeLEQFF},
+        {InstructionType::SHLEFTII, &VirtualMachine::executeSHLEFTII},
+        {InstructionType::SHRIGHTII, &VirtualMachine::executeSHRIGHTII},
+        {InstructionType::USHRIGHTII, &VirtualMachine::executeUSHRIGHTII},
+        {InstructionType::ADDII, &VirtualMachine::executeADDII},
+        {InstructionType::ADDIF, &VirtualMachine::executeADDIF},
+        {InstructionType::ADDFI, &VirtualMachine::executeADDFI},
+        {InstructionType::ADDFF, &VirtualMachine::executeADDFF},
+        {InstructionType::ADDSS, &VirtualMachine::executeADDSS},
+        {InstructionType::ADDVV, &VirtualMachine::executeADDVV},
+        {InstructionType::SUBII, &VirtualMachine::executeSUBII},
+        {InstructionType::SUBIF, &VirtualMachine::executeSUBIF},
+        {InstructionType::SUBFI, &VirtualMachine::executeSUBFI},
+        {InstructionType::SUBFF, &VirtualMachine::executeSUBFF},
+        {InstructionType::SUBVV, &VirtualMachine::executeSUBVV},
+        {InstructionType::MULII, &VirtualMachine::executeMULII},
+        {InstructionType::MULIF, &VirtualMachine::executeMULIF},
+        {InstructionType::MULFI, &VirtualMachine::executeMULFI},
+        {InstructionType::MULFF, &VirtualMachine::executeMULFF},
+        {InstructionType::MULVF, &VirtualMachine::executeMULVF},
+        {InstructionType::MULFV, &VirtualMachine::executeMULFV},
+        {InstructionType::DIVII, &VirtualMachine::executeDIVII},
+        {InstructionType::DIVIF, &VirtualMachine::executeDIVIF},
+        {InstructionType::DIVFI, &VirtualMachine::executeDIVFI},
+        {InstructionType::DIVFF, &VirtualMachine::executeDIVFF},
+        {InstructionType::DIVVF, &VirtualMachine::executeDIVVF},
+        {InstructionType::DIVFV, &VirtualMachine::executeDIVFV},
+        {InstructionType::MODII, &VirtualMachine::executeMODII},
+        {InstructionType::NEGI, &VirtualMachine::executeNEGI},
+        {InstructionType::NEGF, &VirtualMachine::executeNEGF},
+        {InstructionType::MOVSP, &VirtualMachine::executeMOVSP},
+        {InstructionType::JMP, &VirtualMachine::executeJMP},
+        {InstructionType::JSR, &VirtualMachine::executeJSR},
+        {InstructionType::JZ, &VirtualMachine::executeJZ},
+        {InstructionType::RETN, &VirtualMachine::executeRETN},
+        {InstructionType::DESTRUCT, &VirtualMachine::executeDESTRUCT},
+        {InstructionType::NOTI, &VirtualMachine::executeNOTI},
+        {InstructionType::DECISP, &VirtualMachine::executeDECISP},
+        {InstructionType::INCISP, &VirtualMachine::executeINCISP},
+        {InstructionType::JNZ, &VirtualMachine::executeJNZ},
+        {InstructionType::CPDOWNBP, &VirtualMachine::executeCPDOWNBP},
+        {InstructionType::CPTOPBP, &VirtualMachine::executeCPTOPBP},
+        {InstructionType::DECIBP, &VirtualMachine::executeDECIBP},
+        {InstructionType::INCIBP, &VirtualMachine::executeINCIBP},
+        {InstructionType::SAVEBP, &VirtualMachine::executeSAVEBP},
+        {InstructionType::RESTOREBP, &VirtualMachine::executeRESTOREBP},
+        {InstructionType::STORE_STATE, &VirtualMachine::executeSTORE_STATE}};
     for (auto &pair : g_handlers) {
         registerHandler(pair.first, pair.second);
     }
@@ -137,7 +137,7 @@ ScriptExecution::ScriptExecution(std::shared_ptr<ScriptProgram> program, std::un
     _handlers.insert(std::make_pair(InstructionType::NOP2, [](auto &) {}));
 }
 
-int ScriptExecution::run() {
+int VirtualMachine::run() {
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context->savedState) {
@@ -188,7 +188,7 @@ int ScriptExecution::run() {
     return -1;
 }
 
-void ScriptExecution::executeCPDOWNSP(const Instruction &ins) {
+void VirtualMachine::executeCPDOWNSP(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = static_cast<int>(_stack.size()) - count;
     int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
@@ -198,39 +198,39 @@ void ScriptExecution::executeCPDOWNSP(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeRSADDI(const Instruction &ins) {
+void VirtualMachine::executeRSADDI(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(0));
 }
 
-void ScriptExecution::executeRSADDF(const Instruction &ins) {
+void VirtualMachine::executeRSADDF(const Instruction &ins) {
     _stack.push_back(Variable::ofFloat(0.0f));
 }
 
-void ScriptExecution::executeRSADDS(const Instruction &ins) {
+void VirtualMachine::executeRSADDS(const Instruction &ins) {
     _stack.push_back(Variable::ofString(""));
 }
 
-void ScriptExecution::executeRSADDO(const Instruction &ins) {
+void VirtualMachine::executeRSADDO(const Instruction &ins) {
     _stack.push_back(Variable::ofObject(kObjectInvalid));
 }
 
-void ScriptExecution::executeRSADDEFF(const Instruction &ins) {
+void VirtualMachine::executeRSADDEFF(const Instruction &ins) {
     _stack.push_back(Variable::ofEffect(nullptr));
 }
 
-void ScriptExecution::executeRSADDEVT(const Instruction &ins) {
+void VirtualMachine::executeRSADDEVT(const Instruction &ins) {
     _stack.push_back(Variable::ofEvent(nullptr));
 }
 
-void ScriptExecution::executeRSADDLOC(const Instruction &ins) {
+void VirtualMachine::executeRSADDLOC(const Instruction &ins) {
     _stack.push_back(Variable::ofLocation(nullptr));
 }
 
-void ScriptExecution::executeRSADDTAL(const Instruction &ins) {
+void VirtualMachine::executeRSADDTAL(const Instruction &ins) {
     _stack.push_back(Variable::ofTalent(nullptr));
 }
 
-void ScriptExecution::executeCPTOPSP(const Instruction &ins) {
+void VirtualMachine::executeCPTOPSP(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
 
@@ -239,24 +239,24 @@ void ScriptExecution::executeCPTOPSP(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeCONSTI(const Instruction &ins) {
+void VirtualMachine::executeCONSTI(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(ins.intValue));
 }
 
-void ScriptExecution::executeCONSTF(const Instruction &ins) {
+void VirtualMachine::executeCONSTF(const Instruction &ins) {
     _stack.push_back(Variable::ofFloat(ins.floatValue));
 }
 
-void ScriptExecution::executeCONSTS(const Instruction &ins) {
+void VirtualMachine::executeCONSTS(const Instruction &ins) {
     _stack.push_back(Variable::ofString(ins.strValue));
 }
 
-void ScriptExecution::executeCONSTO(const Instruction &ins) {
+void VirtualMachine::executeCONSTO(const Instruction &ins) {
     uint32_t objectId = ins.objectId == kObjectSelf ? _context->callerId : ins.objectId;
     _stack.push_back(Variable::ofObject(objectId));
 }
 
-void ScriptExecution::executeACTION(const Instruction &ins) {
+void VirtualMachine::executeACTION(const Instruction &ins) {
     auto &routine = _context->routines->get(ins.routine);
     if (ins.argCount > routine.getArgumentCount()) {
         throw std::invalid_argument("Too many routine arguments");
@@ -310,61 +310,61 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeLOGANDII(const Instruction &ins) {
+void VirtualMachine::executeLOGANDII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left && right)));
     });
 }
 
-void ScriptExecution::executeLOGORII(const Instruction &ins) {
+void VirtualMachine::executeLOGORII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left || right)));
     });
 }
 
-void ScriptExecution::executeINCORII(const Instruction &ins) {
+void VirtualMachine::executeINCORII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(left | right));
     });
 }
 
-void ScriptExecution::executeEXCORII(const Instruction &ins) {
+void VirtualMachine::executeEXCORII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(left ^ right));
     });
 }
 
-void ScriptExecution::executeBOOLANDII(const Instruction &ins) {
+void VirtualMachine::executeBOOLANDII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(left & right));
     });
 }
 
-void ScriptExecution::executeEQUALII(const Instruction &ins) {
+void VirtualMachine::executeEQUALII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
     });
 }
 
-void ScriptExecution::executeEQUALFF(const Instruction &ins) {
+void VirtualMachine::executeEQUALFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(fabs(left - right) < kFloatTolerance)));
     });
 }
 
-void ScriptExecution::executeEQUALSS(const Instruction &ins) {
+void VirtualMachine::executeEQUALSS(const Instruction &ins) {
     withStringsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
     });
 }
 
-void ScriptExecution::executeEQUALOO(const Instruction &ins) {
+void VirtualMachine::executeEQUALOO(const Instruction &ins) {
     withObjectsFromStack([this](uint32_t left, uint32_t right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
     });
 }
 
-void ScriptExecution::executeEQUALTT(const Instruction &ins) {
+void VirtualMachine::executeEQUALTT(const Instruction &ins) {
     int numVariables = ins.size / 4;
     std::vector<Variable> vars1;
     for (int i = 0; i < numVariables; ++i) {
@@ -380,55 +380,55 @@ void ScriptExecution::executeEQUALTT(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(equal)));
 }
 
-void ScriptExecution::executeEQUALEFFEFF(const Instruction &ins) {
+void VirtualMachine::executeEQUALEFFEFF(const Instruction &ins) {
     withEffectsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
     });
 }
 
-void ScriptExecution::executeEQUALEVTEVT(const Instruction &ins) {
+void VirtualMachine::executeEQUALEVTEVT(const Instruction &ins) {
     withEventsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
     });
 }
 
-void ScriptExecution::executeEQUALLOCLOC(const Instruction &ins) {
+void VirtualMachine::executeEQUALLOCLOC(const Instruction &ins) {
     withLocationsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
     });
 }
 
-void ScriptExecution::executeEQUALTALTAL(const Instruction &ins) {
+void VirtualMachine::executeEQUALTALTAL(const Instruction &ins) {
     withTalentsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
     });
 }
 
-void ScriptExecution::executeNEQUALII(const Instruction &ins) {
+void VirtualMachine::executeNEQUALII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
     });
 }
 
-void ScriptExecution::executeNEQUALFF(const Instruction &ins) {
+void VirtualMachine::executeNEQUALFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
     });
 }
 
-void ScriptExecution::executeNEQUALSS(const Instruction &ins) {
+void VirtualMachine::executeNEQUALSS(const Instruction &ins) {
     withStringsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
     });
 }
 
-void ScriptExecution::executeNEQUALOO(const Instruction &ins) {
+void VirtualMachine::executeNEQUALOO(const Instruction &ins) {
     withObjectsFromStack([this](uint32_t left, uint32_t right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
     });
 }
 
-void ScriptExecution::executeNEQUALTT(const Instruction &ins) {
+void VirtualMachine::executeNEQUALTT(const Instruction &ins) {
     int numVariables = ins.size / 4;
     std::vector<Variable> vars1;
     for (int i = 0; i < numVariables; ++i) {
@@ -444,85 +444,85 @@ void ScriptExecution::executeNEQUALTT(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(notEqual)));
 }
 
-void ScriptExecution::executeNEQUALEFFEFF(const Instruction &ins) {
+void VirtualMachine::executeNEQUALEFFEFF(const Instruction &ins) {
     withEffectsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
     });
 }
 
-void ScriptExecution::executeNEQUALEVTEVT(const Instruction &ins) {
+void VirtualMachine::executeNEQUALEVTEVT(const Instruction &ins) {
     withEventsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
     });
 }
 
-void ScriptExecution::executeNEQUALLOCLOC(const Instruction &ins) {
+void VirtualMachine::executeNEQUALLOCLOC(const Instruction &ins) {
     withLocationsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
     });
 }
 
-void ScriptExecution::executeNEQUALTALTAL(const Instruction &ins) {
+void VirtualMachine::executeNEQUALTALTAL(const Instruction &ins) {
     withTalentsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
     });
 }
 
-void ScriptExecution::executeGEQII(const Instruction &ins) {
+void VirtualMachine::executeGEQII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left >= right)));
     });
 }
 
-void ScriptExecution::executeGEQFF(const Instruction &ins) {
+void VirtualMachine::executeGEQFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left >= right)));
     });
 }
 
-void ScriptExecution::executeGTII(const Instruction &ins) {
+void VirtualMachine::executeGTII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left > right)));
     });
 }
 
-void ScriptExecution::executeGTFF(const Instruction &ins) {
+void VirtualMachine::executeGTFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left > right)));
     });
 }
 
-void ScriptExecution::executeLTII(const Instruction &ins) {
+void VirtualMachine::executeLTII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left < right)));
     });
 }
 
-void ScriptExecution::executeLTFF(const Instruction &ins) {
+void VirtualMachine::executeLTFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left < right)));
     });
 }
 
-void ScriptExecution::executeLEQII(const Instruction &ins) {
+void VirtualMachine::executeLEQII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left <= right)));
     });
 }
 
-void ScriptExecution::executeLEQFF(const Instruction &ins) {
+void VirtualMachine::executeLEQFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofInt(static_cast<int>(left <= right)));
     });
 }
 
-void ScriptExecution::executeSHLEFTII(const Instruction &ins) {
+void VirtualMachine::executeSHLEFTII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(left << right));
     });
 }
 
-void ScriptExecution::executeSHRIGHTII(const Instruction &ins) {
+void VirtualMachine::executeSHRIGHTII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         int result = left;
         if (result < 0) {
@@ -534,43 +534,43 @@ void ScriptExecution::executeSHRIGHTII(const Instruction &ins) {
     });
 }
 
-void ScriptExecution::executeUSHRIGHTII(const Instruction &ins) {
+void VirtualMachine::executeUSHRIGHTII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(static_cast<unsigned int>(left) >> right));
     });
 }
 
-void ScriptExecution::executeADDII(const Instruction &ins) {
+void VirtualMachine::executeADDII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(left + right));
     });
 }
 
-void ScriptExecution::executeADDIF(const Instruction &ins) {
+void VirtualMachine::executeADDIF(const Instruction &ins) {
     withIntFloatFromStack([this](int left, float right) {
         _stack.push_back(Variable::ofFloat(left + right));
     });
 }
 
-void ScriptExecution::executeADDFI(const Instruction &ins) {
+void VirtualMachine::executeADDFI(const Instruction &ins) {
     withFloatIntFromStack([this](float left, int right) {
         _stack.push_back(Variable::ofFloat(left + right));
     });
 }
 
-void ScriptExecution::executeADDFF(const Instruction &ins) {
+void VirtualMachine::executeADDFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofFloat(left + right));
     });
 }
 
-void ScriptExecution::executeADDSS(const Instruction &ins) {
+void VirtualMachine::executeADDSS(const Instruction &ins) {
     withStringsFromStack([this](auto &left, auto &right) {
         _stack.push_back(Variable::ofString(left + right));
     });
 }
 
-void ScriptExecution::executeADDVV(const Instruction &ins) {
+void VirtualMachine::executeADDVV(const Instruction &ins) {
     withVectorsFromStack([this](auto &left, auto &right) {
         auto result = left + right;
         _stack.push_back(Variable::ofFloat(result.x));
@@ -579,31 +579,31 @@ void ScriptExecution::executeADDVV(const Instruction &ins) {
     });
 }
 
-void ScriptExecution::executeSUBII(const Instruction &ins) {
+void VirtualMachine::executeSUBII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(left - right));
     });
 }
 
-void ScriptExecution::executeSUBIF(const Instruction &ins) {
+void VirtualMachine::executeSUBIF(const Instruction &ins) {
     withIntFloatFromStack([this](int left, float right) {
         _stack.push_back(Variable::ofFloat(left - right));
     });
 }
 
-void ScriptExecution::executeSUBFI(const Instruction &ins) {
+void VirtualMachine::executeSUBFI(const Instruction &ins) {
     withFloatIntFromStack([this](float left, int right) {
         _stack.push_back(Variable::ofFloat(left - right));
     });
 }
 
-void ScriptExecution::executeSUBFF(const Instruction &ins) {
+void VirtualMachine::executeSUBFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofFloat(left - right));
     });
 }
 
-void ScriptExecution::executeSUBVV(const Instruction &ins) {
+void VirtualMachine::executeSUBVV(const Instruction &ins) {
     withVectorsFromStack([this](auto &left, auto &right) {
         auto result = left - right;
         _stack.push_back(Variable::ofFloat(result.x));
@@ -612,31 +612,31 @@ void ScriptExecution::executeSUBVV(const Instruction &ins) {
     });
 }
 
-void ScriptExecution::executeMULII(const Instruction &ins) {
+void VirtualMachine::executeMULII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(left * right));
     });
 }
 
-void ScriptExecution::executeMULIF(const Instruction &ins) {
+void VirtualMachine::executeMULIF(const Instruction &ins) {
     withIntFloatFromStack([this](int left, float right) {
         _stack.push_back(Variable::ofFloat(left * right));
     });
 }
 
-void ScriptExecution::executeMULFI(const Instruction &ins) {
+void VirtualMachine::executeMULFI(const Instruction &ins) {
     withFloatIntFromStack([this](float left, int right) {
         _stack.push_back(Variable::ofFloat(left * right));
     });
 }
 
-void ScriptExecution::executeMULFF(const Instruction &ins) {
+void VirtualMachine::executeMULFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofFloat(left * right));
     });
 }
 
-void ScriptExecution::executeMULVF(const Instruction &ins) {
+void VirtualMachine::executeMULVF(const Instruction &ins) {
     withVectorFloatFromStack([this](auto &left, float right) {
         auto result = left * right;
         _stack.push_back(Variable::ofFloat(result.x));
@@ -645,7 +645,7 @@ void ScriptExecution::executeMULVF(const Instruction &ins) {
     });
 }
 
-void ScriptExecution::executeMULFV(const Instruction &ins) {
+void VirtualMachine::executeMULFV(const Instruction &ins) {
     withFloatVectorFromStack([this](float left, auto &right) {
         auto result = left * right;
         _stack.push_back(Variable::ofFloat(result.x));
@@ -654,31 +654,31 @@ void ScriptExecution::executeMULFV(const Instruction &ins) {
     });
 }
 
-void ScriptExecution::executeDIVII(const Instruction &ins) {
+void VirtualMachine::executeDIVII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(left / right));
     });
 }
 
-void ScriptExecution::executeDIVIF(const Instruction &ins) {
+void VirtualMachine::executeDIVIF(const Instruction &ins) {
     withIntFloatFromStack([this](int left, float right) {
         _stack.push_back(Variable::ofFloat(left / std::max(kFloatTolerance, right)));
     });
 }
 
-void ScriptExecution::executeDIVFI(const Instruction &ins) {
+void VirtualMachine::executeDIVFI(const Instruction &ins) {
     withFloatIntFromStack([this](float left, int right) {
         _stack.push_back(Variable::ofFloat(left / right));
     });
 }
 
-void ScriptExecution::executeDIVFF(const Instruction &ins) {
+void VirtualMachine::executeDIVFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
         _stack.push_back(Variable::ofFloat(left / std::max(kFloatTolerance, right)));
     });
 }
 
-void ScriptExecution::executeDIVVF(const Instruction &ins) {
+void VirtualMachine::executeDIVVF(const Instruction &ins) {
     withVectorFloatFromStack([this](auto &left, float right) {
         auto result = left / right;
         _stack.push_back(Variable::ofFloat(result.x));
@@ -687,7 +687,7 @@ void ScriptExecution::executeDIVVF(const Instruction &ins) {
     });
 }
 
-void ScriptExecution::executeDIVFV(const Instruction &ins) {
+void VirtualMachine::executeDIVFV(const Instruction &ins) {
     withFloatVectorFromStack([this](float left, auto &right) {
         auto result = left / right;
         _stack.push_back(Variable::ofFloat(result.x));
@@ -696,44 +696,44 @@ void ScriptExecution::executeDIVFV(const Instruction &ins) {
     });
 }
 
-void ScriptExecution::executeMODII(const Instruction &ins) {
+void VirtualMachine::executeMODII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
         _stack.push_back(Variable::ofInt(left % right));
     });
 }
 
-void ScriptExecution::executeNEGI(const Instruction &ins) {
+void VirtualMachine::executeNEGI(const Instruction &ins) {
     _stack.back().intValue *= -1;
 }
 
-void ScriptExecution::executeNEGF(const Instruction &ins) {
+void VirtualMachine::executeNEGF(const Instruction &ins) {
     _stack.back().floatValue *= -1.0f;
 }
 
-void ScriptExecution::executeMOVSP(const Instruction &ins) {
+void VirtualMachine::executeMOVSP(const Instruction &ins) {
     int count = -ins.stackOffset / 4;
     for (int i = 0; i < count; ++i) {
         _stack.pop_back();
     }
 }
 
-void ScriptExecution::executeJMP(const Instruction &ins) {
+void VirtualMachine::executeJMP(const Instruction &ins) {
     _nextInstruction = ins.offset + ins.jumpOffset;
 }
 
-void ScriptExecution::executeJSR(const Instruction &ins) {
+void VirtualMachine::executeJSR(const Instruction &ins) {
     _returnOffsets.push_back(ins.nextOffset);
     _nextInstruction = ins.offset + ins.jumpOffset;
 }
 
-void ScriptExecution::executeJZ(const Instruction &ins) {
+void VirtualMachine::executeJZ(const Instruction &ins) {
     bool zero = getIntFromStack() == 0;
     if (zero) {
         _nextInstruction = ins.offset + ins.jumpOffset;
     }
 }
 
-void ScriptExecution::executeRETN(const Instruction &ins) {
+void VirtualMachine::executeRETN(const Instruction &ins) {
     if (_returnOffsets.empty()) {
         _nextInstruction = _program->length();
     } else {
@@ -742,7 +742,7 @@ void ScriptExecution::executeRETN(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeDESTRUCT(const Instruction &ins) {
+void VirtualMachine::executeDESTRUCT(const Instruction &ins) {
     int startIdx = static_cast<int>(_stack.size()) - ins.size / 4;
     int startIdxNoDestroy = startIdx + ins.stackOffset / 4;
     int countNoDestroy = ins.sizeNoDestroy / 4;
@@ -753,29 +753,29 @@ void ScriptExecution::executeDESTRUCT(const Instruction &ins) {
     _stack.resize(startIdx + countNoDestroy);
 }
 
-void ScriptExecution::executeDECISP(const Instruction &ins) {
+void VirtualMachine::executeDECISP(const Instruction &ins) {
     int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
     _stack[dstIdx].intValue--;
 }
 
-void ScriptExecution::executeINCISP(const Instruction &ins) {
+void VirtualMachine::executeINCISP(const Instruction &ins) {
     int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
     _stack[dstIdx].intValue++;
 }
 
-void ScriptExecution::executeNOTI(const Instruction &ins) {
+void VirtualMachine::executeNOTI(const Instruction &ins) {
     int value = getIntFromStack();
     _stack.push_back(Variable::ofInt(static_cast<int>(!value)));
 }
 
-void ScriptExecution::executeJNZ(const Instruction &ins) {
+void VirtualMachine::executeJNZ(const Instruction &ins) {
     bool notZero = getIntFromStack() != 0;
     if (notZero) {
         _nextInstruction = ins.offset + ins.jumpOffset;
     }
 }
 
-void ScriptExecution::executeCPDOWNBP(const Instruction &ins) {
+void VirtualMachine::executeCPDOWNBP(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = static_cast<int>(_stack.size()) - count;
     int dstIdx = _globalCount + ins.stackOffset / 4;
@@ -785,7 +785,7 @@ void ScriptExecution::executeCPDOWNBP(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeCPTOPBP(const Instruction &ins) {
+void VirtualMachine::executeCPTOPBP(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = _globalCount + ins.stackOffset / 4;
 
@@ -794,26 +794,26 @@ void ScriptExecution::executeCPTOPBP(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeDECIBP(const Instruction &ins) {
+void VirtualMachine::executeDECIBP(const Instruction &ins) {
     int dstIdx = _globalCount + ins.stackOffset / 4;
     _stack[dstIdx].intValue--;
 }
 
-void ScriptExecution::executeINCIBP(const Instruction &ins) {
+void VirtualMachine::executeINCIBP(const Instruction &ins) {
     int dstIdx = _globalCount + ins.stackOffset / 4;
     _stack[dstIdx].intValue++;
 }
 
-void ScriptExecution::executeSAVEBP(const Instruction &ins) {
+void VirtualMachine::executeSAVEBP(const Instruction &ins) {
     _globalCount = static_cast<int>(_stack.size());
     _stack.push_back(Variable::ofInt(_globalCount));
 }
 
-void ScriptExecution::executeRESTOREBP(const Instruction &ins) {
+void VirtualMachine::executeRESTOREBP(const Instruction &ins) {
     _globalCount = getIntFromStack();
 }
 
-void ScriptExecution::executeSTORE_STATE(const Instruction &ins) {
+void VirtualMachine::executeSTORE_STATE(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = _globalCount - count;
 
@@ -834,7 +834,7 @@ void ScriptExecution::executeSTORE_STATE(const Instruction &ins) {
     _savedState.insOffset = ins.offset + 0x10;
 }
 
-int ScriptExecution::getIntFromStack() {
+int VirtualMachine::getIntFromStack() {
     Variable var(std::move(_stack.back()));
     _stack.pop_back();
 
@@ -843,7 +843,7 @@ int ScriptExecution::getIntFromStack() {
     return var.intValue;
 }
 
-float ScriptExecution::getFloatFromStack() {
+float VirtualMachine::getFloatFromStack() {
     Variable var(std::move(_stack.back()));
     _stack.pop_back();
 
@@ -852,7 +852,7 @@ float ScriptExecution::getFloatFromStack() {
     return var.floatValue;
 }
 
-glm::vec3 ScriptExecution::getVectorFromStack() {
+glm::vec3 VirtualMachine::getVectorFromStack() {
     float z = getFloatFromStack();
     float y = getFloatFromStack();
     float x = getFloatFromStack();
@@ -860,7 +860,7 @@ glm::vec3 ScriptExecution::getVectorFromStack() {
     return glm::vec3(x, y, z);
 }
 
-void ScriptExecution::withStackVariables(const std::function<void(const Variable &, const Variable &)> &fn) {
+void VirtualMachine::withStackVariables(const std::function<void(const Variable &, const Variable &)> &fn) {
     Variable second(std::move(_stack.back()));
     _stack.pop_back();
 
@@ -870,7 +870,7 @@ void ScriptExecution::withStackVariables(const std::function<void(const Variable
     fn(first, second);
 }
 
-void ScriptExecution::withIntsFromStack(const std::function<void(int, int)> &fn) {
+void VirtualMachine::withIntsFromStack(const std::function<void(int, int)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Int, left.type);
         throwIfInvalidType(VariableType::Int, right.type);
@@ -878,7 +878,7 @@ void ScriptExecution::withIntsFromStack(const std::function<void(int, int)> &fn)
     });
 }
 
-void ScriptExecution::withIntFloatFromStack(const std::function<void(int, float)> &fn) {
+void VirtualMachine::withIntFloatFromStack(const std::function<void(int, float)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Int, left.type);
         throwIfInvalidType(VariableType::Float, right.type);
@@ -886,7 +886,7 @@ void ScriptExecution::withIntFloatFromStack(const std::function<void(int, float)
     });
 }
 
-void ScriptExecution::withFloatIntFromStack(const std::function<void(float, int)> &fn) {
+void VirtualMachine::withFloatIntFromStack(const std::function<void(float, int)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Float, left.type);
         throwIfInvalidType(VariableType::Int, right.type);
@@ -894,7 +894,7 @@ void ScriptExecution::withFloatIntFromStack(const std::function<void(float, int)
     });
 }
 
-void ScriptExecution::withFloatsFromStack(const std::function<void(float, float)> &fn) {
+void VirtualMachine::withFloatsFromStack(const std::function<void(float, float)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Float, left.type);
         throwIfInvalidType(VariableType::Float, right.type);
@@ -902,7 +902,7 @@ void ScriptExecution::withFloatsFromStack(const std::function<void(float, float)
     });
 }
 
-void ScriptExecution::withStringsFromStack(const std::function<void(const std::string &, const std::string &)> &fn) {
+void VirtualMachine::withStringsFromStack(const std::function<void(const std::string &, const std::string &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::String, left.type);
         throwIfInvalidType(VariableType::String, right.type);
@@ -910,7 +910,7 @@ void ScriptExecution::withStringsFromStack(const std::function<void(const std::s
     });
 }
 
-void ScriptExecution::withObjectsFromStack(const std::function<void(uint32_t, uint32_t)> &fn) {
+void VirtualMachine::withObjectsFromStack(const std::function<void(uint32_t, uint32_t)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Object, left.type);
         throwIfInvalidType(VariableType::Object, right.type);
@@ -918,7 +918,7 @@ void ScriptExecution::withObjectsFromStack(const std::function<void(uint32_t, ui
     });
 }
 
-void ScriptExecution::withEffectsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
+void VirtualMachine::withEffectsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Effect, left.type);
         throwIfInvalidType(VariableType::Effect, right.type);
@@ -926,7 +926,7 @@ void ScriptExecution::withEffectsFromStack(const std::function<void(const std::s
     });
 }
 
-void ScriptExecution::withEventsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
+void VirtualMachine::withEventsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Event, left.type);
         throwIfInvalidType(VariableType::Event, right.type);
@@ -934,7 +934,7 @@ void ScriptExecution::withEventsFromStack(const std::function<void(const std::sh
     });
 }
 
-void ScriptExecution::withLocationsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
+void VirtualMachine::withLocationsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Location, left.type);
         throwIfInvalidType(VariableType::Location, right.type);
@@ -942,7 +942,7 @@ void ScriptExecution::withLocationsFromStack(const std::function<void(const std:
     });
 }
 
-void ScriptExecution::withTalentsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
+void VirtualMachine::withTalentsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Talent, left.type);
         throwIfInvalidType(VariableType::Talent, right.type);
@@ -950,28 +950,28 @@ void ScriptExecution::withTalentsFromStack(const std::function<void(const std::s
     });
 }
 
-void ScriptExecution::withFloatVectorFromStack(const std::function<void(float, const glm::vec3 &)> &fn) {
+void VirtualMachine::withFloatVectorFromStack(const std::function<void(float, const glm::vec3 &)> &fn) {
     auto right = getVectorFromStack();
     auto left = getFloatFromStack();
 
     fn(left, right);
 }
 
-void ScriptExecution::withVectorFloatFromStack(const std::function<void(const glm::vec3 &, float)> &fn) {
+void VirtualMachine::withVectorFloatFromStack(const std::function<void(const glm::vec3 &, float)> &fn) {
     auto right = getFloatFromStack();
     auto left = getVectorFromStack();
 
     fn(left, right);
 }
 
-void ScriptExecution::withVectorsFromStack(const std::function<void(const glm::vec3 &, const glm::vec3 &)> &fn) {
+void VirtualMachine::withVectorsFromStack(const std::function<void(const glm::vec3 &, const glm::vec3 &)> &fn) {
     auto right = getVectorFromStack();
     auto left = getVectorFromStack();
 
     fn(left, right);
 }
 
-void ScriptExecution::throwIfInvalidType(VariableType expected, VariableType actual) {
+void VirtualMachine::throwIfInvalidType(VariableType expected, VariableType actual) {
     if (actual != expected) {
         throw std::runtime_error(str(boost::format("Invalid variable type: expected=%d, actual=%d") %
                                      static_cast<int>(expected) %
@@ -979,11 +979,11 @@ void ScriptExecution::throwIfInvalidType(VariableType expected, VariableType act
     }
 }
 
-int ScriptExecution::getStackSize() const {
+int VirtualMachine::getStackSize() const {
     return static_cast<int>(_stack.size());
 }
 
-const Variable &ScriptExecution::getStackVariable(int index) const {
+const Variable &VirtualMachine::getStackVariable(int index) const {
     return _stack[index];
 }
 

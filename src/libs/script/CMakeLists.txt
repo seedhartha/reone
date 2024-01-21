@@ -20,7 +20,6 @@ set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/di/module.h
     ${SCRIPT_INCLUDE_DIR}/di/services.h
     ${SCRIPT_INCLUDE_DIR}/enginetype.h
-    ${SCRIPT_INCLUDE_DIR}/execution.h
     ${SCRIPT_INCLUDE_DIR}/executioncontext.h
     ${SCRIPT_INCLUDE_DIR}/executionstate.h
     ${SCRIPT_INCLUDE_DIR}/format/ncsreader.h
@@ -34,18 +33,19 @@ set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/routines.h
     ${SCRIPT_INCLUDE_DIR}/types.h
     ${SCRIPT_INCLUDE_DIR}/variable.h
-    ${SCRIPT_INCLUDE_DIR}/variableutil.h)
+    ${SCRIPT_INCLUDE_DIR}/variableutil.h
+    ${SCRIPT_INCLUDE_DIR}/virtualmachine.h)
 
 set(SCRIPT_SOURCES
     ${SCRIPT_SOURCE_DIR}/di/module.cpp
-    ${SCRIPT_SOURCE_DIR}/execution.cpp
     ${SCRIPT_SOURCE_DIR}/format/ncsreader.cpp
     ${SCRIPT_SOURCE_DIR}/format/ncswriter.cpp
     ${SCRIPT_SOURCE_DIR}/instrutil.cpp
     ${SCRIPT_SOURCE_DIR}/program.cpp
     ${SCRIPT_SOURCE_DIR}/routine.cpp
     ${SCRIPT_SOURCE_DIR}/variable.cpp
-    ${SCRIPT_SOURCE_DIR}/variableutil.cpp)
+    ${SCRIPT_SOURCE_DIR}/variableutil.cpp
+    ${SCRIPT_SOURCE_DIR}/virtualmachine.cpp)
 
 add_library(script STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(script PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

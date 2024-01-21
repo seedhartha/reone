@@ -19,9 +19,10 @@
 
 #include "reone/game/game.h"
 #include "reone/resource/provider/scripts.h"
-#include "reone/script/execution.h"
 #include "reone/script/executioncontext.h"
 #include "reone/script/routines.h"
+#include "reone/script/virtualmachine.h"
+
 
 using namespace reone::script;
 
@@ -48,7 +49,7 @@ int ScriptRunner::run(const std::string &resRef, uint32_t callerId, uint32_t tri
     ctx->userDefinedEventNumber = userDefinedEventNumber;
     ctx->scriptVar = scriptVar;
 
-    return ScriptExecution(program, std::move(ctx)).run();
+    return VirtualMachine(program, std::move(ctx)).run();
 }
 
 } // namespace game

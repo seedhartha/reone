@@ -18,6 +18,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../../fixtures/game.h"
 #include "../../fixtures/graphics.h"
 #include "../../fixtures/resource.h"
 #include "../../fixtures/scene.h"
@@ -78,13 +79,15 @@ protected:
             _options,
             _graphicsModule.services(),
             _resourceModule.services(),
-            _sceneModule.services());
+            _sceneModule.services(),
+            _console);
     }
 
     TestOptions _options;
     TestGraphicsModule _graphicsModule;
     TestResourceModule _resourceModule;
     TestSceneModule _sceneModule;
+    MockConsole _console;
 
     std::unique_ptr<Game> _game;
 };

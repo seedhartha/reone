@@ -103,26 +103,6 @@ void Engine::init() {
         _resourceModule->services(),
         _systemModule->services());
 
-#if R_NEO_GAME
-    _services->resource.director.onModuleLoad("end_m01aa");
-    _neoGame = std::make_unique<neo::Game>(
-        *_optionsView,
-        _services->graphics,
-        _services->resource,
-        _services->scene);
-    _neoGame->init();
-    showCursor(false);
-    setRelativeMouseMode(true);
-#else
-    _game = std::make_unique<Game>(
-        gameId,
-        _options.game.path,
-        *_optionsView,
-        *_services,
-        *_console);
-    _game->init();
-#endif
-
     _profiler = std::make_unique<Profiler>(
         _options.graphics,
         _services->graphics,
@@ -135,6 +115,27 @@ void Engine::init() {
         _services->graphics,
         _services->resource);
     _console->init();
+
+#if R_NEO_GAME
+    _services->resource.director.onModuleLoad("end_m01aa");
+    _neoGame = std::make_unique<neo::Game>(
+        *_optionsView,
+        _services->graphics,
+        _services->resource,
+        _services->scene,
+        *_console);
+    _neoGame->init();
+    showCursor(false);
+    setRelativeMouseMode(true);
+#else
+    _game = std::make_unique<Game>(
+        gameId,
+        _options.game.path,
+        *_optionsView,
+        *_services,
+        *_console);
+    _game->init();
+#endif
 }
 
 void Engine::deinit() {

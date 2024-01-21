@@ -17,9 +17,10 @@
 
 #include "reone/game/action/docommand.h"
 
-#include "reone/script/execution.h"
 #include "reone/script/executioncontext.h"
 #include "reone/script/program.h"
+#include "reone/script/virtualmachine.h"
+
 
 #include "reone/game/object.h"
 
@@ -34,7 +35,7 @@ void DoCommandAction::execute(std::shared_ptr<Action> self, Object &actor, float
     executionCtx->callerId = actor.id();
 
     std::shared_ptr<ScriptProgram> program(_actionToDo->savedState->program);
-    ScriptExecution(program, std::move(executionCtx)).run();
+    VirtualMachine(program, std::move(executionCtx)).run();
     complete();
 }
 

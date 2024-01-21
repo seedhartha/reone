@@ -70,9 +70,9 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/resource/resref.cpp
     ${TESTS_SOURCE_DIR}/resource/strings.cpp
     ${TESTS_SOURCE_DIR}/scene/model.cpp
-    ${TESTS_SOURCE_DIR}/script/execution.cpp
     ${TESTS_SOURCE_DIR}/script/format/ncsreader.cpp
     ${TESTS_SOURCE_DIR}/script/format/ncswriter.cpp
+    ${TESTS_SOURCE_DIR}/script/virtualmachine.cpp
     ${TESTS_SOURCE_DIR}/system/binaryreader.cpp
     ${TESTS_SOURCE_DIR}/system/binarywriter.cpp
     ${TESTS_SOURCE_DIR}/system/cache.cpp

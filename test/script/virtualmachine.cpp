@@ -17,10 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/script/execution.h"
 #include "reone/script/executioncontext.h"
 #include "reone/script/executionstate.h"
 #include "reone/script/program.h"
+#include "reone/script/virtualmachine.h"
 
 #include "../fixtures/script.h"
 
@@ -31,20 +31,20 @@ using testing::_;
 using testing::Return;
 using testing::ReturnRef;
 
-TEST(script_execution, should_run_script_program__degenerate) {
+TEST(virtual_machine, should_run_script_program__degenerate) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     auto context = std::make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(-1, result);
 }
 
-TEST(script_execution, should_run_script_program__boolean_logic) {
+TEST(virtual_machine, should_run_script_program__boolean_logic) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(0));              // 0
@@ -67,23 +67,23 @@ TEST(script_execution, should_run_script_program__boolean_logic) {
     program->add(Instruction(InstructionType::LOGORII));  // 0, 0, 1, 0, 1, 1
 
     auto context = std::make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(1, result);
-    EXPECT_EQ(6, execution.getStackSize());
-    EXPECT_EQ(0, execution.getStackVariable(0).intValue);
-    EXPECT_EQ(0, execution.getStackVariable(1).intValue);
-    EXPECT_EQ(1, execution.getStackVariable(2).intValue);
-    EXPECT_EQ(0, execution.getStackVariable(3).intValue);
-    EXPECT_EQ(1, execution.getStackVariable(4).intValue);
-    EXPECT_EQ(1, execution.getStackVariable(5).intValue);
+    EXPECT_EQ(6, machine.getStackSize());
+    EXPECT_EQ(0, machine.getStackVariable(0).intValue);
+    EXPECT_EQ(0, machine.getStackVariable(1).intValue);
+    EXPECT_EQ(1, machine.getStackVariable(2).intValue);
+    EXPECT_EQ(0, machine.getStackVariable(3).intValue);
+    EXPECT_EQ(1, machine.getStackVariable(4).intValue);
+    EXPECT_EQ(1, machine.getStackVariable(5).intValue);
 }
 
-TEST(script_execution, should_run_script_program__math) {
+TEST(virtual_machine, should_run_script_program__math) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(-7));              // -7
@@ -121,18 +121,18 @@ TEST(script_execution, should_run_script_program__math) {
     program->add(Instruction(InstructionType::NEGF));      // -14.4
 
     auto context = std::make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(-1, result);
-    EXPECT_EQ(1, execution.getStackSize());
-    EXPECT_NEAR(-14.4f, execution.getStackVariable(0).floatValue, 1e-5);
+    EXPECT_EQ(1, machine.getStackSize());
+    EXPECT_NEAR(-14.4f, machine.getStackVariable(0).floatValue, 1e-5);
 }
 
-TEST(script_execution, should_run_script_program__comparisons) {
+TEST(virtual_machine, should_run_script_program__comparisons) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(2));           // 2
@@ -172,16 +172,16 @@ TEST(script_execution, should_run_script_program__comparisons) {
     program->add(Instruction(InstructionType::ADDII)); // 8
 
     auto context = std::make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(8, result);
 }
 
-TEST(script_execution, should_run_script_program__loop) {
+TEST(virtual_machine, should_run_script_program__loop) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(0));
@@ -194,16 +194,16 @@ TEST(script_execution, should_run_script_program__loop) {
     program->add(Instruction::newMOVSP(-4));
 
     auto context = std::make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(10, result);
 }
 
-TEST(script_execution, should_run_script_program__action) {
+TEST(virtual_machine, should_run_script_program__action) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -222,10 +222,10 @@ TEST(script_execution, should_run_script_program__action) {
     auto context = std::make_unique<ExecutionContext>();
     context->routines = &routines;
 
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(-1, result);
@@ -235,7 +235,7 @@ TEST(script_execution, should_run_script_program__action) {
     EXPECT_EQ(1, std::get<0>(invocation[0])[1].intValue);
 }
 
-TEST(script_execution, should_run_script_program__action_with_vectors) {
+TEST(virtual_machine, should_run_script_program__action_with_vectors) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -256,17 +256,17 @@ TEST(script_execution, should_run_script_program__action_with_vectors) {
     auto context = std::make_unique<ExecutionContext>();
     context->routines = &routines;
 
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(-1, result);
-    EXPECT_EQ(3, execution.getStackSize());
-    EXPECT_NEAR(7.0f, execution.getStackVariable(0).floatValue, 1e-5);
-    EXPECT_NEAR(6.0f, execution.getStackVariable(1).floatValue, 1e-5);
-    EXPECT_NEAR(5.0f, execution.getStackVariable(2).floatValue, 1e-5);
+    EXPECT_EQ(3, machine.getStackSize());
+    EXPECT_NEAR(7.0f, machine.getStackVariable(0).floatValue, 1e-5);
+    EXPECT_NEAR(6.0f, machine.getStackVariable(1).floatValue, 1e-5);
+    EXPECT_NEAR(5.0f, machine.getStackVariable(2).floatValue, 1e-5);
     EXPECT_EQ(1ll, routine->invokeInvocations().size());
     auto &invocation = routine->invokeInvocations();
     auto inVecValue = std::get<0>(invocation[0])[0].vecValue;
@@ -276,7 +276,7 @@ TEST(script_execution, should_run_script_program__action_with_vectors) {
     EXPECT_EQ(1, std::get<0>(invocation[0])[1].intValue);
 }
 
-TEST(script_execution, should_run_script_program__action_with_store_state) {
+TEST(virtual_machine, should_run_script_program__action_with_store_state) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -304,14 +304,14 @@ TEST(script_execution, should_run_script_program__action_with_store_state) {
     auto context = std::make_unique<ExecutionContext>();
     context->routines = &routines;
 
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(-1, result);
-    EXPECT_EQ(0, execution.getStackSize());
+    EXPECT_EQ(0, machine.getStackSize());
     EXPECT_EQ(1ll, routine->invokeInvocations().size());
     auto &routineInvocation = routine->invokeInvocations()[0];
     auto &actionContext = std::get<0>(routineInvocation)[0].context;
@@ -324,7 +324,7 @@ TEST(script_execution, should_run_script_program__action_with_store_state) {
     EXPECT_EQ(5, actionContext->savedState->locals[0].intValue);
 }
 
-TEST(script_execution, should_run_script_program__globals) {
+TEST(virtual_machine, should_run_script_program__globals) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction(InstructionType::RSADDI));
@@ -340,16 +340,16 @@ TEST(script_execution, should_run_script_program__globals) {
 
     auto context = std::make_unique<ExecutionContext>();
 
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(42, result);
 }
 
-TEST(script_execution, should_run_script_program__subroutine) {
+TEST(virtual_machine, should_run_script_program__subroutine) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction(InstructionType::RSADDI));
@@ -365,16 +365,16 @@ TEST(script_execution, should_run_script_program__subroutine) {
 
     auto context = std::make_unique<ExecutionContext>();
 
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(42, result);
 }
 
-TEST(script_execution, should_run_script_program__vector_math) {
+TEST(virtual_machine, should_run_script_program__vector_math) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTF(1.0f));        // 1.0
@@ -414,18 +414,18 @@ TEST(script_execution, should_run_script_program__vector_math) {
     program->add(Instruction(InstructionType::ADDFF)); // 15015.0
 
     auto context = std::make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(-1, result);
-    EXPECT_EQ(1, execution.getStackSize());
-    EXPECT_NEAR(15015.0f, execution.getStackVariable(0).floatValue, 1e-5);
+    EXPECT_EQ(1, machine.getStackSize());
+    EXPECT_NEAR(15015.0f, machine.getStackVariable(0).floatValue, 1e-5);
 }
 
-TEST(script_execution, should_run_script_program__structs) {
+TEST(virtual_machine, should_run_script_program__structs) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -452,10 +452,10 @@ TEST(script_execution, should_run_script_program__structs) {
     program->add(Instruction(InstructionType::LOGORII));
 
     auto context = std::make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, std::move(context));
+    auto machine = VirtualMachine(program, std::move(context));
 
     // when
-    auto result = execution.run();
+    auto result = machine.run();
 
     // then
     EXPECT_EQ(1, result);

@@ -80,8 +80,15 @@ public:
     const graphics::AABB &aabb() const { return _aabb; }
     IUser *user() { return _user; }
     const IUser *user() const { return _user; }
+    void *externalRef() const { return _externalRef; }
 
-    void setUser(IUser &user) { _user = &user; }
+    void setUser(IUser &user) {
+        _user = &user;
+    }
+
+    void setExternalRef(void *externalRef) {
+        _externalRef = externalRef;
+    }
 
     // Flags
 
@@ -113,6 +120,7 @@ protected:
     graphics::AABB _aabb;
 
     IUser *_user {nullptr};
+    void *_externalRef {nullptr};
 
     // Flags
 

@@ -51,6 +51,8 @@ class ModelSceneNode;
 
 namespace game {
 
+class IConsole;
+
 namespace neo {
 
 class Camera;
@@ -99,11 +101,13 @@ public:
     Game(OptionsView &options,
          graphics::GraphicsServices &graphicsSvc,
          resource::ResourceServices &resourceSvc,
-         scene::SceneServices &sceneSvc) :
+         scene::SceneServices &sceneSvc,
+         IConsole &console) :
         _options(options),
         _graphicsSvc(graphicsSvc),
         _resourceSvc(resourceSvc),
-        _sceneSvc(sceneSvc) {
+        _sceneSvc(sceneSvc),
+        _console(console) {
     }
 
     ~Game() {
@@ -171,6 +175,7 @@ private:
     graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;
     scene::SceneServices &_sceneSvc;
+    IConsole &_console;
 
     bool _inited {false};
 

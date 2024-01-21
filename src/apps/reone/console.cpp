@@ -44,11 +44,12 @@ void Console::init() {
         _outputOffset = 0;
     });
     registerCommand("help", "", [this](const auto &tokens) {
+        printLine("Available commands:");
         for (auto &command : _commands) {
             if (!command.description.empty()) {
-                printLine(str(boost::format("%s: %s") % command.name % command.description));
+                printLine(str(boost::format("  %s: %s") % command.name % command.description));
             } else {
-                printLine(command.name);
+                printLine("  " + command.name);
             }
         }
     });
@@ -76,20 +77,25 @@ void Console::registerCommand(std::string name, std::string description, Command
 }
 
 void Console::printLine(const std::string &text) {
-    float maxWidth = _graphicsOpt.width - 2.0f * kTextOffset;
-    std::ostringstream ss;
-    for (size_t i = 0; i < text.length(); ++i) {
-        ss << text[i];
-        std::string s = ss.str();
-        float w = _font->measure(s);
-        if (w >= maxWidth) {
-            _output.push_front(s.substr(0, s.length() - 1));
-            ss.str("");
-            ss << text[i];
+    std::vector<std::string> lines;
+    boost::split(lines, text, boost::is_any_of("\n"), boost::token_compress_on);
+
+    for (const auto &line : lines) {
+        float maxWidth = _graphicsOpt.width - 2.0f * kTextOffset;
+        std::ostringstream ss;
+        for (size_t i = 0; i < line.length(); ++i) {
+            ss << line[i];
+            std::string s = ss.str();
+            float w = _font->measure(s);
+            if (w >= maxWidth) {
+                _output.push_front(s.substr(0, s.length() - 1));
+                ss.str("");
+                ss << line[i];
+            }
         }
-    }
-    if (ss.tellp() > 0) {
-        _output.push_front(ss.str());
+        if (ss.tellp() > 0) {
+            _output.push_front(ss.str());
+        }
     }
 
     trimOutput();
