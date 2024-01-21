@@ -227,6 +227,7 @@ void Game::init() {
                 auto headSceneNode = scene.newModel(*headModel, ModelUsage::Creature);
                 sceneNode->attach("headhook", *headSceneNode);
             }
+            sceneNode->setDrawDistance(_options.graphics.drawDistance);
             sceneNode->setLocalTransform(std::move(transform));
             scene.addRoot(std::move(sceneNode));
         }
@@ -239,6 +240,7 @@ void Game::init() {
             auto transform = glm::translate(door.get().position());
             transform *= glm::eulerAngleZ(door.get().facing());
             auto sceneNode = scene.newModel(*model, ModelUsage::Door);
+            // sceneNode->setDrawDistance(_options.graphics.drawDistance);
             sceneNode->setLocalTransform(std::move(transform));
             scene.addRoot(std::move(sceneNode));
         }
@@ -251,6 +253,7 @@ void Game::init() {
             auto transform = glm::translate(placeable.get().position());
             transform *= glm::eulerAngleZ(placeable.get().facing());
             auto sceneNode = scene.newModel(*model, ModelUsage::Placeable);
+            sceneNode->setDrawDistance(_options.graphics.drawDistance);
             sceneNode->setLocalTransform(std::move(transform));
             scene.addRoot(std::move(sceneNode));
         }
