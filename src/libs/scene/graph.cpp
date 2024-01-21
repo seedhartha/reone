@@ -47,6 +47,32 @@ namespace reone {
 
 namespace scene {
 
+struct ModelDistancePair {
+    ModelSceneNode &model;
+    float distance;
+
+    ModelDistancePair(ModelSceneNode &model, float distance) :
+        model(model),
+        distance(distance) {
+    }
+};
+
+} // namespace scene
+
+} // namespace reone
+
+template <>
+struct std::less<reone::scene::ModelDistancePair> {
+    bool operator()(const reone::scene::ModelDistancePair &lhs,
+                    const reone::scene::ModelDistancePair &rhs) const {
+        return lhs.distance < rhs.distance;
+    }
+};
+
+namespace reone {
+
+namespace scene {
+
 static constexpr int kMaxFlareLights = 4;
 static constexpr int kMaxSoundCount = 4;
 
@@ -455,9 +481,9 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
         auto camera = cameraNode->get().camera();
         _graphicsSvc.uniforms.setGlobals([this, &camera](auto &globals) {
             globals.projection = camera->projection();
-            globals.projectionInv = glm::inverse(globals.projection);
+            globals.projectionInv = camera->projectionInv();
             globals.view = camera->view();
-            globals.viewInv = glm::inverse(globals.view);
+            globals.viewInv = camera->viewInv();
             globals.cameraPosition = glm::vec4(camera->position(), 1.0f);
             globals.worldAmbientColor = glm::vec4(ambientLightColor(), 1.0f);
             globals.clipNear = camera->zNear();
@@ -893,6 +919,24 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
     sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
 
     return distances[0].first;
+}
+
+std::optional<std::reference_wrapper<ModelSceneNode>> SceneGraph::pickModelRay(const glm::vec3 &origin, const glm::vec3 &dir) const {
+    std::set<ModelDistancePair> models;
+    for (auto &root : _modelRoots) {
+        if (!root->isEnabled() || root->isCulled() || !root->isPickable()) {
+            continue;
+        }
+        auto aabbWorld = root->aabb() * root->absoluteTransform();
+        float distance;
+        if (aabbWorld.raycast(origin, 1.0f / dir, std::numeric_limits<float>::max(), distance)) {
+            models.insert({*root, distance});
+        }
+    }
+    if (models.empty()) {
+        return std::nullopt;
+    }
+    return models.begin()->model;
 }
 
 std::shared_ptr<CameraSceneNode> SceneGraph::newCamera() {

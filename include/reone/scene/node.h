@@ -63,7 +63,7 @@ public:
     bool isPoint() const { return _point; }
 
     glm::vec3 origin() const;
-    glm::vec2 getOrigin2D() const;
+    glm::vec2 origin2D() const;
 
     float getDistanceTo(const glm::vec3 &point) const;
     float getDistanceTo(const SceneNode &other) const;

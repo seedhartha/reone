@@ -107,7 +107,8 @@ bool AABB::intersect(const AABB &other) const {
 
 bool AABB::raycast(const glm::vec3 &origin,
                    const glm::vec3 &invDir,
-                   float maxDistance, float &outDistance) const {
+                   float maxDistance,
+                   float &outDistance) const {
     float tx1 = (_min.x - origin.x) * invDir.x;
     float tx2 = (_max.x - origin.x) * invDir.x;
 

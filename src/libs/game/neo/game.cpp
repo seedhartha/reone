@@ -52,6 +52,7 @@
 #include "reone/resource/template/generated/uts.h"
 #include "reone/resource/template/generated/utt.h"
 #include "reone/resource/template/generated/utw.h"
+#include "reone/scene/collision.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/system/checkutil.h"
@@ -229,8 +230,9 @@ void Game::init() {
                 auto headSceneNode = scene.newModel(*headModel, ModelUsage::Creature);
                 sceneNode->attach("headhook", *headSceneNode);
             }
-            sceneNode->setDrawDistance(_options.graphics.drawDistance);
             sceneNode->setLocalTransform(std::move(transform));
+            sceneNode->setDrawDistance(_options.graphics.drawDistance);
+            sceneNode->setPickable(true);
             scene.addRoot(std::move(sceneNode));
         }
         for (auto &door : area.doors()) {
@@ -242,8 +244,9 @@ void Game::init() {
             auto transform = glm::translate(door.get().position());
             transform *= glm::eulerAngleZ(door.get().facing());
             auto sceneNode = scene.newModel(*model, ModelUsage::Door);
-            // sceneNode->setDrawDistance(_options.graphics.drawDistance);
             sceneNode->setLocalTransform(std::move(transform));
+            // sceneNode->setDrawDistance(_options.graphics.drawDistance);
+            sceneNode->setPickable(true);
             scene.addRoot(std::move(sceneNode));
         }
         for (auto &placeable : area.placeables()) {
@@ -255,8 +258,9 @@ void Game::init() {
             auto transform = glm::translate(placeable.get().position());
             transform *= glm::eulerAngleZ(placeable.get().facing());
             auto sceneNode = scene.newModel(*model, ModelUsage::Placeable);
-            sceneNode->setDrawDistance(_options.graphics.drawDistance);
             sceneNode->setLocalTransform(std::move(transform));
+            sceneNode->setDrawDistance(_options.graphics.drawDistance);
+            sceneNode->setPickable(true);
             scene.addRoot(std::move(sceneNode));
         }
     }
@@ -276,6 +280,19 @@ bool Game::handle(const input::Event &event) {
     if (_cameraController.handle(event)) {
         return true;
     }
+    switch (event.type) {
+    case input::EventType::MouseButtonDown:
+        if (event.button.button != input::MouseButton::Left) {
+            break;
+        }
+        if (_pickedModel) {
+            _pickedModel->get().setEnabled(false);
+            return true;
+        }
+        break;
+    default:
+        break;
+    }
     return false;
 }
 
@@ -286,6 +303,10 @@ void Game::update(float dt) {
     }
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     scene.update(dt);
+    if (_cameraSceneNode) {
+        auto &camera = *_cameraSceneNode->get().camera();
+        _pickedModel = scene.pickModelRay(camera.position(), camera.forward());
+    }
 }
 
 void Game::render() {

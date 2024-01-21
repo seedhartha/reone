@@ -37,11 +37,18 @@ public:
 
     CameraType type() const { return _type; }
     const glm::mat4 &projection() const { return _projection; }
+    const glm::mat4 &projectionInv() const { return _projectionInv; }
     const glm::mat4 &view() const { return _view; }
     const glm::mat4 &viewInv() const { return _viewInv; }
     const glm::vec3 &position() { return _position; }
     float zNear() const { return _zNear; }
     float zFar() const { return _zFar; }
+
+    glm::vec3 forward() const {
+        return -glm::vec3 {_view[0][2],
+                           _view[1][2],
+                           _view[2][2]};
+    }
 
     void setView(glm::mat4 view) {
         _view = std::move(view);

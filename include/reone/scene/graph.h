@@ -89,6 +89,7 @@ public:
     virtual bool testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const = 0;
 
     virtual ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const = 0;
+    virtual std::optional<std::reference_wrapper<ModelSceneNode>> pickModelRay(const glm::vec3 &origin, const glm::vec3 &dir) const = 0;
 
     virtual const std::string &name() const = 0;
     virtual std::optional<std::reference_wrapper<CameraSceneNode>> camera() = 0;
@@ -232,6 +233,7 @@ public:
     bool testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const override;
 
     ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const override;
+    std::optional<std::reference_wrapper<ModelSceneNode>> pickModelRay(const glm::vec3 &origin, const glm::vec3 &dir) const override;
 
     void setWalkableSurfaces(std::set<uint32_t> surfaces) override { _walkableSurfaces = std::move(surfaces); }
     void setWalkcheckSurfaces(std::set<uint32_t> surfaces) override { _walkcheckSurfaces = std::move(surfaces); }

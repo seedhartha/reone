@@ -52,6 +52,7 @@ public:
     MOCK_METHOD(bool, testWalk, (const glm::vec3 &, const glm::vec3 &, const IUser *, Collision &), (const override));
 
     MOCK_METHOD(ModelSceneNode *, pickModelAt, (int, int, IUser *), (const override));
+    MOCK_METHOD(std::optional<std::reference_wrapper<ModelSceneNode>>, pickModelRay, (const glm::vec3 &, const glm::vec3 &), (const override));
 
     MOCK_METHOD(const std::string &, name, (), (const override));
     MOCK_METHOD(std::optional<std::reference_wrapper<CameraSceneNode>>, camera, (), (override));

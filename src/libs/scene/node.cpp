@@ -71,7 +71,7 @@ glm::vec3 SceneNode::origin() const {
     return glm::vec3(_absTransform[3]);
 }
 
-glm::vec2 SceneNode::getOrigin2D() const {
+glm::vec2 SceneNode::origin2D() const {
     return glm::vec2(_absTransform[3]);
 }
 
@@ -92,7 +92,7 @@ float SceneNode::getSquareDistanceTo(const SceneNode &other) const {
 }
 
 float SceneNode::getSquareDistanceTo2D(const glm::vec2 &point) const {
-    return glm::distance2(getOrigin2D(), point);
+    return glm::distance2(origin2D(), point);
 }
 
 glm::vec3 SceneNode::getWorldCenterOfAABB() const {

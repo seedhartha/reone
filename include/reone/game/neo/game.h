@@ -45,6 +45,7 @@ namespace scene {
 struct SceneServices;
 
 class CameraSceneNode;
+class ModelSceneNode;
 
 } // namespace scene
 
@@ -173,12 +174,13 @@ private:
 
     bool _inited {false};
 
-    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
-    CameraController _cameraController;
-
     ObjectId _nextObjectId {2};
     std::list<std::unique_ptr<Object>> _objects;
     std::optional<std::reference_wrapper<Module>> _module;
+
+    CameraController _cameraController;
+    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
+    std::optional<std::reference_wrapper<scene::ModelSceneNode>> _pickedModel;
 };
 
 } // namespace neo
