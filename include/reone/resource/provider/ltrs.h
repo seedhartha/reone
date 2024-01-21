@@ -43,6 +43,7 @@ public:
     }
 
     std::shared_ptr<Ltr> get(const ResRef &resRef) override {
+        std::lock_guard<std::mutex> lock {_mutex};
         return _cache.getOrAdd(resRef, std::bind(&Ltrs::getFromResources, this, resRef));
     }
 
@@ -50,6 +51,7 @@ private:
     Resources &_resources;
 
     Cache<ResRef, Ltr> _cache;
+    std::mutex _mutex;
 
     std::shared_ptr<Ltr> getFromResources(const ResRef &resRef) {
         auto res = _resources.get(ResourceId(resRef, ResType::Ltr));

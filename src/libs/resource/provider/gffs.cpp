@@ -26,6 +26,7 @@ namespace reone {
 namespace resource {
 
 std::shared_ptr<Gff> Gffs::get(const std::string &resRef, ResType type) {
+    std::lock_guard<std::mutex> lock {_mutex};
     ResourceId resId(resRef, type);
     return _cache.getOrAdd(resId, [this, &resId]() {
         auto res = _resources.find(resId);

@@ -36,6 +36,7 @@ void Walkmeshes::clear() {
 }
 
 std::shared_ptr<Walkmesh> Walkmeshes::get(const std::string &resRef, ResType type) {
+    std::lock_guard<std::mutex> lock {_mutex};
     auto lcResRef = boost::to_lower_copy(resRef);
 
     auto maybeWalkmesh = _cache.find(lcResRef);

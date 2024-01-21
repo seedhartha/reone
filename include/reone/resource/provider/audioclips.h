@@ -49,6 +49,7 @@ public:
     }
 
     std::shared_ptr<audio::AudioClip> get(const std::string &key) override {
+        std::lock_guard<std::mutex> lock {_mutex};
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -61,6 +62,7 @@ private:
     Resources &_resources;
 
     std::unordered_map<std::string, std::shared_ptr<audio::AudioClip>> _objects;
+    std::mutex _mutex;
 
     std::shared_ptr<audio::AudioClip> doGet(std::string resRef);
 };

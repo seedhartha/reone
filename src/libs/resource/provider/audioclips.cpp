@@ -31,7 +31,6 @@ namespace resource {
 
 std::shared_ptr<AudioClip> AudioClips::doGet(std::string resRef) {
     std::shared_ptr<AudioClip> clip;
-
     auto m3pRes = _resources.find(ResourceId(resRef, ResType::Mp3));
     if (m3pRes) {
         auto stream = MemoryInputStream(m3pRes->data);
@@ -49,7 +48,6 @@ std::shared_ptr<AudioClip> AudioClips::doGet(std::string resRef) {
             clip = reader.stream();
         }
     }
-
     return clip;
 }
 

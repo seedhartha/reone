@@ -26,6 +26,7 @@ namespace reone {
 namespace resource {
 
 std::shared_ptr<TwoDA> TwoDAs::get(const std::string &resRef) {
+    std::lock_guard<std::mutex> lock {_mutex};
     return _cache.getOrAdd(resRef, [this, &resRef]() {
         auto res = _resources.find(ResourceId(resRef, ResType::TwoDA));
         if (!res) {

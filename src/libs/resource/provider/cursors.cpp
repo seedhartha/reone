@@ -44,6 +44,7 @@ void Cursors::deinit() {
 }
 
 std::shared_ptr<Cursor> Cursors::get(CursorType type) {
+    std::lock_guard<std::mutex> lock {_mutex};
     auto maybeCursor = _cache.find(type);
     if (maybeCursor != _cache.end()) {
         return maybeCursor->second;

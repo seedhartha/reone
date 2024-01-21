@@ -39,6 +39,7 @@ std::shared_ptr<Model> Models::get(const std::string &resRef) {
     if (resRef.empty()) {
         return nullptr;
     }
+    std::lock_guard<std::recursive_mutex> lock {_mutex};
 
     auto lcResRef = boost::to_lower_copy(resRef);
     auto maybeModel = _cache.find(lcResRef);

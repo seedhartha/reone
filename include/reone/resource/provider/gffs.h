@@ -54,6 +54,7 @@ private:
     Resources &_resources;
 
     Cache<ResourceId, Gff> _cache;
+    std::mutex _mutex;
 };
 
 } // namespace resource

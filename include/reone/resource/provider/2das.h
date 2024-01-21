@@ -52,6 +52,7 @@ private:
     Resources &_resources;
 
     Cache<std::string, TwoDA> _cache;
+    std::mutex _mutex;
 };
 
 } // namespace resource
