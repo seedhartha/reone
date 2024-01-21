@@ -15,9 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/gui/console.h"
+#include "console.h"
 
-#include "reone/game/options.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/meshregistry.h"
@@ -25,12 +24,11 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/provider/fonts.h"
+#include "reone/system/checkutil.h"
 
 using namespace reone::graphics;
 
 namespace reone {
-
-namespace game {
 
 static constexpr int kMaxOutputLineCount = 100;
 static constexpr int kVisibleLineCount = 15;
@@ -38,6 +36,7 @@ static constexpr int kVisibleLineCount = 15;
 static constexpr float kTextOffset = 3.0f;
 
 void Console::init() {
+    checkThat(!_inited, "Must not be initialized");
     _font = _resourceSvc.fonts.get("fnt_console");
 
     registerCommand("clear", "", [this](const auto &tokens) {
@@ -46,9 +45,23 @@ void Console::init() {
     });
     registerCommand("help", "", [this](const auto &tokens) {
         for (auto &command : _commands) {
-            printLine(str(boost::format("%s: %s") % command.name % command.description));
+            if (!command.description.empty()) {
+                printLine(str(boost::format("%s: %s") % command.name % command.description));
+            } else {
+                printLine(command.name);
+            }
         }
     });
+
+    _inited = true;
+}
+
+void Console::deinit() {
+    if (!_inited) {
+        return;
+    }
+    _font.reset();
+    _inited = false;
 }
 
 void Console::registerCommand(std::string name, std::string description, CommandHandler handler) {
@@ -63,8 +76,7 @@ void Console::registerCommand(std::string name, std::string description, Command
 }
 
 void Console::printLine(const std::string &text) {
-    float maxWidth = _options.graphics.width - 2.0f * kTextOffset;
-
+    float maxWidth = _graphicsOpt.width - 2.0f * kTextOffset;
     std::ostringstream ss;
     for (size_t i = 0; i < text.length(); ++i) {
         ss << text[i];
@@ -163,14 +175,14 @@ void Console::executeInputText() {
     }
     auto commandByName = _nameToCommand.find(tokens[0]);
     if (commandByName == _nameToCommand.end()) {
-        printLine("Unknown command");
+        printLine("Unrecognized command: " + tokens[0]);
         return;
     }
     auto &handler = commandByName->second.get().handler;
     try {
         handler(tokens);
-    } catch (const std::invalid_argument &) {
-        printLine("Invalid argument");
+    } catch (const std::exception &ex) {
+        printLine("Command failed: " + std::string(ex.what()));
     }
 }
 
@@ -186,7 +198,16 @@ void Console::render() {
 
 void Console::renderBackground() {
     float height = kVisibleLineCount * _font->height();
-    auto transform = glm::scale(glm::vec3 {_options.graphics.width, height, 1.0f});
+    _graphicsSvc.uniforms.setGlobals([this](auto &globals) {
+        globals.reset();
+        globals.projection = glm::ortho(
+            0.0f, static_cast<float>(_graphicsOpt.width),
+            static_cast<float>(_graphicsOpt.height), 0.0f,
+            0.0f, 100.0f);
+    });
+    auto transform = glm::scale(
+        glm::translate(glm::vec3 {0.0f, _graphicsOpt.height - height, 0.0f}),
+        glm::vec3 {_graphicsOpt.width, height, 1.0f});
     _graphicsSvc.uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);
@@ -199,7 +220,7 @@ void Console::renderBackground() {
 
 void Console::renderLines() {
     float height = kVisibleLineCount * _font->height();
-    glm::vec3 position {kTextOffset, height - 0.5f * _font->height(), 0.0f};
+    glm::vec3 position {kTextOffset, _graphicsOpt.height - 0.5f * _font->height(), 0.0f};
 
     // Input
 
@@ -214,7 +235,5 @@ void Console::renderLines() {
         _font->render(line, position, glm::vec3(1.0f), TextGravity::RightCenter);
     }
 }
-
-} // namespace game
 
 } // namespace reone

@@ -26,12 +26,12 @@
 
 #include "action.h"
 #include "combat.h"
+#include "console.h"
 #include "di/services.h"
 #include "effect.h"
 #include "event.h"
 #include "gui/chargen.h"
 #include "gui/computer.h"
-#include "gui/console.h"
 #include "gui/container.h"
 #include "gui/conversation.h"
 #include "gui/dialog.h"
@@ -92,11 +92,13 @@ public:
         resource::GameID gameId,
         std::filesystem::path path,
         OptionsView &options,
-        ServicesView &services) :
+        ServicesView &services,
+        IConsole &console) :
         _gameId(gameId),
         _path(std::move(path)),
         _options(options),
         _services(services),
+        _console(console),
         _party(*this),
         _combat(*this, services) {
     }
@@ -314,6 +316,7 @@ private:
     std::filesystem::path _path;
     OptionsView &_options;
     ServicesView &_services;
+    IConsole &_console;
 
     Screen _screen {Screen::None};
 
@@ -353,7 +356,6 @@ private:
     std::unique_ptr<SaveLoad> _saveLoad;
 
     std::unique_ptr<Map> _map;
-    std::unique_ptr<Console> _console;
     std::unique_ptr<LoadingScreen> _loadScreen;
 
     Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
@@ -443,19 +445,21 @@ private:
 
     // Console commands
 
-    void cmdInfo(const Console::TokenList &tokens);
-    void cmdListGlobals(const Console::TokenList &tokens);
-    void cmdListLocals(const Console::TokenList &tokens);
-    void cmdListAnim(const Console::TokenList &tokens);
-    void cmdPlayAnim(const Console::TokenList &tokens);
-    void cmdKill(const Console::TokenList &tokens);
-    void cmdAddItem(const Console::TokenList &tokens);
-    void cmdGiveXP(const Console::TokenList &tokens);
-    void cmdWarp(const Console::TokenList &tokens);
-    void cmdRunScript(const Console::TokenList &tokens);
-    void cmdShowAABB(const Console::TokenList &tokens);
-    void cmdShowWalkmesh(const Console::TokenList &tokens);
-    void cmdShowTriggers(const Console::TokenList &tokens);
+    void registerConsoleCommands();
+
+    void consoleInfo(const IConsole::TokenList &tokens);
+    void consoleListGlobals(const IConsole::TokenList &tokens);
+    void consoleListLocals(const IConsole::TokenList &tokens);
+    void consoleListAnim(const IConsole::TokenList &tokens);
+    void consolePlayAnim(const IConsole::TokenList &tokens);
+    void consoleKill(const IConsole::TokenList &tokens);
+    void consoleAddItem(const IConsole::TokenList &tokens);
+    void consoleGiveXP(const IConsole::TokenList &tokens);
+    void consoleWarp(const IConsole::TokenList &tokens);
+    void consoleRunScript(const IConsole::TokenList &tokens);
+    void consoleShowAABB(const IConsole::TokenList &tokens);
+    void consoleShowWalkmesh(const IConsole::TokenList &tokens);
+    void consoleShowTriggers(const IConsole::TokenList &tokens);
 
     // END Console commands
 };

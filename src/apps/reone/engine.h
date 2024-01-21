@@ -31,6 +31,7 @@
 #include "reone/script/di/module.h"
 #include "reone/system/di/module.h"
 
+#include "console.h"
 #include "options.h"
 #include "profiler.h"
 
@@ -82,6 +83,7 @@ private:
     std::unique_ptr<game::Game> _game;
     std::unique_ptr<game::neo::Game> _neoGame;
     std::unique_ptr<Profiler> _profiler;
+    std::unique_ptr<Console> _console;
 
     std::atomic_bool _quit {false};
     std::atomic_bool _focus {false};

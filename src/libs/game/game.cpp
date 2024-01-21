@@ -81,6 +81,7 @@ namespace reone {
 namespace game {
 
 void Game::init() {
+    registerConsoleCommands();
     initLocalServices();
     setSceneSurfaces();
     setCursorType(CursorType::Default);
@@ -91,24 +92,23 @@ void Game::init() {
     openMainMenu();
 }
 
-void Game::initLocalServices() {
-    auto console = std::make_unique<Console>(_options, _services.graphics, _services.resource);
-    console->init();
-    console->registerCommand("info", "information on selected object", std::bind(&Game::cmdInfo, this, std::placeholders::_1));
-    console->registerCommand("listglobals", "list global variables", std::bind(&Game::cmdListGlobals, this, std::placeholders::_1));
-    console->registerCommand("listlocals", "list local variables", std::bind(&Game::cmdListLocals, this, std::placeholders::_1));
-    console->registerCommand("runscript", "run script", std::bind(&Game::cmdRunScript, this, std::placeholders::_1));
-    console->registerCommand("listanim", "list animations of selected object", std::bind(&Game::cmdListAnim, this, std::placeholders::_1));
-    console->registerCommand("playanim", "play animation on selected object", std::bind(&Game::cmdPlayAnim, this, std::placeholders::_1));
-    console->registerCommand("warp", "warp to a module", std::bind(&Game::cmdWarp, this, std::placeholders::_1));
-    console->registerCommand("kill", "kill selected object", std::bind(&Game::cmdKill, this, std::placeholders::_1));
-    console->registerCommand("additem", "add item to selected object", std::bind(&Game::cmdAddItem, this, std::placeholders::_1));
-    console->registerCommand("givexp", "give experience to selected creature", std::bind(&Game::cmdGiveXP, this, std::placeholders::_1));
-    console->registerCommand("showaabb", "toggle rendering AABB", std::bind(&Game::cmdShowAABB, this, std::placeholders::_1));
-    console->registerCommand("showwalkmesh", "toggle rendering walkmesh", std::bind(&Game::cmdShowWalkmesh, this, std::placeholders::_1));
-    console->registerCommand("showtriggers", "toggle rendering triggers", std::bind(&Game::cmdShowTriggers, this, std::placeholders::_1));
-    _console = std::move(console);
+void Game::registerConsoleCommands() {
+    _console.registerCommand("info", "information on selected object", std::bind(&Game::consoleInfo, this, std::placeholders::_1));
+    _console.registerCommand("listglobals", "list global variables", std::bind(&Game::consoleListGlobals, this, std::placeholders::_1));
+    _console.registerCommand("listlocals", "list local variables", std::bind(&Game::consoleListLocals, this, std::placeholders::_1));
+    _console.registerCommand("runscript", "run script", std::bind(&Game::consoleRunScript, this, std::placeholders::_1));
+    _console.registerCommand("listanim", "list animations of selected object", std::bind(&Game::consoleListAnim, this, std::placeholders::_1));
+    _console.registerCommand("playanim", "play animation on selected object", std::bind(&Game::consolePlayAnim, this, std::placeholders::_1));
+    _console.registerCommand("warp", "warp to a module", std::bind(&Game::consoleWarp, this, std::placeholders::_1));
+    _console.registerCommand("kill", "kill selected object", std::bind(&Game::consoleKill, this, std::placeholders::_1));
+    _console.registerCommand("additem", "add item to selected object", std::bind(&Game::consoleAddItem, this, std::placeholders::_1));
+    _console.registerCommand("givexp", "give experience to selected creature", std::bind(&Game::consoleGiveXP, this, std::placeholders::_1));
+    _console.registerCommand("showaabb", "toggle rendering AABB", std::bind(&Game::consoleShowAABB, this, std::placeholders::_1));
+    _console.registerCommand("showwalkmesh", "toggle rendering walkmesh", std::bind(&Game::consoleShowWalkmesh, this, std::placeholders::_1));
+    _console.registerCommand("showtriggers", "toggle rendering triggers", std::bind(&Game::consoleShowTriggers, this, std::placeholders::_1));
+}
 
+void Game::initLocalServices() {
     auto routines = std::make_unique<Routines>(_gameId, this, &_services);
     routines->init();
     _routines = std::move(routines);
@@ -163,9 +163,6 @@ bool Game::handle(const input::Event &event) {
         }
         switch (_screen) {
         case Screen::InGame: {
-            if (_console->handle(event)) {
-                return true;
-            }
             if (_party.handle(event)) {
                 return true;
             }
@@ -481,9 +478,6 @@ void Game::renderGUI() {
     case Screen::InGame:
         if (_cameraType == CameraType::ThirdPerson) {
             renderHUD();
-        }
-        if (_console->isOpen()) {
-            _console->render();
         }
         break;
 
@@ -839,10 +833,10 @@ CameraType Game::getConversationCamera(int &cameraId) const {
     return _conversation->getCamera(cameraId);
 }
 
-void Game::cmdInfo(const Console::TokenList &tokens) {
+void Game::consoleInfo(const IConsole::TokenList &tokens) {
     auto object = module()->area()->selectedObject();
     if (!object) {
-        _console->printLine("No object is selected");
+        _console.printLine("No object is selected");
         return;
     }
     glm::vec3 position(object->position());
@@ -876,60 +870,60 @@ void Game::cmdInfo(const Console::TokenList &tokens) {
         break;
     }
 
-    _console->printLine(ss.str());
+    _console.printLine(ss.str());
 }
 
-void Game::cmdListGlobals(const Console::TokenList &tokens) {
+void Game::consoleListGlobals(const IConsole::TokenList &tokens) {
     auto &strings = globalStrings();
     for (auto &var : strings) {
-        _console->printLine(var.first + " = " + var.second);
+        _console.printLine(var.first + " = " + var.second);
     }
 
     auto &booleans = globalBooleans();
     for (auto &var : booleans) {
-        _console->printLine(var.first + " = " + (var.second ? "true" : "false"));
+        _console.printLine(var.first + " = " + (var.second ? "true" : "false"));
     }
 
     auto &numbers = globalNumbers();
     for (auto &var : numbers) {
-        _console->printLine(var.first + " = " + std::to_string(var.second));
+        _console.printLine(var.first + " = " + std::to_string(var.second));
     }
 
     auto &locations = globalLocations();
     for (auto &var : locations) {
-        _console->printLine(str(boost::format("%s = (%.04f, %.04f, %.04f, %.04f") %
-                                var.first %
-                                var.second->position().x %
-                                var.second->position().y %
-                                var.second->position().z %
-                                var.second->facing()));
+        _console.printLine(str(boost::format("%s = (%.04f, %.04f, %.04f, %.04f") %
+                               var.first %
+                               var.second->position().x %
+                               var.second->position().y %
+                               var.second->position().z %
+                               var.second->facing()));
     }
 }
 
-void Game::cmdListLocals(const Console::TokenList &tokens) {
+void Game::consoleListLocals(const IConsole::TokenList &tokens) {
     auto object = module()->area()->selectedObject();
     if (!object) {
-        _console->printLine("No object is selected");
+        _console.printLine("No object is selected");
         return;
     }
 
     auto &booleans = object->localBooleans();
     for (auto &var : booleans) {
-        _console->printLine(std::to_string(var.first) + " -> " + (var.second ? "true" : "false"));
+        _console.printLine(std::to_string(var.first) + " -> " + (var.second ? "true" : "false"));
     }
 
     auto &numbers = object->localNumbers();
     for (auto &var : numbers) {
-        _console->printLine(std::to_string(var.first) + " -> " + std::to_string(var.second));
+        _console.printLine(std::to_string(var.first) + " -> " + std::to_string(var.second));
     }
 }
 
-void Game::cmdListAnim(const Console::TokenList &tokens) {
+void Game::consoleListAnim(const IConsole::TokenList &tokens) {
     auto object = module()->area()->selectedObject();
     if (!object) {
         object = party().getLeader();
         if (!object) {
-            _console->printLine("No object is selected");
+            _console.printLine("No object is selected");
             return;
         }
     }
@@ -945,21 +939,21 @@ void Game::cmdListAnim(const Console::TokenList &tokens) {
 
     for (auto &anim : anims) {
         if (substr.empty() || boost::contains(anim, substr)) {
-            _console->printLine(anim);
+            _console.printLine(anim);
         }
     }
 }
 
-void Game::cmdPlayAnim(const Console::TokenList &tokens) {
+void Game::consolePlayAnim(const IConsole::TokenList &tokens) {
     if (tokens.size() < 2) {
-        _console->printLine("Usage: playanim anim_name");
+        _console.printLine("Usage: playanim anim_name");
         return;
     }
     auto object = module()->area()->selectedObject();
     if (!object) {
         object = party().getLeader();
         if (!object) {
-            _console->printLine("No object is selected");
+            _console.printLine("No object is selected");
             return;
         }
     }
@@ -967,10 +961,10 @@ void Game::cmdPlayAnim(const Console::TokenList &tokens) {
     model->playAnimation(tokens[1], nullptr, AnimationProperties::fromFlags(AnimationFlags::loop));
 }
 
-void Game::cmdKill(const Console::TokenList &tokens) {
+void Game::consoleKill(const IConsole::TokenList &tokens) {
     auto object = module()->area()->selectedObject();
     if (!object) {
-        _console->printLine("No object is selected");
+        _console.printLine("No object is selected");
         return;
     }
     auto effect = newEffect<DamageEffect>(
@@ -981,16 +975,16 @@ void Game::cmdKill(const Console::TokenList &tokens) {
     object->applyEffect(std::move(effect), DurationType::Instant);
 }
 
-void Game::cmdAddItem(const Console::TokenList &tokens) {
+void Game::consoleAddItem(const IConsole::TokenList &tokens) {
     if (tokens.size() < 2) {
-        _console->printLine("Usage: additem item_tpl [size]");
+        _console.printLine("Usage: additem item_tpl [size]");
         return;
     }
     auto object = module()->area()->selectedObject();
     if (!object) {
         object = party().getLeader();
         if (!object) {
-            _console->printLine("No object is selected");
+            _console.printLine("No object is selected");
             return;
         }
     }
@@ -998,9 +992,9 @@ void Game::cmdAddItem(const Console::TokenList &tokens) {
     object->addItem(tokens[1], stackSize);
 }
 
-void Game::cmdGiveXP(const Console::TokenList &tokens) {
+void Game::consoleGiveXP(const IConsole::TokenList &tokens) {
     if (tokens.size() < 2) {
-        _console->printLine("Usage: givexp amount");
+        _console.printLine("Usage: givexp amount");
         return;
     }
 
@@ -1009,7 +1003,7 @@ void Game::cmdGiveXP(const Console::TokenList &tokens) {
         object = party().getLeader();
     }
     if (!object || object->type() != ObjectType::Creature) {
-        _console->printLine("No creature is selected");
+        _console.printLine("No creature is selected");
         return;
     }
 
@@ -1017,17 +1011,17 @@ void Game::cmdGiveXP(const Console::TokenList &tokens) {
     std::static_pointer_cast<Creature>(object)->giveXP(amount);
 }
 
-void Game::cmdWarp(const Console::TokenList &tokens) {
+void Game::consoleWarp(const IConsole::TokenList &tokens) {
     if (tokens.size() < 2) {
-        _console->printLine("Usage: warp module");
+        _console.printLine("Usage: warp module");
         return;
     }
     loadModule(tokens[1]);
 }
 
-void Game::cmdRunScript(const Console::TokenList &tokens) {
+void Game::consoleRunScript(const IConsole::TokenList &tokens) {
     if (tokens.size() < 3) {
-        _console->printLine("Usage: runscript resref caller_id [triggerrer_id [event_number [script_var]]], e.g. runscript k_ai_master 1 2 3 4");
+        _console.printLine("Usage: runscript resref caller_id [triggerrer_id [event_number [script_var]]], e.g. runscript k_ai_master 1 2 3 4");
         return;
     }
 
@@ -1038,30 +1032,30 @@ void Game::cmdRunScript(const Console::TokenList &tokens) {
     int scriptVar = tokens.size() > 5 ? stoi(tokens[5]) : -1;
 
     int result = scriptRunner().run(resRef, callerId, triggerrerId, eventNumber, scriptVar);
-    _console->printLine(str(boost::format("%s -> %d") % resRef % result));
+    _console.printLine(str(boost::format("%s -> %d") % resRef % result));
 }
 
-void Game::cmdShowAABB(const Console::TokenList &tokens) {
+void Game::consoleShowAABB(const IConsole::TokenList &tokens) {
     if (tokens.size() < 2) {
-        _console->printLine("Usage: showaabb 1|0");
+        _console.printLine("Usage: showaabb 1|0");
         return;
     }
     bool show = stoi(tokens[1]);
     setShowAABB(show);
 }
 
-void Game::cmdShowWalkmesh(const Console::TokenList &tokens) {
+void Game::consoleShowWalkmesh(const IConsole::TokenList &tokens) {
     if (tokens.size() < 2) {
-        _console->printLine("Usage: showwalkmesh 1|0");
+        _console.printLine("Usage: showwalkmesh 1|0");
         return;
     }
     bool show = stoi(tokens[1]);
     setShowWalkmesh(show);
 }
 
-void Game::cmdShowTriggers(const Console::TokenList &tokens) {
+void Game::consoleShowTriggers(const IConsole::TokenList &tokens) {
     if (tokens.size() < 2) {
-        _console->printLine("Usage: showtriggers 1|0");
+        _console.printLine("Usage: showtriggers 1|0");
         return;
     }
     bool show = stoi(tokens[1]);

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "reone/game/console.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/options.h"
 #include "reone/graphics/types.h"
@@ -27,9 +28,10 @@ namespace reone {
 
 namespace graphics {
 
+struct GraphicsOptions;
 struct GraphicsServices;
 
-}
+} // namespace graphics
 
 namespace resource {
 
@@ -37,35 +39,29 @@ struct ResourceServices;
 
 }
 
-namespace game {
-
-struct OptionsView;
-
-class Console {
+class Console : public game::IConsole, boost::noncopyable {
 public:
-    using TokenList = std::vector<std::string>;
-    using CommandHandler = std::function<void(const TokenList &)>;
-
-    Console(OptionsView &options,
+    Console(graphics::GraphicsOptions &graphicsOpt,
             graphics::GraphicsServices &graphicsSvc,
             resource::ResourceServices &resourceSvc) :
-        _options(options),
+        _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc),
         _resourceSvc(resourceSvc),
         _input(gui::TextInputFlags::console) {
     }
 
-    void init();
+    ~Console() {
+        deinit();
+    }
 
-    void registerCommand(std::string name, std::string description, CommandHandler handler);
-    void printLine(const std::string &text);
+    void init();
+    void deinit();
 
     bool handle(const input::Event &event);
     void render();
 
-    bool isOpen() const {
-        return _open;
-    }
+    void registerCommand(std::string name, std::string description, CommandHandler handler) override;
+    void printLine(const std::string &text) override;
 
 private:
     struct Command {
@@ -74,9 +70,11 @@ private:
         CommandHandler handler;
     };
 
-    OptionsView &_options;
+    graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;
+
+    bool _inited {false};
 
     std::shared_ptr<graphics::Font> _font;
     bool _open {false};
@@ -101,7 +99,5 @@ private:
     void renderBackground();
     void renderLines();
 };
-
-} // namespace game
 
 } // namespace reone

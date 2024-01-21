@@ -33,7 +33,7 @@ using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
 
-#define R_NEO_GAME 0
+#define R_NEO_GAME 1
 
 namespace reone {
 
@@ -114,7 +114,12 @@ void Engine::init() {
     showCursor(false);
     setRelativeMouseMode(true);
 #else
-    _game = std::make_unique<Game>(gameId, _options.game.path, *_optionsView, *_services);
+    _game = std::make_unique<Game>(
+        gameId,
+        _options.game.path,
+        *_optionsView,
+        *_services,
+        *_console);
     _game->init();
 #endif
 
@@ -124,9 +129,16 @@ void Engine::init() {
         _services->resource,
         _services->system);
     _profiler->init();
+
+    _console = std::make_unique<Console>(
+        _options.graphics,
+        _services->graphics,
+        _services->resource);
+    _console->init();
 }
 
 void Engine::deinit() {
+    _console.reset();
     _profiler.reset();
 #if R_NEO_GAME
     _neoGame.reset();
@@ -183,6 +195,12 @@ int Engine::run() {
             while (!events.empty()) {
                 auto event = events.front();
                 events.pop();
+                if (_profiler->handle(event)) {
+                    continue;
+                }
+                if (_console->handle(event)) {
+                    continue;
+                }
 #if R_NEO_GAME
                 if (_neoGame->handle(event)) {
                     continue;
@@ -196,7 +214,6 @@ int Engine::run() {
                     continue;
                 }
 #endif
-                _profiler->handle(event);
             }
         });
         if (quit) {
@@ -228,6 +245,7 @@ int Engine::run() {
             _game->render();
 #endif
             _profiler->render();
+            _console->render();
             _window->swap();
             _services->audio.mixer.render();
         });
