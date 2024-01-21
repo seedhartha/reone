@@ -33,7 +33,7 @@ using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
 
-#define R_NEO_GAME 1
+#define R_NEO_GAME 0
 
 namespace reone {
 

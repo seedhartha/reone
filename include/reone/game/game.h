@@ -440,6 +440,24 @@ private:
     }
 
     // END GUI
+
+    // Console commands
+
+    void cmdInfo(const Console::TokenList &tokens);
+    void cmdListGlobals(const Console::TokenList &tokens);
+    void cmdListLocals(const Console::TokenList &tokens);
+    void cmdListAnim(const Console::TokenList &tokens);
+    void cmdPlayAnim(const Console::TokenList &tokens);
+    void cmdKill(const Console::TokenList &tokens);
+    void cmdAddItem(const Console::TokenList &tokens);
+    void cmdGiveXP(const Console::TokenList &tokens);
+    void cmdWarp(const Console::TokenList &tokens);
+    void cmdRunScript(const Console::TokenList &tokens);
+    void cmdShowAABB(const Console::TokenList &tokens);
+    void cmdShowWalkmesh(const Console::TokenList &tokens);
+    void cmdShowTriggers(const Console::TokenList &tokens);
+
+    // END Console commands
 };
 
 } // namespace game

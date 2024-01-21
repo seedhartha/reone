@@ -25,43 +25,58 @@
 
 namespace reone {
 
+namespace graphics {
+
+struct GraphicsServices;
+
+}
+
+namespace resource {
+
+struct ResourceServices;
+
+}
+
 namespace game {
 
-struct ServicesView;
-
-class Game;
+struct OptionsView;
 
 class Console {
 public:
-    Console(
-        Game &game,
-        ServicesView &services) :
-        _game(game),
-        _services(services),
-        _input(gui::TextInputFlags::console) {
+    using TokenList = std::vector<std::string>;
+    using CommandHandler = std::function<void(const TokenList &)>;
 
-        init();
+    Console(OptionsView &options,
+            graphics::GraphicsServices &graphicsSvc,
+            resource::ResourceServices &resourceSvc) :
+        _options(options),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc),
+        _input(gui::TextInputFlags::console) {
     }
 
     void init();
 
+    void registerCommand(std::string name, std::string description, CommandHandler handler);
+    void printLine(const std::string &text);
+
     bool handle(const input::Event &event);
     void render();
 
-    bool isOpen() const { return _open; }
+    bool isOpen() const {
+        return _open;
+    }
 
 private:
-    using CommandHandler = std::function<void(std::string, std::vector<std::string>)>;
-
     struct Command {
         std::string name;
-        std::string alias;
         std::string description;
         CommandHandler handler;
     };
 
-    Game &_game;
-    ServicesView &_services;
+    OptionsView &_options;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
 
     std::shared_ptr<graphics::Font> _font;
     bool _open {false};
@@ -72,9 +87,8 @@ private:
 
     // Commands
 
-    std::vector<Command> _commands;
-    std::unordered_map<std::string, Command> _commandByName;
-    std::unordered_map<std::string, Command> _commandByAlias;
+    std::list<Command> _commands;
+    std::unordered_map<std::string, std::reference_wrapper<Command>> _nameToCommand;
 
     // END Commands
 
@@ -82,35 +96,10 @@ private:
     bool handleKeyUp(const input::KeyEvent &event);
 
     void executeInputText();
-    void print(const std::string &text);
     void trimOutput();
 
     void renderBackground();
     void renderLines();
-
-    // Commands
-
-    void initCommands();
-
-    void addCommand(std::string name, std::string alias, std::string description, CommandHandler handler);
-
-    void cmdClear(std::string input, std::vector<std::string> tokens);
-    void cmdInfo(std::string input, std::vector<std::string> tokens);
-    void cmdListGlobals(std::string input, std::vector<std::string> tokens);
-    void cmdListLocals(std::string input, std::vector<std::string> tokens);
-    void cmdListAnim(std::string input, std::vector<std::string> tokens);
-    void cmdPlayAnim(std::string input, std::vector<std::string> tokens);
-    void cmdRunScript(std::string input, std::vector<std::string> tokens);
-    void cmdWarp(std::string input, std::vector<std::string> tokens);
-    void cmdKill(std::string input, std::vector<std::string> tokens);
-    void cmdAddItem(std::string input, std::vector<std::string> tokens);
-    void cmdGiveXP(std::string input, std::vector<std::string> tokens);
-    void cmdShowAABB(std::string input, std::vector<std::string> tokens);
-    void cmdShowWalkmesh(std::string input, std::vector<std::string> tokens);
-    void cmdShowTriggers(std::string input, std::vector<std::string> tokens);
-    void cmdHelp(std::string input, std::vector<std::string> tokens);
-
-    // END Commands
 };
 
 } // namespace game
