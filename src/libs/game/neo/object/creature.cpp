@@ -97,7 +97,7 @@ void Creature::load(const UTC &utc,
         _appearance.texture = std::move(texture);
     }
 
-    _state = ObjectState::Loaded;
+    setState(ObjectState::Loaded);
 }
 
 void Creature::equip(Item &item, InventorySlot slot) {

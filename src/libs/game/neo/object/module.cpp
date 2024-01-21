@@ -42,7 +42,7 @@ void Module::load(const IFO &ifo) {
     _entryFacing = -glm::atan(
         ifo.Mod_Entry_Dir_X,
         ifo.Mod_Entry_Dir_Y);
-    _state = ObjectState::Loaded;
+    setState(ObjectState::Loaded);
 }
 
 void Module::update(float dt) {

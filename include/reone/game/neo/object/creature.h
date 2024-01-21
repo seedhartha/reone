@@ -59,6 +59,11 @@ public:
             id,
             std::move(tag),
             ObjectType::Creature) {
+
+        Event event;
+        event.type = EventType::ObjectCreated;
+        event.object.objectId = _id;
+        _events.push_back(std::move(event));
     }
 
     void load(const resource::generated::UTC &utc,

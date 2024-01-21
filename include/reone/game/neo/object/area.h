@@ -96,6 +96,11 @@ public:
             std::move(tag),
             ObjectType::Area),
         _areaObjectLoader(areaObjectLoader) {
+
+        Event event;
+        event.type = EventType::ObjectCreated;
+        event.object.objectId = _id;
+        _events.push_back(std::move(event));
     }
 
     void load(const resource::generated::ARE &are,

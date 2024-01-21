@@ -212,80 +212,6 @@ void Game::init() {
     _cameraController.refreshSceneNode();
 
     startModule("end_m01aa");
-    if (_module) {
-        auto &area = _module->get().area();
-        for (auto &room : area.rooms()) {
-            auto model = _resourceSvc.models.get(room.model);
-            if (!model) {
-                throw ResourceNotFoundException("Room model not found: " + room.model);
-            }
-            auto sceneNode = scene.newModel(*model, ModelUsage::Room);
-            sceneNode->setLocalTransform(glm::translate(room.position));
-            scene.addRoot(std::move(sceneNode));
-        }
-        for (auto &creature : area.creatures()) {
-            const auto &appearance = creature.get().appearance();
-            auto modelName = appearance.model.value();
-            auto model = _resourceSvc.models.get(modelName);
-            if (!model) {
-                throw ResourceNotFoundException("Creature model not found: " + modelName);
-            }
-            auto transform = glm::translate(creature.get().position());
-            transform *= glm::eulerAngleZ(creature.get().facing());
-            auto sceneNode = scene.newModel(*model, ModelUsage::Creature);
-            if (appearance.texture) {
-                auto &texName = appearance.texture->value();
-                auto texture = _resourceSvc.textures.get(texName, TextureUsage::MainTex);
-                if (!texture) {
-                    throw ResourceNotFoundException("Creature texture not found: " + texName);
-                }
-                sceneNode->setMainTexture(texture.get());
-            }
-            if (appearance.normalHeadModel) {
-                auto headModel = _resourceSvc.models.get(appearance.normalHeadModel->value());
-                if (!headModel) {
-                    throw ResourceNotFoundException("Creature head model not found: " + modelName);
-                }
-                auto headSceneNode = scene.newModel(*headModel, ModelUsage::Creature);
-                sceneNode->attach("headhook", *headSceneNode);
-            }
-            sceneNode->setLocalTransform(std::move(transform));
-            sceneNode->setDrawDistance(_options.graphics.drawDistance);
-            sceneNode->setPickable(true);
-            sceneNode->setExternalRef(&creature.get());
-            scene.addRoot(std::move(sceneNode));
-        }
-        for (auto &door : area.doors()) {
-            auto modelName = door.get().modelName().value();
-            auto model = _resourceSvc.models.get(modelName);
-            if (!model) {
-                throw ResourceNotFoundException("Door model not found: " + modelName);
-            }
-            auto transform = glm::translate(door.get().position());
-            transform *= glm::eulerAngleZ(door.get().facing());
-            auto sceneNode = scene.newModel(*model, ModelUsage::Door);
-            sceneNode->setLocalTransform(std::move(transform));
-            // sceneNode->setDrawDistance(_options.graphics.drawDistance);
-            sceneNode->setPickable(true);
-            sceneNode->setExternalRef(&door.get());
-            scene.addRoot(std::move(sceneNode));
-        }
-        for (auto &placeable : area.placeables()) {
-            auto modelName = placeable.get().modelName().value();
-            auto model = _resourceSvc.models.get(modelName);
-            if (!model) {
-                throw ResourceNotFoundException("Placeable model not found: " + modelName);
-            }
-            auto transform = glm::translate(placeable.get().position());
-            transform *= glm::eulerAngleZ(placeable.get().facing());
-            auto sceneNode = scene.newModel(*model, ModelUsage::Placeable);
-            sceneNode->setLocalTransform(std::move(transform));
-            sceneNode->setDrawDistance(_options.graphics.drawDistance);
-            sceneNode->setPickable(true);
-            sceneNode->setExternalRef(&placeable.get());
-            scene.addRoot(std::move(sceneNode));
-        }
-    }
 
     _profiler.reserveThread(kLogicThreadName);
 
@@ -343,7 +269,83 @@ void Game::update(float dt) {
     {
         std::lock_guard<std::mutex> lock {_eventsMutex};
         for (auto &event : _events) {
-            if (event.type == EventType::ObjectLocationChanged) {
+            if (event.type == EventType::ObjectStateChanged && event.object.state == ObjectState::Loaded) {
+                auto &object = static_cast<Object &>(_idToObject.at(event.object.objectId).get());
+                if (object.type() == ObjectType::Area) {
+                    auto &area = static_cast<Area &>(object);
+                    for (auto &room : area.rooms()) {
+                        auto model = _resourceSvc.models.get(room.model);
+                        if (!model) {
+                            throw ResourceNotFoundException("Room model not found: " + room.model);
+                        }
+                        auto sceneNode = scene.newModel(*model, ModelUsage::Room);
+                        sceneNode->setLocalTransform(glm::translate(room.position));
+                        scene.addRoot(std::move(sceneNode));
+                    }
+                } else if (object.type() == ObjectType::Creature) {
+                    auto &creature = static_cast<Creature &>(object);
+                    const auto &appearance = creature.appearance();
+                    auto modelName = appearance.model.value();
+                    auto model = _resourceSvc.models.get(modelName);
+                    if (!model) {
+                        throw ResourceNotFoundException("Creature model not found: " + modelName);
+                    }
+                    auto transform = glm::translate(creature.position());
+                    transform *= glm::eulerAngleZ(creature.facing());
+                    auto sceneNode = scene.newModel(*model, ModelUsage::Creature);
+                    if (appearance.texture) {
+                        auto &texName = appearance.texture->value();
+                        auto texture = _resourceSvc.textures.get(texName, TextureUsage::MainTex);
+                        if (!texture) {
+                            throw ResourceNotFoundException("Creature texture not found: " + texName);
+                        }
+                        sceneNode->setMainTexture(texture.get());
+                    }
+                    if (appearance.normalHeadModel) {
+                        auto headModel = _resourceSvc.models.get(appearance.normalHeadModel->value());
+                        if (!headModel) {
+                            throw ResourceNotFoundException("Creature head model not found: " + modelName);
+                        }
+                        auto headSceneNode = scene.newModel(*headModel, ModelUsage::Creature);
+                        sceneNode->attach("headhook", *headSceneNode);
+                    }
+                    sceneNode->setLocalTransform(std::move(transform));
+                    sceneNode->setDrawDistance(_options.graphics.drawDistance);
+                    sceneNode->setPickable(true);
+                    sceneNode->setExternalRef(&creature);
+                    scene.addRoot(std::move(sceneNode));
+                } else if (object.type() == ObjectType::Door) {
+                    auto &door = static_cast<Door &>(object);
+                    auto modelName = door.modelName().value();
+                    auto model = _resourceSvc.models.get(modelName);
+                    if (!model) {
+                        throw ResourceNotFoundException("Door model not found: " + modelName);
+                    }
+                    auto transform = glm::translate(door.position());
+                    transform *= glm::eulerAngleZ(door.facing());
+                    auto sceneNode = scene.newModel(*model, ModelUsage::Door);
+                    sceneNode->setLocalTransform(std::move(transform));
+                    // sceneNode->setDrawDistance(_options.graphics.drawDistance);
+                    sceneNode->setPickable(true);
+                    sceneNode->setExternalRef(&door);
+                    scene.addRoot(std::move(sceneNode));
+                } else if (object.type() == ObjectType::Placeable) {
+                    auto &placeable = static_cast<Placeable &>(object);
+                    auto modelName = placeable.modelName().value();
+                    auto model = _resourceSvc.models.get(modelName);
+                    if (!model) {
+                        throw ResourceNotFoundException("Placeable model not found: " + modelName);
+                    }
+                    auto transform = glm::translate(placeable.position());
+                    transform *= glm::eulerAngleZ(placeable.facing());
+                    auto sceneNode = scene.newModel(*model, ModelUsage::Placeable);
+                    sceneNode->setLocalTransform(std::move(transform));
+                    sceneNode->setDrawDistance(_options.graphics.drawDistance);
+                    sceneNode->setPickable(true);
+                    sceneNode->setExternalRef(&placeable);
+                    scene.addRoot(std::move(sceneNode));
+                }
+            } else if (event.type == EventType::ObjectLocationChanged) {
                 auto &object = static_cast<SpatialObject &>(_idToObject.at(event.object.objectId).get());
                 auto sceneNode = scene.modelByExternalRef(&object);
                 if (sceneNode) {
@@ -398,9 +400,22 @@ void Game::logicThreadFunc() {
         _ticks = ticks;
         _profiler.measure(kLogicThreadName, 0, [this, &dt]() {
             if (_module) {
-                _module->get().update(dt);
+                auto &module = _module->get();
+                module.update(dt);
+
                 std::lock_guard<std::mutex> lock {_eventsMutex};
-                for (auto &object : _module->get().area().objects()) {
+                for (auto &event : module.events()) {
+                    _events.push_back(std::move(event));
+                }
+                module.clearEvents();
+
+                auto &area = module.area();
+                for (auto &event : area.events()) {
+                    _events.push_back(std::move(event));
+                }
+                area.clearEvents();
+
+                for (auto &object : area.objects()) {
                     for (auto &event : object.get().events()) {
                         _events.push_back(std::move(event));
                     }

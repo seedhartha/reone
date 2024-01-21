@@ -37,7 +37,7 @@ void Door::load(const UTD &utd,
         throw ValidationException("Empty door model name");
     }
     _modelName = std::move(modelName);
-    _state = ObjectState::Loaded;
+    setState(ObjectState::Loaded);
 }
 
 } // namespace neo

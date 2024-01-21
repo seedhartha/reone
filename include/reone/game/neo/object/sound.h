@@ -32,6 +32,11 @@ public:
             id,
             std::move(tag),
             ObjectType::Sound) {
+
+        Event event;
+        event.type = EventType::ObjectCreated;
+        event.object.objectId = _id;
+        _events.push_back(std::move(event));
     }
 };
 

@@ -26,11 +26,14 @@ namespace game {
 namespace neo {
 
 enum class EventType {
+    ObjectCreated,
+    ObjectStateChanged,
     ObjectLocationChanged
 };
 
 struct ObjectEventData {
     ObjectId objectId;
+    ObjectState state;
 };
 
 struct Event {

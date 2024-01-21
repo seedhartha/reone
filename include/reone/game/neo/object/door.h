@@ -46,6 +46,11 @@ public:
             id,
             std::move(tag),
             ObjectType::Door) {
+
+        Event event;
+        event.type = EventType::ObjectCreated;
+        event.object.objectId = _id;
+        _events.push_back(std::move(event));
     }
 
     void load(const resource::generated::UTD &utd,

@@ -104,7 +104,7 @@ void Area::load(const ARE &are,
         auto &waypoint = _areaObjectLoader.loadWaypoint(gitWaypoint.TemplateResRef);
         add(waypoint);
     }
-    _state = ObjectState::Loaded;
+    setState(ObjectState::Loaded);
 }
 
 void Area::add(Camera &camera) {

@@ -23,6 +23,12 @@ namespace game {
 
 namespace neo {
 
+enum class ObjectState {
+    Created,
+    Loaded,
+    Destroyed
+};
+
 using ObjectId = uint32_t;
 using ObjectTag = std::string;
 

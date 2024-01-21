@@ -30,12 +30,6 @@ namespace game {
 
 namespace neo {
 
-enum class ObjectState {
-    Created,
-    Loaded,
-    Destroyed
-};
-
 using ActionQueue = std::queue<Action>;
 using EffectList = std::vector<Effect>;
 
@@ -121,6 +115,19 @@ protected:
         _tag(std::move(tag)),
         _type(type) {
     }
+
+    void setState(ObjectState state) {
+        if (_state == state) {
+            return;
+        }
+        _state = state;
+
+        Event event;
+        event.type = EventType::ObjectStateChanged;
+        event.object.objectId = _id;
+        event.object.state = _state;
+        _events.push_back(std::move(event));
+    }
 };
 
 class SpatialObject : public Object {
@@ -130,6 +137,9 @@ public:
     }
 
     void setPosition(glm::vec3 position) {
+        if (_position == position) {
+            return;
+        }
         _position = std::move(position);
 
         Event event;
@@ -143,6 +153,9 @@ public:
     }
 
     void setFacing(float facing) {
+        if (_facing == facing) {
+            return;
+        }
         _facing = facing;
 
         Event event;

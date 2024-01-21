@@ -37,7 +37,7 @@ void Placeable::load(const UTP &utp,
         throw ValidationException("Empty placeable model name");
     }
     _modelName = std::move(modelName);
-    _state = ObjectState::Loaded;
+    setState(ObjectState::Loaded);
 }
 
 } // namespace neo
