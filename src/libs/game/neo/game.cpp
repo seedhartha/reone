@@ -201,7 +201,6 @@ void Game::init() {
 
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     scene.setUpdateRoots(true);
-    scene.setRenderAABB(true);
 
     auto camera = scene.newCamera();
     float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
@@ -214,7 +213,6 @@ void Game::init() {
     startModule("end_m01aa");
 
     _profiler.reserveThread(kLogicThreadName);
-
     _logicThread = std::thread {std::bind(&Game::logicThreadFunc, this)};
     _inited = true;
 }

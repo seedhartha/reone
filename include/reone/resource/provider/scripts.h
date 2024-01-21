@@ -45,7 +45,6 @@ public:
     }
 
     std::shared_ptr<script::ScriptProgram> get(const std::string &key) override {
-        std::lock_guard<std::mutex> lock {_mutex};
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -58,7 +57,6 @@ private:
     Resources &_resources;
 
     std::unordered_map<std::string, std::shared_ptr<script::ScriptProgram>> _objects;
-    std::mutex _mutex;
 
     std::shared_ptr<script::ScriptProgram> doGet(std::string resRef);
 };

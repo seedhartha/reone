@@ -61,7 +61,6 @@ private:
     graphics::IStatistic &_statistic;
 
     std::unordered_map<std::string, std::shared_ptr<graphics::Model>> _cache;
-    std::recursive_mutex _mutex;
 
     std::shared_ptr<graphics::Model> doGet(const std::string &resRef);
 };

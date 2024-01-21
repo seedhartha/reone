@@ -47,7 +47,6 @@ std::shared_ptr<Texture> Textures::get(const std::string &resRef, TextureUsage u
     if (resRef.empty()) {
         return nullptr;
     }
-    std::lock_guard<std::mutex> lock {_mutex};
     auto maybeTexture = _cache.find(resRef);
     if (maybeTexture != _cache.end()) {
         return maybeTexture->second;

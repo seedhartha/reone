@@ -62,7 +62,6 @@ private:
     Resources &_resources;
 
     std::unordered_map<std::string, std::shared_ptr<graphics::Texture>> _cache;
-    std::mutex _mutex;
 
     std::shared_ptr<graphics::Texture> doGet(const std::string &resRef, graphics::TextureUsage usage);
 };

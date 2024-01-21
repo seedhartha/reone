@@ -51,7 +51,6 @@ private:
     resource::Resources &_resources;
 
     std::unordered_map<std::string, std::shared_ptr<graphics::Walkmesh>> _cache;
-    std::mutex _mutex;
 
     std::shared_ptr<graphics::Walkmesh> doGet(const std::string &resRef, ResType type);
 };

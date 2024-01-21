@@ -54,7 +54,6 @@ public:
     }
 
     std::shared_ptr<movie::IMovie> get(const std::string &name) override {
-        std::lock_guard<std::mutex> lock {_mutex};
         auto maybeObject = _objects.find(name);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -69,7 +68,6 @@ private:
     audio::IAudioMixer &_audioPlayer;
 
     std::unordered_map<std::string, std::shared_ptr<movie::IMovie>> _objects;
-    std::mutex _mutex;
 
     std::shared_ptr<movie::IMovie> doGet(std::string name);
 };

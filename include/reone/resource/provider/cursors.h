@@ -69,7 +69,6 @@ public:
 
 private:
     std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
-    std::mutex _mutex;
 
     // Services
 

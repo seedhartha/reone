@@ -605,21 +605,23 @@ void SceneGraph::renderOpaque(IRenderPass &pass) {
 
     if (_renderAABB) {
         for (auto &model : _modelRoots) {
-            if (model->isEnabled()) {
+            if (model->isEnabled() && !model->isCulled()) {
                 model->renderAABB(pass);
             }
         }
     }
     if (_renderWalkmeshes) {
         for (auto &walkmesh : _walkmeshRoots) {
-            if (walkmesh->isEnabled()) {
+            if (walkmesh->isEnabled() && !walkmesh->isCulled()) {
                 walkmesh->render(pass);
             }
         }
     }
     if (_renderTriggers) {
         for (auto &trigger : _triggerRoots) {
-            trigger->render(pass);
+            if (trigger->isEnabled() && !trigger->isCulled()) {
+                trigger->render(pass);
+            }
         }
     }
 }

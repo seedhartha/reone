@@ -63,7 +63,6 @@ public:
     }
 
     std::shared_ptr<graphics::Font> get(const std::string &key) override {
-        std::lock_guard<std::mutex> lock {_mutex};
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -74,7 +73,6 @@ public:
 
 private:
     std::unordered_map<std::string, std::shared_ptr<graphics::Font>> _objects;
-    std::mutex _mutex;
 
     // Services
 
