@@ -315,7 +315,7 @@ void PBRRenderPass::drawAABB(const std::vector<glm::vec4> &corners) {
     auto &program = _shaderRegistry.get(ShaderProgramId::pbrAABB);
     _context.useProgram(program);
     program.setUniform("uCorners", corners);
-    _context.withDepthTestMode(DepthTestMode::None, [this]() {
+    _context.withDepthMask(false, [this]() {
         _context.withPolygonMode(PolygonMode::Line, [this]() {
             _meshRegistry.get(MeshName::aabb).draw();
         });

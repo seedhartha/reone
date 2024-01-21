@@ -180,6 +180,8 @@ void Game::init() {
     checkThat(!_inited, "Must not be initialized");
 
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    scene.setUpdateRoots(true);
+    scene.setRenderAABB(true);
 
     auto camera = scene.newCamera();
     float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
@@ -282,6 +284,8 @@ void Game::update(float dt) {
     if (_module) {
         _module->get().update(dt);
     }
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    scene.update(dt);
 }
 
 void Game::render() {

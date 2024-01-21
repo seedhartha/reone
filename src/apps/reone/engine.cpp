@@ -206,7 +206,6 @@ int Engine::run() {
         _profiler->timeUpdate([this, &frameTime]() {
 #if R_NEO_GAME
             _neoGame->update(frameTime);
-            _services->scene.graphs.get(kSceneMain).update(frameTime);
 #else
             _game->update(frameTime);
             bool showcur = _game->cursorType() == CursorType::None;
