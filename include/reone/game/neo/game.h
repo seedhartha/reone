@@ -212,8 +212,26 @@ private:
     std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
     std::optional<std::reference_wrapper<scene::ModelSceneNode>> _pickedModel;
 
+    // Logic thread
+
     void logicThreadFunc();
+    void collectEvents();
+
     void runOnLogicThread(AsyncTask task);
+
+    // END Logic thread
+
+    // Event handling
+
+    void handleEvents();
+
+    void onAreaLoaded(Area &area);
+    void onCreatureLoaded(Creature &creature);
+    void onDoorLoaded(Door &door);
+    void onPlaceableLoaded(Placeable &placeable);
+    void onObjectLocationChanged(SpatialObject &object);
+
+    // END Event handling
 };
 
 } // namespace neo
