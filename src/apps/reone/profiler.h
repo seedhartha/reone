@@ -85,6 +85,7 @@ private:
 
     bool _inited {false};
     std::atomic_bool _enabled {false};
+    float _fpsTarget {60.0f};
 
     std::array<TimedThread, kMaxTimedThreads> _timedThreads;
     int _numTimedThreads {0};

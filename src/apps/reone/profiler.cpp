@@ -42,12 +42,17 @@ static constexpr float kTextOffset = 3.0f;
 static constexpr int kNumTimedFrames = 100;
 static constexpr float kFrameTimesScale = 2.0f;
 
-static constexpr float kFPSRefreshDelay = 1.0f;  // seconds
-static constexpr float kFPSRefreshPeriod = 5.0f; // seconds
-
 void Profiler::init() {
     checkThat(!_inited, "Must not be initialized");
     _font = _resourceSvc.fonts.get(kFontResRef);
+
+    auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::profiler);
+    _graphicsSvc.context.useProgram(program);
+    program.setUniform("uSeriesColor1", glm::vec3 {0.0f, 0.0f, 1.0f});
+    program.setUniform("uSeriesColor2", glm::vec3 {0.0f, 1.0f, 0.0f});
+    program.setUniform("uSeriesColor3", glm::vec3 {0.0f, 1.0f, 1.0f});
+    program.setUniform("uSeriesColor4", glm::vec3 {1.0f, 0.0f, 0.0f});
+
     _inited = true;
 }
 
@@ -60,38 +65,39 @@ void Profiler::deinit() {
 }
 
 bool Profiler::handle(const input::Event &event) {
-    if (event.type != input::EventType::KeyDown || event.key.code != input::KeyCode::F5) {
+    if (event.type != input::EventType::KeyDown) {
         return false;
     }
-    bool enabled = !_enabled;
-    _enabled.store(enabled, std::memory_order::memory_order_release);
-    if (!enabled) {
+    bool enabled = _enabled.load(std::memory_order::memory_order_acquire);
+    if (event.key.code == input::KeyCode::F5) {
+        _enabled.store(!enabled, std::memory_order::memory_order_release);
         return true;
     }
-    // std::lock_guard<std::mutex> lock {_mutex};
-    // _inputTimes.clear();
-    // _updateTimes.clear();
-    // _renderTimes.clear();
-    // _percentilesTimer.reset(kFPSRefreshDelay);
-    return true;
+    if (!enabled) {
+        return false;
+    }
+    switch (event.key.code) {
+    case input::KeyCode::Key1:
+        _fpsTarget = 30.0f;
+        return true;
+    case input::KeyCode::Key2:
+        _fpsTarget = 60.0f;
+        return true;
+    case input::KeyCode::Key3:
+        _fpsTarget = 120.0f;
+        return true;
+    case input::KeyCode::Key4:
+        _fpsTarget = 240.0f;
+        return true;
+    default:
+        return false;
+    }
 }
 
 void Profiler::update(float dt) {
     if (!_enabled.load(std::memory_order::memory_order_acquire)) {
         return;
     }
-    // std::lock_guard<std::mutex> lock {_mutex};
-    // _percentilesTimer.update(dt);
-    // if (!_percentilesTimer.elapsed()) {
-    //     return;
-    // }
-    // if (_renderTimes.size() == kNumTimedFrames) {
-    //     auto renderTimes = _renderTimes;
-    //     std::sort(renderTimes.begin(), renderTimes.end());
-    //     _p99FrameTime = renderTimes[98];
-    //     _p95FrameTime = renderTimes[94];
-    // }
-    // _percentilesTimer.reset(kFPSRefreshPeriod);
 }
 
 void Profiler::render() {
@@ -135,23 +141,26 @@ void Profiler::renderBackground() {
 void Profiler::renderFrameTimes(const TimedThread &thread, int xOffset) {
     auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::profiler);
     _graphicsSvc.context.useProgram(program);
+
     std::vector<glm::vec4> vecTimes;
     vecTimes.resize(kNumTimedFrames / 4, glm::vec4 {0.0f});
+    float oneOverFpsTarget = 1.0f / _fpsTarget;
     for (int slot = 0; slot < 4; ++slot) {
         if (thread.times[slot].size() >= kNumTimedFrames) {
             for (int i = 0; i < kNumTimedFrames / 4; ++i) {
                 for (int j = 0; j < 4; ++j) {
-                    vecTimes[i][j] = thread.times[slot][4 * i + j];
-                    vecTimes[i][j] = thread.times[slot][4 * i + j];
-                    vecTimes[i][j] = thread.times[slot][4 * i + j];
-                    vecTimes[i][j] = thread.times[slot][4 * i + j];
+                    vecTimes[i][j] = thread.times[slot][4 * i + j] / oneOverFpsTarget;
+                    vecTimes[i][j] = thread.times[slot][4 * i + j] / oneOverFpsTarget;
+                    vecTimes[i][j] = thread.times[slot][4 * i + j] / oneOverFpsTarget;
+                    vecTimes[i][j] = thread.times[slot][4 * i + j] / oneOverFpsTarget;
                 }
             }
         } else {
             std::memset(&vecTimes[0], 0, vecTimes.size() * sizeof(glm::vec4));
         }
-        program.setUniform("uTimes" + std::to_string(slot + 1), vecTimes);
+        program.setUniform("uSeriesValues" + std::to_string(slot + 1), vecTimes);
     }
+
     float size = kNumTimedFrames * kFrameTimesScale;
     auto transform = glm::scale(
         glm::translate(glm::vec3 {kTextOffset + xOffset, kTextOffset, 0.0f}),
@@ -161,6 +170,20 @@ void Profiler::renderFrameTimes(const TimedThread &thread, int xOffset) {
         locals.model = std::move(transform);
     });
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+
+    auto targetTime = str(boost::format("%.04fs (%dfps)") % oneOverFpsTarget % static_cast<int>(_fpsTarget));
+    _font->render(
+        targetTime,
+        glm::vec3 {kTextOffset + xOffset, kTextOffset, 0.0f},
+        glm::vec3 {1.0f},
+        TextGravity::RightBottom);
+
+    auto halfTargetTime = str(boost::format("%.04fs (%dfps)") % (0.5f * oneOverFpsTarget) % (2 * static_cast<int>(_fpsTarget)));
+    _font->render(
+        halfTargetTime,
+        glm::vec3 {kTextOffset + xOffset, kTextOffset + 0.5f * size, 0.0f},
+        glm::vec3 {1.0f},
+        TextGravity::RightBottom);
 }
 
 void Profiler::reserveThread(std::string name) {
