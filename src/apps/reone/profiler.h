@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "reone/game/profiler.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/uniformbuffer.h"
 #include "reone/input/event.h"
@@ -39,8 +40,10 @@ struct ResourceServices;
 
 struct SystemServices;
 
-class Profiler : boost::noncopyable {
+class Profiler : public game::IProfiler, boost::noncopyable {
 public:
+    static constexpr int kMaxTimedThreads = 4;
+
     Profiler(graphics::GraphicsOptions &graphicsOpt,
              graphics::GraphicsServices &graphicsSvc,
              resource::ResourceServices &resourceSvc,
@@ -62,11 +65,19 @@ public:
     void update(float dt);
     void render();
 
-    void timeInput(std::function<void()> block);
-    void timeUpdate(std::function<void()> block);
-    void timeRender(std::function<void()> block);
+    void reserveThread(std::string name) override;
+
+    void measure(const std::string &threadName,
+                 int timeIndex,
+                 const std::function<void()> &block) override;
 
 private:
+    struct TimedThread {
+        std::string name;
+        std::array<std::deque<float>, 4> times;
+        std::mutex mutex;
+    };
+
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;
@@ -75,20 +86,14 @@ private:
     bool _inited {false};
     std::atomic_bool _enabled {false};
 
-    std::deque<float> _inputTimes;
-    std::deque<float> _updateTimes;
-    std::deque<float> _renderTimes;
-
-    Timer _percentilesTimer;
-    float _p99FrameTime {0.0f};
-    float _p95FrameTime {0.0f};
+    std::array<TimedThread, kMaxTimedThreads> _timedThreads;
+    int _numTimedThreads {0};
+    std::map<std::string, std::reference_wrapper<TimedThread>> _nameToTimedThread;
 
     std::shared_ptr<graphics::Font> _font;
-    std::mutex _mutex;
 
     void renderBackground();
-    void renderFrameTimes();
-    void renderText();
+    void renderFrameTimes(const TimedThread &thread, int xOffset);
 };
 
 } // namespace reone

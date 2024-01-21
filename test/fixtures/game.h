@@ -23,7 +23,6 @@
 #include "reone/system/exception/notimplemented.h"
 
 #include "reone/game/camerastyles.h"
-#include "reone/game/console.h"
 #include "reone/game/d20/classes.h"
 #include "reone/game/d20/feats.h"
 #include "reone/game/d20/skills.h"
@@ -103,12 +102,6 @@ public:
     MOCK_METHOD(std::set<uint32_t>, getWalkableSurfaces, (), (const override));
     MOCK_METHOD(std::set<uint32_t>, getWalkcheckSurfaces, (), (const override));
     MOCK_METHOD(std::set<uint32_t>, getLineOfSightSurfaces, (), (const override));
-};
-
-class MockConsole : public IConsole, boost::noncopyable {
-public:
-    MOCK_METHOD(void, registerCommand, (std::string, std::string, IConsole::CommandHandler), (override));
-    MOCK_METHOD(void, printLine, (const std::string &), (override));
 };
 
 class TestGameModule : boost::noncopyable {

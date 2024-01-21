@@ -36,6 +36,13 @@ using namespace reone::script;
 
 namespace reone {
 
+static const std::string kMainThreadName {"main"};
+
+static constexpr int kProfilerInputTimeIndex = 0;
+static constexpr int kProfilerUpdateTimeIndex = 1;
+static constexpr int kProfilerRenderGraphicsTimeIndex = 2;
+static constexpr int kProfilerRenderAudioTimeIndex = 3;
+
 void Engine::init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         throw std::runtime_error("SDL_Init failed: " + std::string(SDL_GetError()));
@@ -108,6 +115,7 @@ void Engine::init() {
         _services->resource,
         _services->system);
     _profiler->init();
+    _profiler->reserveThread(kMainThreadName);
 
     _console = std::make_unique<Console>(
         _options.graphics,
@@ -123,7 +131,8 @@ void Engine::init() {
         _services->graphics,
         _services->resource,
         _services->scene,
-        *_console);
+        *_console,
+        *_profiler);
     _neoGame->init();
     showCursor(false);
     setRelativeMouseMode(true);
@@ -186,7 +195,7 @@ int Engine::run() {
         auto ticks = clock.millis();
         auto frameTime = (ticks - _ticks) / 1000.0f;
         _ticks = ticks;
-        _profiler->timeInput([this, &quit]() {
+        _profiler->measure(kMainThreadName, kProfilerInputTimeIndex, [this, &quit]() {
             while (!_events.empty()) {
                 auto event = _events.front();
                 _events.pop();
@@ -214,7 +223,7 @@ int Engine::run() {
         if (quit) {
             break;
         }
-        _profiler->timeUpdate([this, &frameTime]() {
+        _profiler->measure(kMainThreadName, kProfilerUpdateTimeIndex, [this, &frameTime]() {
 #if R_NEO_GAME
             _neoGame->update(frameTime);
 #else
@@ -226,7 +235,7 @@ int Engine::run() {
 #endif
             _profiler->update(frameTime);
         });
-        _profiler->timeRender([this]() {
+        _profiler->measure(kMainThreadName, kProfilerRenderGraphicsTimeIndex, [this]() {
             _services->graphics.statistic.resetDrawCalls();
             if (_options.graphics.pbr) {
                 _services->graphics.pbrTextures.refresh();
@@ -240,6 +249,8 @@ int Engine::run() {
             _profiler->render();
             _console->render();
             _window->swap();
+        });
+        _profiler->measure(kMainThreadName, kProfilerRenderAudioTimeIndex, [this]() {
             _services->audio.mixer.render();
         });
     }

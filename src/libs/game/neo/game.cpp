@@ -29,6 +29,7 @@
 #include "reone/game/neo/object/store.h"
 #include "reone/game/neo/object/trigger.h"
 #include "reone/game/neo/object/waypoint.h"
+#include "reone/game/profiler.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/meshregistry.h"
@@ -77,17 +78,19 @@ namespace neo {
 static constexpr float kCameraMouseSensitity = 0.001f;
 static constexpr float kCameraMoveRate = 8.0f;
 
-static const std::string kPickedModelFormat = R"END(
+static const std::string kPickedModelFormat {R"END(
 Picked model:
   name: '%s'
-)END";
+)END"};
 
-static const std::string kPickedObjectFormat = R"END(
+static const std::string kPickedObjectFormat {R"END(
 Picked object:
   id: %d
   type: %d
   tag: '%s'
-)END";
+)END"};
+
+static const std::string kLogicThreadName {"game"};
 
 bool CameraController::handle(const input::Event &event) {
     switch (event.type) {
@@ -284,6 +287,7 @@ void Game::init() {
         }
     }
 
+    _profiler.reserveThread(kLogicThreadName);
     _logicThread = std::thread {std::bind(&Game::logicThreadFunc, this)};
     _inited = true;
 }
@@ -359,8 +363,7 @@ void Game::quit() {
 }
 
 void Game::logicThreadFunc() {
-    setThreadName("game");
-
+    setThreadName(kLogicThreadName);
     _ticks = _systemSvc.clock.millis();
 
     while (!_quit.load(std::memory_order::memory_order_acquire)) {
@@ -372,9 +375,11 @@ void Game::logicThreadFunc() {
         uint32_t ticks = _systemSvc.clock.millis();
         float dt = (ticks - _ticks) / 1000.0f;
         _ticks = ticks;
-        if (_module) {
-            _module->get().update(dt);
-        }
+        _profiler.measure(kLogicThreadName, 0, [this, &dt]() {
+            if (_module) {
+                _module->get().update(dt);
+            }
+        });
     }
 }
 

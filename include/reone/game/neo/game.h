@@ -54,6 +54,7 @@ class ModelSceneNode;
 namespace game {
 
 class IConsole;
+class IProfiler;
 
 namespace neo {
 
@@ -105,13 +106,15 @@ public:
          graphics::GraphicsServices &graphicsSvc,
          resource::ResourceServices &resourceSvc,
          scene::SceneServices &sceneSvc,
-         IConsole &console) :
+         IConsole &console,
+         IProfiler &profiler) :
         _options(options),
         _systemSvc(systemSvc),
         _graphicsSvc(graphicsSvc),
         _resourceSvc(resourceSvc),
         _sceneSvc(sceneSvc),
-        _console(console) {
+        _console(console),
+        _profiler(profiler) {
     }
 
     ~Game() {
@@ -184,6 +187,7 @@ private:
     resource::ResourceServices &_resourceSvc;
     scene::SceneServices &_sceneSvc;
     IConsole &_console;
+    IProfiler &_profiler;
 
     bool _inited {false};
 

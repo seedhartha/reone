@@ -19,6 +19,7 @@
 
 #include <gmock/gmock.h>
 
+#include "reone/game/console.h"
 #include "reone/game/neo/object/area.h"
 #include "reone/game/neo/object/camera.h"
 #include "reone/game/neo/object/creature.h"
@@ -30,6 +31,7 @@
 #include "reone/game/neo/object/store.h"
 #include "reone/game/neo/object/trigger.h"
 #include "reone/game/neo/object/waypoint.h"
+#include "reone/game/profiler.h"
 
 using namespace reone::resource;
 
@@ -55,6 +57,18 @@ public:
     MOCK_METHOD(Store &, loadStore, (const ResRef &), (override));
     MOCK_METHOD(Trigger &, loadTrigger, (const ResRef &), (override));
     MOCK_METHOD(Waypoint &, loadWaypoint, (const ResRef &), (override));
+};
+
+class MockConsole : public IConsole, boost::noncopyable {
+public:
+    MOCK_METHOD(void, registerCommand, (std::string, std::string, IConsole::CommandHandler), (override));
+    MOCK_METHOD(void, printLine, (const std::string &), (override));
+};
+
+class MockProfiler : public IProfiler, boost::noncopyable {
+public:
+    MOCK_METHOD(void, reserveThread, (std::string), (override));
+    MOCK_METHOD(void, measure, (const std::string &, int, const std::function<void()> &), (override));
 };
 
 } // namespace neo

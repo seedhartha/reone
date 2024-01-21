@@ -18,8 +18,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "../../fixtures/game.h"
 #include "../../fixtures/graphics.h"
+#include "../../fixtures/neogame.h"
 #include "../../fixtures/resource.h"
 #include "../../fixtures/scene.h"
 #include "../../fixtures/system.h"
@@ -83,7 +83,8 @@ protected:
             _graphicsModule.services(),
             _resourceModule.services(),
             _sceneModule.services(),
-            _console);
+            _console,
+            _profiler);
     }
 
     TestOptions _options;
@@ -92,6 +93,7 @@ protected:
     TestResourceModule _resourceModule;
     TestSceneModule _sceneModule;
     MockConsole _console;
+    MockProfiler _profiler;
 
     std::unique_ptr<Game> _game;
 };

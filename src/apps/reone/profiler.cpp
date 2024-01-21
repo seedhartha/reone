@@ -32,6 +32,7 @@
 #include "reone/system/di/services.h"
 #include "reone/system/stringbuilder.h"
 
+using namespace reone::game;
 using namespace reone::graphics;
 
 namespace reone {
@@ -63,41 +64,40 @@ bool Profiler::handle(const input::Event &event) {
         return false;
     }
     bool enabled = !_enabled;
-    _enabled = enabled;
+    _enabled.store(enabled, std::memory_order::memory_order_release);
     if (!enabled) {
         return true;
     }
-    std::lock_guard<std::mutex> lock {_mutex};
-    _inputTimes.clear();
-    _updateTimes.clear();
-    _renderTimes.clear();
-    _percentilesTimer.reset(kFPSRefreshDelay);
+    // std::lock_guard<std::mutex> lock {_mutex};
+    // _inputTimes.clear();
+    // _updateTimes.clear();
+    // _renderTimes.clear();
+    // _percentilesTimer.reset(kFPSRefreshDelay);
     return true;
 }
 
 void Profiler::update(float dt) {
-    if (!_enabled) {
+    if (!_enabled.load(std::memory_order::memory_order_acquire)) {
         return;
     }
-    std::lock_guard<std::mutex> lock {_mutex};
-    _percentilesTimer.update(dt);
-    if (!_percentilesTimer.elapsed()) {
-        return;
-    }
-    if (_renderTimes.size() == kNumTimedFrames) {
-        auto renderTimes = _renderTimes;
-        std::sort(renderTimes.begin(), renderTimes.end());
-        _p99FrameTime = renderTimes[98];
-        _p95FrameTime = renderTimes[94];
-    }
-    _percentilesTimer.reset(kFPSRefreshPeriod);
+    // std::lock_guard<std::mutex> lock {_mutex};
+    // _percentilesTimer.update(dt);
+    // if (!_percentilesTimer.elapsed()) {
+    //     return;
+    // }
+    // if (_renderTimes.size() == kNumTimedFrames) {
+    //     auto renderTimes = _renderTimes;
+    //     std::sort(renderTimes.begin(), renderTimes.end());
+    //     _p99FrameTime = renderTimes[98];
+    //     _p95FrameTime = renderTimes[94];
+    // }
+    // _percentilesTimer.reset(kFPSRefreshPeriod);
 }
 
 void Profiler::render() {
-    if (!_enabled) {
+    if (!_enabled.load(std::memory_order::memory_order_acquire)) {
         return;
     }
-    std::lock_guard<std::mutex> lock {_mutex};
     _graphicsSvc.uniforms.setGlobals([this](auto &globals) {
         globals.reset();
         globals.projection = glm::ortho(
@@ -107,8 +107,13 @@ void Profiler::render() {
     });
     _graphicsSvc.context.withBlendMode(BlendMode::Normal, [this]() {
         renderBackground();
-        renderFrameTimes();
-        renderText();
+        int xOffset = 0;
+        for (int i = 0; i < _numTimedThreads; ++i) {
+            auto &thread = _timedThreads[i];
+            std::lock_guard<std::mutex> lock {thread.mutex};
+            renderFrameTimes(thread, xOffset);
+            xOffset += kNumTimedFrames * kFrameTimesScale + kTextOffset;
+        }
     });
 }
 
@@ -127,103 +132,66 @@ void Profiler::renderBackground() {
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
-void Profiler::renderFrameTimes() {
-    if (_inputTimes.size() < kNumTimedFrames ||
-        _updateTimes.size() < kNumTimedFrames ||
-        _renderTimes.size() < kNumTimedFrames) {
-        return;
-    }
-    std::vector<glm::vec4> inputTimes;
-    std::vector<glm::vec4> updateTimes;
-    std::vector<glm::vec4> renderTimes;
-    inputTimes.resize(kNumTimedFrames / 4, glm::vec4 {0.0f});
-    updateTimes.resize(kNumTimedFrames / 4, glm::vec4 {0.0f});
-    renderTimes.resize(kNumTimedFrames / 4, glm::vec4 {0.0f});
-    for (int i = 0; i < kNumTimedFrames / 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            inputTimes[i][j] = _inputTimes[4 * i + j];
-            updateTimes[i][j] = _updateTimes[4 * i + j];
-            renderTimes[i][j] = _renderTimes[4 * i + j];
+void Profiler::renderFrameTimes(const TimedThread &thread, int xOffset) {
+    auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::profiler);
+    _graphicsSvc.context.useProgram(program);
+    std::vector<glm::vec4> vecTimes;
+    vecTimes.resize(kNumTimedFrames / 4, glm::vec4 {0.0f});
+    for (int slot = 0; slot < 4; ++slot) {
+        if (thread.times[slot].size() >= kNumTimedFrames) {
+            for (int i = 0; i < kNumTimedFrames / 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    vecTimes[i][j] = thread.times[slot][4 * i + j];
+                    vecTimes[i][j] = thread.times[slot][4 * i + j];
+                    vecTimes[i][j] = thread.times[slot][4 * i + j];
+                    vecTimes[i][j] = thread.times[slot][4 * i + j];
+                }
+            }
+        } else {
+            std::memset(&vecTimes[0], 0, vecTimes.size() * sizeof(glm::vec4));
         }
+        program.setUniform("uTimes" + std::to_string(slot + 1), vecTimes);
     }
     float size = kNumTimedFrames * kFrameTimesScale;
-    glm::mat4 transform {1.0f};
-    transform = glm::translate(
-        transform,
-        glm::vec3 {kTextOffset, kTextOffset, 0.0f});
-    transform = glm::scale(transform, glm::vec3 {size, size, 1.0f});
+    auto transform = glm::scale(
+        glm::translate(glm::vec3 {kTextOffset + xOffset, kTextOffset, 0.0f}),
+        glm::vec3 {size, size, 1.0f});
     _graphicsSvc.uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::profiler);
-    _graphicsSvc.context.useProgram(program);
-    program.setUniform("uInputTimes", inputTimes);
-    program.setUniform("uUpdateTimes", updateTimes);
-    program.setUniform("uRenderTimes", renderTimes);
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
-void Profiler::renderText() {
-    StringBuilder text;
-    text.append("[Render]\n");
-    if (_p99FrameTime > 0.0f) {
-        text.append(str(boost::format("p99: %.03f %d") % _p99FrameTime % static_cast<int>(1.0f / _p99FrameTime)));
-    } else {
-        text.append("p99: 0 inf");
+void Profiler::reserveThread(std::string name) {
+    if (_nameToTimedThread.count(name) > 0) {
+        return;
     }
-    text.append("\n");
-    if (_p95FrameTime > 0.0f) {
-        text.append(str(boost::format("p95: %.03f %d") % _p95FrameTime % static_cast<int>(1.0f / _p95FrameTime)));
-    } else {
-        text.append("p95: 0 inf");
-    }
-    text.append("\n");
-    text.append(str(boost::format("%d draw calls") % _graphicsSvc.statistic.numDrawCalls()));
-    std::vector<std::string> lines;
-    boost::split(lines, text.string(), boost::is_any_of("\n"));
-    float y = kTextOffset;
-    for (const auto &line : lines) {
-        _font->render(
-            line,
-            glm::vec3 {2 * kTextOffset + kNumTimedFrames * kFrameTimesScale, y, 0.0f},
-            glm::vec3 {1.0f},
-            TextGravity::RightBottom);
-        y += _font->height() + kTextOffset;
-    }
+    checkLessOrEqual("timed thread count", _numTimedThreads, kMaxTimedThreads);
+    _timedThreads[_numTimedThreads].name = std::move(name);
+    auto &reserved = _timedThreads[_numTimedThreads];
+    _nameToTimedThread.insert({reserved.name, reserved});
+    ++_numTimedThreads;
 }
 
-void Profiler::timeInput(std::function<void()> block) {
+void Profiler::measure(const std::string &threadName,
+                       int timeIndex,
+                       const std::function<void()> &block) {
     uint64_t before = _systemSvc.clock.micros();
     block();
     uint64_t after = _systemSvc.clock.micros();
-    std::lock_guard<std::mutex> lock {_mutex};
-    if (_inputTimes.size() == kNumTimedFrames) {
-        _inputTimes.pop_front();
+    if (!_enabled.load(std::memory_order::memory_order_acquire)) {
+        return;
     }
-    _inputTimes.push_back((after - before) / 1e6f);
-}
-
-void Profiler::timeUpdate(std::function<void()> block) {
-    uint64_t before = _systemSvc.clock.micros();
-    block();
-    uint64_t after = _systemSvc.clock.micros();
-    std::lock_guard<std::mutex> lock {_mutex};
-    if (_updateTimes.size() == kNumTimedFrames) {
-        _updateTimes.pop_front();
+    checkThat(0 <= timeIndex && timeIndex < 4, "timeIndex must be between 0 and 3");
+    checkThat(_nameToTimedThread.count(threadName) > 0, "Timed thread must be reserved");
+    auto &thread = _nameToTimedThread.at(threadName).get();
+    std::lock_guard<std::mutex> lock {thread.mutex};
+    auto &times = thread.times[timeIndex];
+    if (times.size() == kNumTimedFrames) {
+        times.pop_front();
     }
-    _updateTimes.push_back((after - before) / 1e6f);
-}
-
-void Profiler::timeRender(std::function<void()> block) {
-    uint64_t before = _systemSvc.clock.micros();
-    block();
-    uint64_t after = _systemSvc.clock.micros();
-    std::lock_guard<std::mutex> lock {_mutex};
-    if (_renderTimes.size() == kNumTimedFrames) {
-        _renderTimes.pop_front();
-    }
-    _renderTimes.push_back((after - before) / 1e6f);
+    times.push_back((after - before) / 1e6f);
 }
 
 } // namespace reone
