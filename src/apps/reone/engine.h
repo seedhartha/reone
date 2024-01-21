@@ -85,19 +85,12 @@ private:
     std::unique_ptr<Profiler> _profiler;
     std::unique_ptr<Console> _console;
 
-    std::atomic_bool _quit {false};
-    std::atomic_bool _focus {false};
-    std::atomic_int _frameState {FrameStates::rendered};
-
     std::queue<input::Event> _events;
-    std::mutex _eventsMutex;
 
     uint32_t _ticks {0};
 
     bool _showCursor {true};
     bool _relativeMouseMode {false};
-
-    void gameThreadFunc();
 
     void processEvents(bool &quit);
 

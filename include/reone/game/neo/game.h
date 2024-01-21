@@ -121,6 +121,9 @@ public:
     void update(float dt);
     void render();
 
+    void pause(bool pause);
+    void quit();
+
     // Module
 
     void startModule(const std::string &name);
@@ -179,6 +182,10 @@ private:
 
     bool _inited {false};
 
+    std::atomic_bool _quit {false};
+    std::atomic_bool _paused {false};
+    std::thread _logicThread;
+
     ObjectId _nextObjectId {2};
     std::list<std::unique_ptr<Object>> _objects;
     std::optional<std::reference_wrapper<Module>> _module;
@@ -186,6 +193,8 @@ private:
     CameraController _cameraController;
     std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
     std::optional<std::reference_wrapper<scene::ModelSceneNode>> _pickedModel;
+
+    void logicThreadFunc();
 };
 
 } // namespace neo

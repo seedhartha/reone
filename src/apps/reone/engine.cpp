@@ -22,7 +22,6 @@
 #include "reone/graphics/window.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/gameprobe.h"
-#include "reone/system/threadutil.h"
 
 using namespace reone::audio;
 using namespace reone::game;
@@ -166,20 +165,19 @@ void Engine::deinit() {
 }
 
 int Engine::run() {
-    std::thread gameThread {std::bind(&Engine::gameThreadFunc, this)};
-
     auto &clock = _services->system.clock;
     _ticks = clock.millis();
 
-    while (!_quit.load(std::memory_order::memory_order_acquire)) {
-        bool quit;
+    bool quit = false;
+    while (!quit) {
         processEvents(quit);
         if (quit) {
-            _quit.store(true, std::memory_order::memory_order_release);
             break;
         }
         bool focus = _window->isInFocus();
-        _focus.store(focus, std::memory_order::memory_order_release);
+#if R_NEO_GAME
+        _neoGame->pause(!focus);
+#endif
         if (!focus) {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
             continue;
@@ -188,14 +186,9 @@ int Engine::run() {
         auto frameTime = (ticks - _ticks) / 1000.0f;
         _ticks = ticks;
         _profiler->timeInput([this, &quit]() {
-            std::queue<input::Event> events;
-            {
-                std::lock_guard<std::mutex> lock {_eventsMutex};
-                std::swap(events, _events);
-            }
-            while (!events.empty()) {
-                auto event = events.front();
-                events.pop();
+            while (!_events.empty()) {
+                auto event = _events.front();
+                _events.pop();
                 if (_profiler->handle(event)) {
                     continue;
                 }
@@ -218,7 +211,6 @@ int Engine::run() {
             }
         });
         if (quit) {
-            _quit.store(true, std::memory_order::memory_order_release);
             break;
         }
         _profiler->timeUpdate([this, &frameTime]() {
@@ -235,7 +227,6 @@ int Engine::run() {
         });
         _profiler->timeRender([this]() {
             _services->graphics.statistic.resetDrawCalls();
-            runMainThreadTasks();
             if (_options.graphics.pbr) {
                 _services->graphics.pbrTextures.refresh();
             }
@@ -250,34 +241,12 @@ int Engine::run() {
             _window->swap();
             _services->audio.mixer.render();
         });
-        _frameState.store(FrameStates::rendered, std::memory_order_release);
     }
-
-    if (gameThread.joinable()) {
-        gameThread.join();
-    }
+#if R_NEO_GAME
+    _neoGame->quit();
+#endif
 
     return 0;
-}
-
-void Engine::gameThreadFunc() {
-    setThreadName("game");
-
-    while (!_quit.load(std::memory_order::memory_order_acquire)) {
-        if (!_focus.load(std::memory_order::memory_order_acquire)) {
-            std::this_thread::sleep_for(std::chrono::milliseconds {100});
-            continue;
-        }
-        int expectedState = FrameStates::rendered;
-        if (!_frameState.compare_exchange_strong(
-                expectedState,
-                FrameStates::updating,
-                std::memory_order_acq_rel)) {
-            continue;
-        }
-        // TODO: move input handling and updates here from the main thread
-        _frameState.store(FrameStates::updated, std::memory_order::memory_order_release);
-    }
 }
 
 void Engine::processEvents(bool &quit) {
@@ -307,7 +276,6 @@ void Engine::processEvents(bool &quit) {
         }
         unhandled.push(*event);
     }
-    std::lock_guard<std::mutex> lock {_eventsMutex};
     while (!unhandled.empty()) {
         _events.push(std::move(unhandled.front()));
         unhandled.pop();

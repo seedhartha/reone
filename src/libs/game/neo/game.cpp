@@ -59,7 +59,7 @@
 #include "reone/system/checkutil.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/exception/validation.h"
-#include "reone/system/stringbuilder.h"
+#include "reone/system/threadutil.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -282,12 +282,16 @@ void Game::init() {
         }
     }
 
+    _logicThread = std::thread {std::bind(&Game::logicThreadFunc, this)};
     _inited = true;
 }
 
 void Game::deinit() {
     if (!_inited) {
         return;
+    }
+    if (_logicThread.joinable()) {
+        _logicThread.join();
     }
     _inited = false;
 }
@@ -345,6 +349,26 @@ void Game::render() {
     _graphicsSvc.context.useProgram(program);
     _graphicsSvc.context.bindTexture(output);
     _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw();
+}
+
+void Game::pause(bool pause) {
+    _paused.store(pause, std::memory_order::memory_order_release);
+}
+
+void Game::quit() {
+    _quit.store(true, std::memory_order::memory_order_release);
+}
+
+void Game::logicThreadFunc() {
+    setThreadName("game");
+
+    while (!_quit.load(std::memory_order::memory_order_acquire)) {
+        bool paused = _paused.load(std::memory_order::memory_order_acquire);
+        if (paused) {
+            std::this_thread::sleep_for(std::chrono::milliseconds {100});
+            continue;
+        }
+    }
 }
 
 void Game::startModule(const std::string &name) {
