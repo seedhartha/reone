@@ -125,8 +125,7 @@ private:
     float _cameraFacing {0.0f};
     float _cameraPitch {0.0f};
 
-    glm::vec3 _playerPosition {0.0f};
-    float _playerFacing {0.0f};
+    glm::vec3 _playerMoveDir {0.0f};
 
     int _commandMask {0};
 
@@ -135,7 +134,10 @@ private:
     std::optional<AsyncTaskExecutor> _gameLogicExecutor;
 };
 
-class Game : public IAreaLoader, public IAreaObjectLoader, boost::noncopyable {
+class Game : public IAreaLoader,
+             public IAreaObjectLoader,
+             public IActionExecutor,
+             boost::noncopyable {
 public:
     Game(OptionsView &options,
          SystemServices &systemSvc,
@@ -204,6 +206,12 @@ public:
     Waypoint &loadWaypoint(const resource::ResRef &tmplt) override;
 
     // END IAreaObjectLoader
+
+    // IActionExecutor
+
+    bool executeAction(Object &subject, const Action &action, float dt) override;
+
+    // END IActionExecutor
 
     // Object factory methods
 

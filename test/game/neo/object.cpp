@@ -126,7 +126,7 @@ TEST(spatial_object, should_set_facing_point) {
 
     // then
     auto facing = object.facing();
-    EXPECT_EQ(facing, glm::radians(-135.0f));
+    EXPECT_EQ(facing, glm::radians(135.0f));
     EXPECT_EQ(object.events().size(), 2);
     EXPECT_EQ(object.events().back().type, EventType::ObjectLocationChanged);
     EXPECT_EQ(object.events().back().object.objectId, object.id());

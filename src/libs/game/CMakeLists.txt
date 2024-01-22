@@ -283,6 +283,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/neo/event.h
     ${GAME_INCLUDE_DIR}/neo/game.h
     ${GAME_INCLUDE_DIR}/neo/inventory.h
+    ${GAME_INCLUDE_DIR}/neo/location.h
     ${GAME_INCLUDE_DIR}/neo/object.h
     ${GAME_INCLUDE_DIR}/neo/object/area.h
     ${GAME_INCLUDE_DIR}/neo/object/camera.h

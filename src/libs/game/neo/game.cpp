@@ -215,9 +215,6 @@ bool PlayerCameraController::handle(const input::Event &event) {
 }
 
 void PlayerCameraController::update(float dt) {
-    if (!_commandMask) {
-        return;
-    }
     if (_player) {
         if (_commandMask & CommandTypes::RotateCameraCCW) {
             _cameraFacing += kCameraTurnRate * dt;
@@ -228,36 +225,35 @@ void PlayerCameraController::update(float dt) {
         float cosFacing = glm::cos(_cameraFacing);
         float sinPitch = glm::sin(_cameraPitch - glm::half_pi<float>());
         float cosPitch = glm::cos(_cameraPitch - glm::half_pi<float>());
-        auto &player = _player->get();
-        _playerPosition = player.position();
-        _playerFacing = player.facing();
         if (_commandMask & CommandTypes::MovePlayerFront) {
-            _playerPosition.x -= kPlayerMoveRate * sinFacing * dt;
-            _playerPosition.y += kPlayerMoveRate * cosFacing * dt;
-            _playerPosition.z += 0.0f;
-            _playerFacing = _cameraFacing;
+            _playerMoveDir.x = -1000.0f * sinFacing;
+            _playerMoveDir.y = 1000.0f * cosFacing;
+            _playerMoveDir.z = 0.0f;
         } else if (_commandMask & CommandTypes::MovePlayerBack) {
-            _playerPosition.x += kPlayerMoveRate * sinFacing * dt;
-            _playerPosition.y -= kPlayerMoveRate * cosFacing * dt;
-            _playerPosition.z += 0.0f;
-            _playerFacing = _cameraFacing + glm::pi<float>();
+            _playerMoveDir.x = 1000.0f * sinFacing;
+            _playerMoveDir.y = -1000.0f * cosFacing;
+            _playerMoveDir.z = 0.0f;
         } else if (_commandMask & CommandTypes::MovePlayerLeft) {
-            _playerPosition.x -= kPlayerMoveRate * cosFacing * dt;
-            _playerPosition.y -= kPlayerMoveRate * sinFacing * dt;
-            _playerPosition.z += 0.0f;
-            _playerFacing = _cameraFacing + glm::half_pi<float>();
+            _playerMoveDir.x = -1000.0f * cosFacing;
+            _playerMoveDir.y = -1000.0f * sinFacing;
+            _playerMoveDir.z = 0.0f;
         } else if (_commandMask & CommandTypes::MovePlayerRight) {
-            _playerPosition.x += kPlayerMoveRate * cosFacing * dt;
-            _playerPosition.y += kPlayerMoveRate * sinFacing * dt;
-            _playerPosition.z += 0.0f;
-            _playerFacing = _cameraFacing - glm::half_pi<float>();
+            _playerMoveDir.x = 1000.0f * cosFacing;
+            _playerMoveDir.y = 1000.0f * sinFacing;
+            _playerMoveDir.z = 0.0f;
+        } else {
+            _playerMoveDir = glm::vec3 {0.0f};
         }
-        _cameraPosition.x = _playerPosition.x + kCameraDistance * sinFacing * cosPitch;
-        _cameraPosition.y = _playerPosition.y - kCameraDistance * cosFacing * cosPitch;
-        _cameraPosition.z = _playerPosition.z + kCameraHeight - kCameraDistance * sinPitch;
+        _cameraPosition = _player->get().position() + glm::vec3 {0.0f, 0.0f, kCameraHeight};
+        _cameraPosition.x += kCameraDistance * sinFacing * cosPitch;
+        _cameraPosition.y -= kCameraDistance * cosFacing * cosPitch;
+        _cameraPosition.z += kCameraDistance * sinPitch;
         refreshCamera();
         refreshPlayer();
     } else {
+        if (!_commandMask) {
+            return;
+        }
         float sinFacing = glm::sin(_cameraFacing);
         float cosFacing = glm::cos(_cameraFacing);
         float sinPitch = glm::sin(_cameraPitch - glm::half_pi<float>());
@@ -301,8 +297,11 @@ void PlayerCameraController::refreshCamera() {
 void PlayerCameraController::refreshPlayer() {
     (*_gameLogicExecutor)([this]() {
         auto &player = _player->get();
-        player.setPosition(_playerPosition);
-        player.setFacing(_playerFacing);
+        player.clearAllActions();
+        Action action;
+        action.type = ActionType::MoveToPoint;
+        action.location.position = player.position() + _playerMoveDir;
+        player.add(std::move(action));
     });
 }
 
@@ -328,7 +327,6 @@ void Game::init() {
         float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
         camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
         _playerCameraController.setCamera(*camera);
-        _playerCameraController.setCameraPosition(module.entryPosition());
         _playerCameraController.setCameraFacing(module.entryFacing());
         _playerCameraController.setCameraPitch(glm::radians(kCameraPitch));
         _playerCameraController.refreshCamera();
@@ -567,6 +565,23 @@ void Game::logicThreadFunc() {
     }
 }
 
+bool Game::executeAction(Object &subject, const Action &action, float dt) {
+    if (subject.type() == ObjectType::Creature) {
+        if (action.type == ActionType::MoveToPoint) {
+            auto &creature = static_cast<Creature &>(subject);
+            auto delta = action.location.position - creature.position();
+            auto distance = glm::length(delta);
+            if (distance < 1.0f) {
+                return true;
+            }
+            auto dir = delta / distance;
+            creature.setFacingPoint(action.location.position);
+            creature.setPosition(creature.position() + kPlayerMoveRate * dir * dt);
+        }
+    }
+    return false;
+}
+
 void Game::collectEvents() {
     std::lock_guard<std::mutex> lock {_eventsMutex};
 
@@ -779,6 +794,7 @@ Camera &Game::newCamera(ObjectTag tag) {
 
 Creature &Game::newCreature(ObjectTag tag) {
     auto object = std::make_unique<Creature>(_nextObjectId++, std::move(tag));
+    object->setActionExecutor(*this);
     auto &creature = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -788,6 +804,7 @@ Creature &Game::newCreature(ObjectTag tag) {
 
 Door &Game::newDoor(ObjectTag tag) {
     auto object = std::make_unique<Door>(_nextObjectId++, std::move(tag));
+    object->setActionExecutor(*this);
     auto &door = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -797,6 +814,7 @@ Door &Game::newDoor(ObjectTag tag) {
 
 Encounter &Game::newEncounter(ObjectTag tag) {
     auto object = std::make_unique<Encounter>(_nextObjectId++, std::move(tag));
+    object->setActionExecutor(*this);
     auto &encounter = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -806,6 +824,7 @@ Encounter &Game::newEncounter(ObjectTag tag) {
 
 Item &Game::newItem(ObjectTag tag) {
     auto object = std::make_unique<Item>(_nextObjectId++, std::move(tag));
+    object->setActionExecutor(*this);
     auto &item = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -815,6 +834,7 @@ Item &Game::newItem(ObjectTag tag) {
 
 Module &Game::newModule(ObjectTag tag) {
     auto object = std::make_unique<Module>(_nextObjectId++, std::move(tag), *this);
+    object->setActionExecutor(*this);
     auto &module = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -824,6 +844,7 @@ Module &Game::newModule(ObjectTag tag) {
 
 Placeable &Game::newPlaceable(ObjectTag tag) {
     auto object = std::make_unique<Placeable>(_nextObjectId++, std::move(tag));
+    object->setActionExecutor(*this);
     auto &placeable = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -833,6 +854,7 @@ Placeable &Game::newPlaceable(ObjectTag tag) {
 
 Sound &Game::newSound(ObjectTag tag) {
     auto object = std::make_unique<Sound>(_nextObjectId++, std::move(tag));
+    object->setActionExecutor(*this);
     auto &sound = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -842,6 +864,7 @@ Sound &Game::newSound(ObjectTag tag) {
 
 Store &Game::newStore(ObjectTag tag) {
     auto object = std::make_unique<Store>(_nextObjectId++, std::move(tag));
+    object->setActionExecutor(*this);
     auto &store = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -851,6 +874,7 @@ Store &Game::newStore(ObjectTag tag) {
 
 Trigger &Game::newTrigger(ObjectTag tag) {
     auto object = std::make_unique<Trigger>(_nextObjectId++, std::move(tag));
+    object->setActionExecutor(*this);
     auto &trigger = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -860,6 +884,7 @@ Trigger &Game::newTrigger(ObjectTag tag) {
 
 Waypoint &Game::newWaypoint(ObjectTag tag) {
     auto object = std::make_unique<Waypoint>(_nextObjectId++, std::move(tag));
+    object->setActionExecutor(*this);
     auto &waypoint = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();

@@ -17,13 +17,24 @@
 
 #pragma once
 
+#include "../types.h"
+
 namespace reone {
 
 namespace game {
 
 namespace neo {
 
+struct LocationActionData {
+    glm::vec3 position;
+    float facing;
+};
+
 struct Action {
+    ActionType type {ActionType::Invalid};
+    union {
+        LocationActionData location;
+    };
 };
 
 } // namespace neo

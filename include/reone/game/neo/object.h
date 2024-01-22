@@ -30,13 +30,21 @@ namespace game {
 
 namespace neo {
 
+class Object;
+
+class IActionExecutor {
+public:
+    virtual ~IActionExecutor() = default;
+
+    virtual bool executeAction(Object &subject, const Action &action, float dt) = 0;
+};
+
 using ActionQueue = std::queue<Action>;
 using EffectList = std::vector<Effect>;
 
 class Object : boost::noncopyable {
 public:
-    virtual void update(float dt) {
-    }
+    virtual void update(float dt);
 
     ObjectId id() const {
         return _id;
@@ -64,6 +72,11 @@ public:
 
     // Actions
 
+    void clearAllActions() {
+        ActionQueue empty;
+        std::swap(_actions, empty);
+    }
+
     void add(Action action) {
         _actions.push(std::move(action));
     }
@@ -73,6 +86,10 @@ public:
             return std::nullopt;
         }
         return _actions.front();
+    }
+
+    void setActionExecutor(IActionExecutor &actionExecutor) {
+        _actionExecutor = actionExecutor;
     }
 
     // END Actions
@@ -101,6 +118,8 @@ protected:
     ObjectId _id;
     ObjectTag _tag;
     ObjectType _type;
+
+    std::optional<std::reference_wrapper<IActionExecutor>> _actionExecutor;
 
     ObjectState _state {ObjectState::Created};
 
