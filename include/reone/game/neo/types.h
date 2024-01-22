@@ -31,6 +31,8 @@ enum class ObjectState {
 
 using ObjectId = uint32_t;
 using ObjectTag = std::string;
+using PortraitId = uint32_t;
+using AppearanceId = uint32_t;
 
 } // namespace neo
 

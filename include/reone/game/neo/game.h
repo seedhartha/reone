@@ -69,34 +69,70 @@ class Store;
 class Trigger;
 class Waypoint;
 
-class CameraController : boost::noncopyable {
+using AsyncTask = std::function<void()>;
+using AsyncTaskExecutor = std::function<void(AsyncTask)>;
+
+class PlayerCameraController : boost::noncopyable {
 public:
     bool handle(const input::Event &event);
     void update(float dt);
 
-    void setSceneNode(scene::CameraSceneNode &sceneNode) {
-        _sceneNode = sceneNode;
+    void setCamera(scene::CameraSceneNode &camera) {
+        _camera = camera;
     }
 
-    void refreshSceneNode();
+    void setCameraPosition(glm::vec3 position) {
+        _cameraPosition = std::move(position);
+    }
+
+    void setCameraFacing(float facing) {
+        _cameraFacing = facing;
+    }
+
+    void setCameraPitch(float pitch) {
+        _cameraPitch = pitch;
+    }
+
+    void setPlayer(Creature &player) {
+        _player = player;
+    }
+
+    void setGameLogicExecutor(AsyncTaskExecutor executor) {
+        _gameLogicExecutor = std::move(executor);
+    }
+
+    void refreshCamera();
+    void refreshPlayer();
 
 private:
-    struct MovementDirections {
+    struct CommandTypes {
         static constexpr int None = 0;
-        static constexpr int Right = 1 << 0;
-        static constexpr int Left = 1 << 1;
-        static constexpr int Front = 1 << 2;
-        static constexpr int Back = 1 << 3;
-        static constexpr int Up = 1 << 4;
-        static constexpr int Down = 1 << 5;
+        static constexpr int MoveCameraRight = 1 << 0;
+        static constexpr int MoveCameraLeft = 1 << 1;
+        static constexpr int MoveCameraFront = 1 << 2;
+        static constexpr int MoveCameraBack = 1 << 3;
+        static constexpr int MoveCameraUp = 1 << 4;
+        static constexpr int MoveCameraDown = 1 << 5;
+        static constexpr int RotateCameraCW = 1 << 6;
+        static constexpr int RotateCameraCCW = 1 << 7;
+        static constexpr int MovePlayerFront = 1 << 8;
+        static constexpr int MovePlayerBack = 1 << 9;
+        static constexpr int MovePlayerLeft = 1 << 10;
+        static constexpr int MovePlayerRight = 1 << 11;
     };
 
-    glm::vec3 _position {0.0f};
-    float _facing {0.0f};
-    float _pitch {glm::half_pi<float>()};
-    int _movementDir {0};
+    glm::vec3 _cameraPosition {0.0f};
+    float _cameraFacing {0.0f};
+    float _cameraPitch {0.0f};
 
-    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _sceneNode;
+    glm::vec3 _playerPosition {0.0f};
+    float _playerFacing {0.0f};
+
+    int _commandMask {0};
+
+    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _camera;
+    std::optional<std::reference_wrapper<Creature>> _player;
+    std::optional<AsyncTaskExecutor> _gameLogicExecutor;
 };
 
 class Game : public IAreaLoader, public IAreaObjectLoader, boost::noncopyable {
@@ -143,6 +179,12 @@ public:
 
     // END Module
 
+    // Player character
+
+    Creature &loadCreature(ObjectTag tag, PortraitId portraitId);
+
+    // END Player character
+
     // IAreaLoader
 
     Area &loadArea(const std::string &name) override;
@@ -181,8 +223,6 @@ public:
     // END Object factory methods
 
 private:
-    using AsyncTask = std::function<void()>;
-
     OptionsView &_options;
     SystemServices &_systemSvc;
     graphics::GraphicsServices &_graphicsSvc;
@@ -207,8 +247,9 @@ private:
     std::list<std::unique_ptr<Object>> _objects;
     std::map<ObjectId, std::reference_wrapper<Object>> _idToObject;
     std::optional<std::reference_wrapper<Module>> _module;
+    std::optional<std::reference_wrapper<Creature>> _pc;
 
-    CameraController _cameraController;
+    PlayerCameraController _playerCameraController;
     std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
     std::optional<std::reference_wrapper<scene::ModelSceneNode>> _pickedModel;
 

@@ -75,8 +75,14 @@ namespace game {
 
 namespace neo {
 
+static constexpr float kCameraDistance = 3.2f;
+static constexpr float kCameraPitch = 84.0f;
+static constexpr float kCameraHeight = 1.6f + 0.4f;
+
 static constexpr float kCameraMouseSensitity = 0.001f;
 static constexpr float kCameraMoveRate = 8.0f;
+static constexpr float kCameraTurnRate = 4.0f;
+static constexpr float kPlayerMoveRate = 4.0f;
 
 static const std::string kPickedModelFormat {R"END(
 Picked model:
@@ -92,108 +98,212 @@ Picked object:
 
 static const std::string kLogicThreadName {"game"};
 
-bool CameraController::handle(const input::Event &event) {
-    switch (event.type) {
-    case input::EventType::MouseMotion: {
-        _pitch += -kCameraMouseSensitity * event.motion.yrel;
-        _facing += -kCameraMouseSensitity * event.motion.xrel;
-        refreshSceneNode();
-        break;
-    }
-    case input::EventType::KeyDown: {
-        switch (event.key.code) {
-        case input::KeyCode::W:
-            _movementDir |= MovementDirections::Front;
+bool PlayerCameraController::handle(const input::Event &event) {
+    if (_player) {
+        switch (event.type) {
+        case input::EventType::KeyDown:
+            switch (event.key.code) {
+            case input::KeyCode::W:
+                _commandMask |= CommandTypes::MovePlayerFront;
+                return true;
+            case input::KeyCode::A:
+                _commandMask |= CommandTypes::RotateCameraCCW;
+                return true;
+            case input::KeyCode::S:
+                _commandMask |= CommandTypes::MovePlayerBack;
+                return true;
+            case input::KeyCode::D:
+                _commandMask |= CommandTypes::RotateCameraCW;
+                return true;
+            case input::KeyCode::Z:
+                _commandMask |= CommandTypes::MovePlayerLeft;
+                return true;
+            case input::KeyCode::C:
+                _commandMask |= CommandTypes::MovePlayerRight;
+                return true;
+            default:
+                break;
+            }
             break;
-        case input::KeyCode::A:
-            _movementDir |= MovementDirections::Left;
-            break;
-        case input::KeyCode::S:
-            _movementDir |= MovementDirections::Back;
-            break;
-        case input::KeyCode::D:
-            _movementDir |= MovementDirections::Right;
-            break;
-        case input::KeyCode::Q:
-            _movementDir |= MovementDirections::Up;
-            break;
-        case input::KeyCode::Z:
-            _movementDir |= MovementDirections::Down;
-            break;
-        default:
-            return false;
-        }
-        break;
-    }
-    case input::EventType::KeyUp:
-        switch (event.key.code) {
-        case input::KeyCode::W:
-            _movementDir &= ~MovementDirections::Front;
-            break;
-        case input::KeyCode::A:
-            _movementDir &= ~MovementDirections::Left;
-            break;
-        case input::KeyCode::S:
-            _movementDir &= ~MovementDirections::Back;
-            break;
-        case input::KeyCode::D:
-            _movementDir &= ~MovementDirections::Right;
-            break;
-        case input::KeyCode::Q:
-            _movementDir &= ~MovementDirections::Up;
-            break;
-        case input::KeyCode::Z:
-            _movementDir &= ~MovementDirections::Down;
+        case input::EventType::KeyUp:
+            switch (event.key.code) {
+            case input::KeyCode::W:
+                _commandMask &= ~CommandTypes::MovePlayerFront;
+                return true;
+            case input::KeyCode::A:
+                _commandMask &= ~CommandTypes::RotateCameraCCW;
+                return true;
+            case input::KeyCode::S:
+                _commandMask &= ~CommandTypes::MovePlayerBack;
+                return true;
+            case input::KeyCode::D:
+                _commandMask &= ~CommandTypes::RotateCameraCW;
+                return true;
+            case input::KeyCode::Z:
+                _commandMask &= ~CommandTypes::MovePlayerLeft;
+                return true;
+            case input::KeyCode::C:
+                _commandMask &= ~CommandTypes::MovePlayerRight;
+                return true;
+            default:
+                break;
+            }
             break;
         default:
-            return false;
+            break;
         }
-    default:
-        return false;
+    } else {
+        switch (event.type) {
+        case input::EventType::MouseMotion:
+            _cameraPitch += -kCameraMouseSensitity * event.motion.yrel;
+            _cameraFacing += -kCameraMouseSensitity * event.motion.xrel;
+            refreshCamera();
+            return true;
+        case input::EventType::KeyDown:
+            switch (event.key.code) {
+            case input::KeyCode::W:
+                _commandMask |= CommandTypes::MoveCameraFront;
+                return true;
+            case input::KeyCode::A:
+                _commandMask |= CommandTypes::MoveCameraLeft;
+                return true;
+            case input::KeyCode::S:
+                _commandMask |= CommandTypes::MoveCameraBack;
+                return true;
+            case input::KeyCode::D:
+                _commandMask |= CommandTypes::MoveCameraRight;
+                return true;
+            case input::KeyCode::Q:
+                _commandMask |= CommandTypes::MoveCameraUp;
+                return true;
+            case input::KeyCode::Z:
+                _commandMask |= CommandTypes::MoveCameraDown;
+                return true;
+            default:
+                break;
+            }
+            break;
+        case input::EventType::KeyUp:
+            switch (event.key.code) {
+            case input::KeyCode::W:
+                _commandMask &= ~CommandTypes::MoveCameraFront;
+                return true;
+            case input::KeyCode::A:
+                _commandMask &= ~CommandTypes::MoveCameraLeft;
+                return true;
+            case input::KeyCode::S:
+                _commandMask &= ~CommandTypes::MoveCameraBack;
+                return true;
+            case input::KeyCode::D:
+                _commandMask &= ~CommandTypes::MoveCameraRight;
+                return true;
+            case input::KeyCode::Q:
+                _commandMask &= ~CommandTypes::MoveCameraUp;
+                return true;
+            case input::KeyCode::Z:
+                _commandMask &= ~CommandTypes::MoveCameraDown;
+                return true;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
     }
-    return true;
+    return false;
 }
 
-void CameraController::update(float dt) {
-    if (!_movementDir) {
+void PlayerCameraController::update(float dt) {
+    if (!_commandMask) {
         return;
     }
-    float sinFacing = glm::sin(_facing);
-    float cosFacing = glm::cos(_facing);
-    float sinPitch = glm::sin(_pitch - glm::half_pi<float>());
-    float cosPitch = glm::cos(_pitch - glm::half_pi<float>());
-    if (_movementDir & MovementDirections::Right) {
-        _position.x += kCameraMoveRate * cosFacing * dt;
-        _position.y += kCameraMoveRate * sinFacing * dt;
-        _position.z += 0.0f;
-    } else if (_movementDir & MovementDirections::Left) {
-        _position.x += -kCameraMoveRate * cosFacing * dt;
-        _position.y += -kCameraMoveRate * sinFacing * dt;
-        _position.z += 0.0f;
-    } else if (_movementDir & MovementDirections::Front) {
-        _position.x -= kCameraMoveRate * sinFacing * dt;
-        _position.y += kCameraMoveRate * cosFacing * dt;
-        _position.z += kCameraMoveRate * sinPitch * dt;
-    } else if (_movementDir & MovementDirections::Back) {
-        _position.x += kCameraMoveRate * sinFacing * dt;
-        _position.y -= kCameraMoveRate * cosFacing * dt;
-        _position.z -= kCameraMoveRate * sinPitch * dt;
-    } else if (_movementDir & MovementDirections::Up) {
-        _position.x += 0.0f;
-        _position.y += 0.0f;
-        _position.z += kCameraMoveRate * dt;
-    } else if (_movementDir & MovementDirections::Down) {
-        _position.x += 0.0f;
-        _position.y += 0.0f;
-        _position.z -= kCameraMoveRate * dt;
+    if (_player) {
+        if (_commandMask & CommandTypes::RotateCameraCCW) {
+            _cameraFacing += kCameraTurnRate * dt;
+        } else if (_commandMask & CommandTypes::RotateCameraCW) {
+            _cameraFacing -= kCameraTurnRate * dt;
+        }
+        float sinFacing = glm::sin(_cameraFacing);
+        float cosFacing = glm::cos(_cameraFacing);
+        float sinPitch = glm::sin(_cameraPitch - glm::half_pi<float>());
+        float cosPitch = glm::cos(_cameraPitch - glm::half_pi<float>());
+        auto &player = _player->get();
+        _playerPosition = player.position();
+        _playerFacing = player.facing();
+        if (_commandMask & CommandTypes::MovePlayerFront) {
+            _playerPosition.x -= kPlayerMoveRate * sinFacing * dt;
+            _playerPosition.y += kPlayerMoveRate * cosFacing * dt;
+            _playerPosition.z += 0.0f;
+            _playerFacing = _cameraFacing;
+        } else if (_commandMask & CommandTypes::MovePlayerBack) {
+            _playerPosition.x += kPlayerMoveRate * sinFacing * dt;
+            _playerPosition.y -= kPlayerMoveRate * cosFacing * dt;
+            _playerPosition.z += 0.0f;
+            _playerFacing = _cameraFacing + glm::pi<float>();
+        } else if (_commandMask & CommandTypes::MovePlayerLeft) {
+            _playerPosition.x -= kPlayerMoveRate * cosFacing * dt;
+            _playerPosition.y -= kPlayerMoveRate * sinFacing * dt;
+            _playerPosition.z += 0.0f;
+            _playerFacing = _cameraFacing + glm::half_pi<float>();
+        } else if (_commandMask & CommandTypes::MovePlayerRight) {
+            _playerPosition.x += kPlayerMoveRate * cosFacing * dt;
+            _playerPosition.y += kPlayerMoveRate * sinFacing * dt;
+            _playerPosition.z += 0.0f;
+            _playerFacing = _cameraFacing - glm::half_pi<float>();
+        }
+        _cameraPosition.x = _playerPosition.x + kCameraDistance * sinFacing * cosPitch;
+        _cameraPosition.y = _playerPosition.y - kCameraDistance * cosFacing * cosPitch;
+        _cameraPosition.z = _playerPosition.z + kCameraHeight - kCameraDistance * sinPitch;
+        refreshCamera();
+        refreshPlayer();
+    } else {
+        float sinFacing = glm::sin(_cameraFacing);
+        float cosFacing = glm::cos(_cameraFacing);
+        float sinPitch = glm::sin(_cameraPitch - glm::half_pi<float>());
+        float cosPitch = glm::cos(_cameraPitch - glm::half_pi<float>());
+        if (_commandMask & CommandTypes::MoveCameraRight) {
+            _cameraPosition.x += kCameraMoveRate * cosFacing * dt;
+            _cameraPosition.y += kCameraMoveRate * sinFacing * dt;
+            _cameraPosition.z += 0.0f;
+        } else if (_commandMask & CommandTypes::MoveCameraLeft) {
+            _cameraPosition.x -= kCameraMoveRate * cosFacing * dt;
+            _cameraPosition.y -= kCameraMoveRate * sinFacing * dt;
+            _cameraPosition.z += 0.0f;
+        } else if (_commandMask & CommandTypes::MoveCameraFront) {
+            _cameraPosition.x -= kCameraMoveRate * sinFacing * dt;
+            _cameraPosition.y += kCameraMoveRate * cosFacing * dt;
+            _cameraPosition.z += kCameraMoveRate * sinPitch * dt;
+        } else if (_commandMask & CommandTypes::MoveCameraBack) {
+            _cameraPosition.x += kCameraMoveRate * sinFacing * dt;
+            _cameraPosition.y -= kCameraMoveRate * cosFacing * dt;
+            _cameraPosition.z -= kCameraMoveRate * sinPitch * dt;
+        } else if (_commandMask & CommandTypes::MoveCameraUp) {
+            _cameraPosition.x += 0.0f;
+            _cameraPosition.y += 0.0f;
+            _cameraPosition.z += kCameraMoveRate * dt;
+        } else if (_commandMask & CommandTypes::MoveCameraDown) {
+            _cameraPosition.x += 0.0f;
+            _cameraPosition.y += 0.0f;
+            _cameraPosition.z -= kCameraMoveRate * dt;
+        }
+        refreshCamera();
     }
-    refreshSceneNode();
 }
 
-void CameraController::refreshSceneNode() {
-    auto transform = glm::translate(_position);
-    transform *= glm::eulerAngleZX(_facing, _pitch);
-    _sceneNode->get().setLocalTransform(std::move(transform));
+void PlayerCameraController::refreshCamera() {
+    auto &camera = _camera->get();
+    auto transform = glm::translate(_cameraPosition);
+    transform *= glm::eulerAngleZX(_cameraFacing, _cameraPitch);
+    camera.setLocalTransform(std::move(transform));
+}
+
+void PlayerCameraController::refreshPlayer() {
+    (*_gameLogicExecutor)([this]() {
+        auto &player = _player->get();
+        player.setPosition(_playerPosition);
+        player.setFacing(_playerFacing);
+    });
 }
 
 void Game::init() {
@@ -202,15 +312,29 @@ void Game::init() {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     scene.setUpdateRoots(true);
 
-    auto camera = scene.newCamera();
-    float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
-    camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
-    scene.setActiveCamera(camera.get());
-    _cameraSceneNode = *camera;
-    _cameraController.setSceneNode(*camera);
-    _cameraController.refreshSceneNode();
-
     startModule("end_m01aa");
+
+    if (_module) {
+        auto &module = _module->get();
+        auto &pc = loadCreature("", 23);
+        _pc = pc;
+        pc.setPosition(module.entryPosition());
+        pc.setFacing(module.entryFacing());
+        module.area().add(pc);
+        _playerCameraController.setPlayer(pc);
+        _playerCameraController.setGameLogicExecutor(std::bind(&Game::runOnLogicThread, this, std::placeholders::_1));
+
+        auto camera = scene.newCamera();
+        float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
+        camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+        _playerCameraController.setCamera(*camera);
+        _playerCameraController.setCameraPosition(module.entryPosition());
+        _playerCameraController.setCameraFacing(module.entryFacing());
+        _playerCameraController.setCameraPitch(glm::radians(kCameraPitch));
+        _playerCameraController.refreshCamera();
+        _cameraSceneNode = *camera;
+        scene.setActiveCamera(camera.get());
+    }
 
     _profiler.reserveThread(kLogicThreadName);
     _logicThread = std::thread {std::bind(&Game::logicThreadFunc, this)};
@@ -229,7 +353,7 @@ void Game::deinit() {
 
 bool Game::handle(const input::Event &event) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    if (_cameraController.handle(event)) {
+    if (_playerCameraController.handle(event)) {
         return true;
     }
     switch (event.type) {
@@ -266,7 +390,7 @@ void Game::update(float dt) {
     handleEvents();
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     scene.update(dt);
-    _cameraController.update(dt);
+    _playerCameraController.update(dt);
     if (_cameraSceneNode) {
         auto &camera = *_cameraSceneNode->get().camera();
         _pickedModel = scene.pickModelRay(camera.position(), camera.forward());
@@ -533,6 +657,25 @@ Creature &Game::loadCreature(const resource::ResRef &tmplt) {
         throw ResourceNotFoundException("heads 2DA not found");
     }
     creature.load(parsedUTC, *appearance, *heads);
+    return creature;
+}
+
+Creature &Game::loadCreature(ObjectTag tag, PortraitId portraitId) {
+    auto &creature = newCreature(std::move(tag));
+    auto portraits = _resourceSvc.twoDas.get("portraits");
+    if (!portraits) {
+        throw ResourceNotFoundException("portraits 2DA not found");
+    }
+    auto appearanceId = portraits->getInt(portraitId, "appearancenumber");
+    auto appearance = _resourceSvc.twoDas.get("appearance");
+    if (!appearance) {
+        throw ResourceNotFoundException("appearance 2DA not found");
+    }
+    auto heads = _resourceSvc.twoDas.get("heads");
+    if (!heads) {
+        throw ResourceNotFoundException("heads 2DA not found");
+    }
+    creature.load(appearanceId, *appearance, *heads);
     return creature;
 }
 

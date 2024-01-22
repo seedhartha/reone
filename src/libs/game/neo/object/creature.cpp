@@ -41,8 +41,21 @@ enum class ModelType {
 void Creature::load(const UTC &utc,
                     const TwoDA &appearance,
                     const TwoDA &heads) {
+    load(
+        utc.Appearance_Type,
+        appearance,
+        heads,
+        utc.BodyVariation,
+        utc.TextureVar);
+}
+
+void Creature::load(AppearanceId appearanceId,
+                    const resource::TwoDA &appearance,
+                    const resource::TwoDA &heads,
+                    std::optional<int> bodyVariation,
+                    std::optional<int> texVariation) {
     ModelType modelType;
-    auto modelTypeStr = appearance.getString(utc.Appearance_Type, "modeltype");
+    auto modelTypeStr = appearance.getString(appearanceId, "modeltype");
     if (modelTypeStr == "F") {
         modelType = ModelType::FullBody;
     } else if (modelTypeStr == "B") {
@@ -58,25 +71,25 @@ void Creature::load(const UTC &utc,
     std::string modelColumn;
     std::string texture;
     if (modelType == ModelType::BodyAndHead) {
-        char bodyVarChar = 'a' + std::max(0, (utc.BodyVariation - 1));
+        char bodyVarChar = 'a' + std::max(0, (bodyVariation.value_or(1) - 1));
         modelColumn = "model";
         modelColumn.push_back(bodyVarChar);
 
         std::string texColumn {"tex"};
         texColumn.push_back(bodyVarChar);
-        texture = appearance.getString(utc.Appearance_Type, texColumn);
+        texture = appearance.getString(appearanceId, texColumn);
         if (!texture.empty()) {
-            texture.append(str(boost::format("%02d") % std::max(1, static_cast<int>(utc.TextureVar))));
+            texture.append(str(boost::format("%02d") % std::max(1, static_cast<int>(texVariation.value_or(1)))));
         }
 
-        uint32_t normalhead = appearance.getInt(utc.Appearance_Type, "normalhead");
+        uint32_t normalhead = appearance.getInt(appearanceId, "normalhead");
         auto normalHeadModel = heads.getString(normalhead, "head");
         if (normalHeadModel.empty()) {
             throw ValidationException("Empty normal head model name");
         }
         _appearance.normalHeadModel = std::move(normalHeadModel);
 
-        uint32_t backuphead = appearance.getInt(utc.Appearance_Type, "backuphead", -1);
+        uint32_t backuphead = appearance.getInt(appearanceId, "backuphead", -1);
         if (backuphead != -1) {
             auto backupHeadModel = heads.getString(backuphead, "head");
             if (backupHeadModel.empty()) {
@@ -86,9 +99,9 @@ void Creature::load(const UTC &utc,
         }
     } else {
         modelColumn = "race";
-        texture = appearance.getString(utc.Appearance_Type, "racetex");
+        texture = appearance.getString(appearanceId, "racetex");
     }
-    auto model = appearance.getString(utc.Appearance_Type, modelColumn);
+    auto model = appearance.getString(appearanceId, modelColumn);
     if (model.empty()) {
         throw ValidationException("Empty creature model name");
     }

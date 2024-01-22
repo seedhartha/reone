@@ -70,6 +70,12 @@ public:
               const resource::TwoDA &appearance,
               const resource::TwoDA &heads);
 
+    void load(AppearanceId appearanceId,
+              const resource::TwoDA &appearance,
+              const resource::TwoDA &heads,
+              std::optional<int> bodyVariation = std::nullopt,
+              std::optional<int> texVariation = std::nullopt);
+
     const Appearance &appearance() const {
         return _appearance;
     }
