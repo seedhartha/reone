@@ -394,8 +394,12 @@ void Game::update(float dt) {
 }
 
 void Game::handleEvents() {
-    std::lock_guard<std::mutex> lock {_eventsMutex};
-    for (auto &event : _events) {
+    EventList events;
+    {
+        std::lock_guard<std::mutex> lock {_eventsMutex};
+        std::swap(events, _events);
+    }
+    for (auto &event : events) {
         if (event.type == EventType::ObjectStateChanged && event.object.state == ObjectState::Loaded) {
             auto &object = static_cast<Object &>(_idToObject.at(event.object.objectId).get());
             if (object.type() == ObjectType::Area) {
@@ -416,7 +420,6 @@ void Game::handleEvents() {
             onObjectLocationChanged(object);
         }
     }
-    _events.clear();
 }
 
 void Game::onAreaLoaded(Area &area) {
