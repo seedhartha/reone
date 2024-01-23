@@ -157,7 +157,6 @@ bool PlayerCameraController::handle(const input::Event &event) {
         case input::EventType::MouseMotion:
             _cameraPitch += -kCameraMouseSensitity * event.motion.yrel;
             _cameraFacing += -kCameraMouseSensitity * event.motion.xrel;
-            refreshCamera();
             return true;
         case input::EventType::KeyDown:
             switch (event.key.code) {
@@ -223,8 +222,6 @@ void PlayerCameraController::update(float dt) {
         }
         float sinFacing = glm::sin(_cameraFacing);
         float cosFacing = glm::cos(_cameraFacing);
-        float sinPitch = glm::sin(_cameraPitch - glm::half_pi<float>());
-        float cosPitch = glm::cos(_cameraPitch - glm::half_pi<float>());
         if (_commandMask & CommandTypes::MovePlayerFront) {
             _playerMoveDir.x = -1000.0f * sinFacing;
             _playerMoveDir.y = 1000.0f * cosFacing;
@@ -244,20 +241,11 @@ void PlayerCameraController::update(float dt) {
         } else {
             _playerMoveDir = glm::vec3 {0.0f};
         }
-        _cameraPosition = _player->get().position() + glm::vec3 {0.0f, 0.0f, kCameraHeight};
-        _cameraPosition.x += kCameraDistance * sinFacing * cosPitch;
-        _cameraPosition.y -= kCameraDistance * cosFacing * cosPitch;
-        _cameraPosition.z += kCameraDistance * sinPitch;
-        refreshCamera();
         refreshPlayer();
     } else {
-        if (!_commandMask) {
-            return;
-        }
         float sinFacing = glm::sin(_cameraFacing);
         float cosFacing = glm::cos(_cameraFacing);
         float sinPitch = glm::sin(_cameraPitch - glm::half_pi<float>());
-        float cosPitch = glm::cos(_cameraPitch - glm::half_pi<float>());
         if (_commandMask & CommandTypes::MoveCameraRight) {
             _cameraPosition.x += kCameraMoveRate * cosFacing * dt;
             _cameraPosition.y += kCameraMoveRate * sinFacing * dt;
@@ -283,12 +271,22 @@ void PlayerCameraController::update(float dt) {
             _cameraPosition.y += 0.0f;
             _cameraPosition.z -= kCameraMoveRate * dt;
         }
-        refreshCamera();
     }
+    refreshCamera();
 }
 
 void PlayerCameraController::refreshCamera() {
-    auto &camera = _camera->get();
+    if (_playerSceneNode) {
+        float sinFacing = glm::sin(_cameraFacing);
+        float cosFacing = glm::cos(_cameraFacing);
+        float sinPitch = glm::sin(_cameraPitch - glm::half_pi<float>());
+        float cosPitch = glm::cos(_cameraPitch - glm::half_pi<float>());
+        _cameraPosition = _playerSceneNode->get().origin() + glm::vec3 {0.0f, 0.0f, kCameraHeight};
+        _cameraPosition.x += kCameraDistance * sinFacing * cosPitch;
+        _cameraPosition.y -= kCameraDistance * cosFacing * cosPitch;
+        _cameraPosition.z += kCameraDistance * sinPitch;
+    }
+    auto &camera = _cameraSceneNode->get();
     auto transform = glm::translate(_cameraPosition);
     transform *= glm::eulerAngleZX(_cameraFacing, _cameraPitch);
     camera.setLocalTransform(std::move(transform));
@@ -326,7 +324,7 @@ void Game::init() {
         auto camera = scene.newCamera();
         float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
         camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
-        _playerCameraController.setCamera(*camera);
+        _playerCameraController.setCameraSceneNode(*camera);
         _playerCameraController.setCameraFacing(module.entryFacing());
         _playerCameraController.setCameraPitch(glm::radians(kCameraPitch));
         _playerCameraController.refreshCamera();
@@ -465,6 +463,9 @@ void Game::onCreatureLoaded(Creature &creature) {
     sceneNode->setDrawDistance(_options.graphics.drawDistance);
     sceneNode->setPickable(true);
     sceneNode->setExternalRef(&creature);
+    if (creature == _pc) {
+        _playerCameraController.setPlayerSceneNode(*sceneNode);
+    }
     scene.addRoot(std::move(sceneNode));
 }
 

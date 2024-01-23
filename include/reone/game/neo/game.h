@@ -77,8 +77,8 @@ public:
     bool handle(const input::Event &event);
     void update(float dt);
 
-    void setCamera(scene::CameraSceneNode &camera) {
-        _camera = camera;
+    void setCameraSceneNode(scene::CameraSceneNode &sceneNode) {
+        _cameraSceneNode = sceneNode;
     }
 
     void setCameraPosition(glm::vec3 position) {
@@ -91,6 +91,10 @@ public:
 
     void setCameraPitch(float pitch) {
         _cameraPitch = pitch;
+    }
+
+    void setPlayerSceneNode(scene::ModelSceneNode &sceneNode) {
+        _playerSceneNode = sceneNode;
     }
 
     void setPlayer(Creature &player) {
@@ -129,7 +133,8 @@ private:
 
     int _commandMask {0};
 
-    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _camera;
+    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
+    std::optional<std::reference_wrapper<scene::ModelSceneNode>> _playerSceneNode;
     std::optional<std::reference_wrapper<Creature>> _player;
     std::optional<AsyncTaskExecutor> _gameLogicExecutor;
 };
