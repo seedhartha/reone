@@ -54,16 +54,18 @@ using EquipmentMap = std::map<InventorySlot, std::reference_wrapper<Item>>;
 
 class Creature : public SpatialObject {
 public:
+    enum class MoveType {
+        Invalid = -1,
+        None,
+        Walk,
+        Run
+    };
+
     Creature(ObjectId id, ObjectTag tag) :
         SpatialObject(
             id,
             std::move(tag),
             ObjectType::Creature) {
-
-        Event event;
-        event.type = EventType::ObjectCreated;
-        event.object.objectId = _id;
-        _events.push_back(std::move(event));
     }
 
     void load(const resource::generated::UTC &utc,
@@ -79,6 +81,16 @@ public:
     const Appearance &appearance() const {
         return _appearance;
     }
+
+    // Movement
+
+    MoveType moveType() const {
+        return _moveType;
+    }
+
+    void setMoveType(MoveType type);
+
+    // END Movement
 
     // Items
 
@@ -105,6 +117,7 @@ public:
 
 private:
     Appearance _appearance;
+    MoveType _moveType {MoveType::Invalid};
     Inventory _inventory;
     EquipmentMap _equipment;
 };

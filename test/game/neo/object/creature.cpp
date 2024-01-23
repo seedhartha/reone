@@ -35,8 +35,8 @@ TEST(creature, should_load_utc) {
     utc.BodyVariation = 1;
     utc.TextureVar = 1;
     auto appearance = TwoDA::Builder()
-                          .columns({"race", "racetex"})
-                          .row({"n_mandalorian", "n_mandalorian01"})
+                          .columns({"modeltype", "race", "racetex"})
+                          .row({"F", "n_mandalorian", "n_mandalorian01"})
                           .build();
     auto heads = TwoDA::Builder().build();
 
@@ -45,8 +45,8 @@ TEST(creature, should_load_utc) {
 
     // then
     EXPECT_TRUE(creature.is(ObjectState::Loaded));
-    EXPECT_EQ(creature.appearance().model, "n_selkath");
-    EXPECT_EQ(creature.appearance().texture, "n_selkath");
+    EXPECT_EQ(creature.appearance().model.value(), std::string {"n_mandalorian"});
+    EXPECT_EQ(creature.appearance().texture.value(), std::string {"n_mandalorian01"});
 }
 
 TEST(creature, should_load_utc_with_body_and_head_appearance) {
@@ -57,8 +57,8 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
     utc.BodyVariation = 1;
     utc.TextureVar = 1;
     auto appearance = TwoDA::Builder()
-                          .columns({"modela", "texa"})
-                          .row({"pmbal", "pmbal"})
+                          .columns({"modeltype", "modela", "texa"})
+                          .row({"B", "pmbal", "pmbal"})
                           .build();
     auto heads = TwoDA::Builder()
                      .columns({"head"})
@@ -69,8 +69,8 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
     creature.load(utc, *appearance, *heads);
 
     // then
-    EXPECT_EQ(creature.appearance().model, "pmbal");
-    EXPECT_EQ(creature.appearance().texture, "pmbal01");
+    EXPECT_EQ(creature.appearance().model.value(), std::string {"pmbal"});
+    EXPECT_EQ(creature.appearance().texture.value(), std::string {"pmbal01"});
 }
 
 TEST(creature, should_equip_item) {
@@ -84,7 +84,7 @@ TEST(creature, should_equip_item) {
     // then
     auto &equipment = creature.equipment();
     EXPECT_EQ(equipment.count(InventorySlots::rightWeapon), 1);
-    EXPECT_EQ(equipment.at(InventorySlots::rightWeapon), item);
+    EXPECT_EQ(equipment.at(InventorySlots::rightWeapon).get(), item);
 }
 
 TEST(creature, should_unequip_previously_equipped_item_on_equip) {
@@ -100,7 +100,7 @@ TEST(creature, should_unequip_previously_equipped_item_on_equip) {
     // then
     auto &equipment = creature.equipment();
     EXPECT_EQ(equipment.count(InventorySlots::rightWeapon), 1);
-    EXPECT_EQ(equipment.at(InventorySlots::rightWeapon), item2);
+    EXPECT_EQ(equipment.at(InventorySlots::rightWeapon).get(), item2);
     auto &items = creature.items();
     EXPECT_EQ(items.size(), 1);
     EXPECT_EQ(items.front().get(), item);

@@ -96,9 +96,14 @@ TEST(spatial_object, should_set_position) {
     // then
     auto position = object.position();
     EXPECT_EQ(position, (glm::vec3 {1.0f, 1.0f, 1.0f}));
-    EXPECT_EQ(object.events().size(), 1);
-    EXPECT_EQ(object.events().back().type, EventType::ObjectLocationChanged);
-    EXPECT_EQ(object.events().back().object.objectId, object.id());
+    std::vector<Event> events;
+    for (const auto &event : object.events()) {
+        events.push_back(event);
+    }
+    EXPECT_EQ(events.size(), 2);
+    EXPECT_EQ(events.at(0).type, EventType::ObjectCreated);
+    EXPECT_EQ(events.at(1).type, EventType::ObjectLocationChanged);
+    EXPECT_EQ(events.at(1).object.objectId, object.id());
 }
 
 TEST(spatial_object, should_set_facing) {
@@ -111,9 +116,14 @@ TEST(spatial_object, should_set_facing) {
     // then
     auto facing = object.facing();
     EXPECT_EQ(facing, glm::radians(270.0f));
-    EXPECT_EQ(object.events().size(), 1);
-    EXPECT_EQ(object.events().back().type, EventType::ObjectLocationChanged);
-    EXPECT_EQ(object.events().back().object.objectId, object.id());
+    std::vector<Event> events;
+    for (const auto &event : object.events()) {
+        events.push_back(event);
+    }
+    EXPECT_EQ(events.size(), 2);
+    EXPECT_EQ(events.at(0).type, EventType::ObjectCreated);
+    EXPECT_EQ(events.at(1).type, EventType::ObjectLocationChanged);
+    EXPECT_EQ(events.at(1).object.objectId, object.id());
 }
 
 TEST(spatial_object, should_set_facing_point) {
@@ -127,7 +137,13 @@ TEST(spatial_object, should_set_facing_point) {
     // then
     auto facing = object.facing();
     EXPECT_EQ(facing, glm::radians(135.0f));
-    EXPECT_EQ(object.events().size(), 2);
-    EXPECT_EQ(object.events().back().type, EventType::ObjectLocationChanged);
-    EXPECT_EQ(object.events().back().object.objectId, object.id());
+    std::vector<Event> events;
+    for (const auto &event : object.events()) {
+        events.push_back(event);
+    }
+    EXPECT_EQ(events.size(), 3);
+    EXPECT_EQ(events.at(0).type, EventType::ObjectCreated);
+    EXPECT_EQ(events.at(1).type, EventType::ObjectLocationChanged);
+    EXPECT_EQ(events.at(2).type, EventType::ObjectLocationChanged);
+    EXPECT_EQ(events.at(2).object.objectId, object.id());
 }

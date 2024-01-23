@@ -54,11 +54,6 @@ public:
             std::move(tag),
             ObjectType::Module),
         _areaLoader(areaLoader) {
-
-        Event event;
-        event.type = EventType::ObjectCreated;
-        event.object.objectId = _id;
-        _events.push_back(std::move(event));
     }
 
     void load(const resource::generated::IFO &ifo);

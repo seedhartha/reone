@@ -28,7 +28,8 @@ namespace neo {
 enum class EventType {
     ObjectCreated,
     ObjectStateChanged,
-    ObjectLocationChanged
+    ObjectLocationChanged,
+    ObjectAnimationChanged
 };
 
 struct ObjectEventData {
@@ -36,10 +37,16 @@ struct ObjectEventData {
     ObjectState state;
 };
 
+struct ObjectAnimationEventData {
+    ObjectId objectId;
+    const char *name;
+};
+
 struct Event {
     EventType type;
     union {
         ObjectEventData object;
+        ObjectAnimationEventData animation;
     };
 };
 

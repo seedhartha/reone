@@ -253,7 +253,7 @@ private:
 
     bool _inited {false};
 
-    uint32_t _ticks {0};
+    uint64_t _ticks {0};
     std::atomic_bool _quit {false};
     std::atomic_bool _paused {false};
     std::thread _logicThread;
@@ -283,6 +283,12 @@ private:
 
     // END Logic thread
 
+    // Action execution
+
+    bool executeMoveToPoint(Creature &subject, const Action &action, float dt);
+
+    // END Action execution
+
     // Event handling
 
     void handleEvents();
@@ -292,6 +298,7 @@ private:
     void onDoorLoaded(Door &door);
     void onPlaceableLoaded(Placeable &placeable);
     void onObjectLocationChanged(SpatialObject &object);
+    void onObjectAnimationChanged(Object &object, const std::string &animName);
 
     // END Event handling
 };

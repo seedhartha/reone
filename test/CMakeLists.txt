@@ -42,6 +42,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/game/neo/game.cpp
     ${TESTS_SOURCE_DIR}/game/neo/object.cpp
     ${TESTS_SOURCE_DIR}/game/neo/object/area.cpp
+    ${TESTS_SOURCE_DIR}/game/neo/object/creature.cpp
     ${TESTS_SOURCE_DIR}/game/neo/object/door.cpp
     ${TESTS_SOURCE_DIR}/game/neo/object/module.cpp
     ${TESTS_SOURCE_DIR}/game/neo/object/placeable.cpp

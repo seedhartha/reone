@@ -133,6 +133,11 @@ protected:
         _id(id),
         _tag(std::move(tag)),
         _type(type) {
+
+        Event event;
+        event.type = EventType::ObjectCreated;
+        event.object.objectId = _id;
+        _events.push_back(std::move(event));
     }
 
     void setState(ObjectState state) {

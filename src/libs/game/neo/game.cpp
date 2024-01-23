@@ -403,7 +403,7 @@ void Game::handleEvents() {
     }
     for (auto &event : events) {
         if (event.type == EventType::ObjectStateChanged && event.object.state == ObjectState::Loaded) {
-            auto &object = static_cast<Object &>(_idToObject.at(event.object.objectId).get());
+            auto &object = _idToObject.at(event.object.objectId).get();
             if (object.type() == ObjectType::Area) {
                 auto &area = static_cast<Area &>(object);
                 onAreaLoaded(area);
@@ -418,8 +418,12 @@ void Game::handleEvents() {
                 onPlaceableLoaded(placeable);
             }
         } else if (event.type == EventType::ObjectLocationChanged) {
-            auto &object = static_cast<SpatialObject &>(_idToObject.at(event.object.objectId).get());
-            onObjectLocationChanged(object);
+            auto &object = _idToObject.at(event.object.objectId).get();
+            auto &spatial = static_cast<SpatialObject &>(object);
+            onObjectLocationChanged(spatial);
+        } else if (event.type == EventType::ObjectAnimationChanged) {
+            auto &object = _idToObject.at(event.animation.objectId).get();
+            onObjectAnimationChanged(object, event.animation.name);
         }
     }
 }
@@ -550,6 +554,16 @@ void Game::onObjectLocationChanged(SpatialObject &object) {
     sceneNode->get().setLocalTransform(std::move(transform));
 }
 
+void Game::onObjectAnimationChanged(Object &object, const std::string &animName) {
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    auto sceneNode = scene.modelByExternalRef(&object);
+    if (!sceneNode) {
+        return;
+    }
+    auto props = AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate);
+    sceneNode->get().playAnimation(animName, nullptr, std::move(props));
+}
+
 void Game::render() {
     glm::ivec2 screenSize {_options.graphics.width, _options.graphics.height};
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
@@ -570,7 +584,7 @@ void Game::quit() {
 
 void Game::logicThreadFunc() {
     setThreadName(kLogicThreadName);
-    _ticks = _systemSvc.clock.millis();
+    _ticks = _systemSvc.clock.micros();
 
     while (!_quit.load(std::memory_order::memory_order_acquire)) {
         bool paused = _paused.load(std::memory_order::memory_order_acquire);
@@ -578,8 +592,8 @@ void Game::logicThreadFunc() {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
             continue;
         }
-        uint32_t ticks = _systemSvc.clock.millis();
-        float dt = (ticks - _ticks) / 1000.0f;
+        uint64_t ticks = _systemSvc.clock.micros();
+        float dt = (ticks - _ticks) / 10e5f;
         _ticks = ticks;
         _profiler.measure(kLogicThreadName, 0, [this, &dt]() {
             if (_module) {
@@ -601,6 +615,16 @@ void Game::logicThreadFunc() {
 }
 
 bool Game::executeAction(Object &subject, const Action &action, float dt) {
+    if (subject.type() == ObjectType::Creature) {
+        auto &creature = static_cast<Creature &>(subject);
+        if (action.type == ActionType::MoveToPoint) {
+            return executeMoveToPoint(creature, action, dt);
+        }
+    }
+    return false;
+}
+
+bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt) {
     static std::set<uint32_t> walkcheckSurfaces {
         1, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -609,103 +633,100 @@ bool Game::executeAction(Object &subject, const Action &action, float dt) {
         1, 3, 4, 5, 6, 9,
         10, 11, 12, 13, 14, 18, 30};
 
-    if (subject.type() == ObjectType::Creature) {
-        if (action.type == ActionType::MoveToPoint) {
-            auto &creature = static_cast<Creature &>(subject);
-            glm::vec3 delta = action.location.position - creature.position();
-            glm::vec2 delta2D = delta;
-            auto distance2D = glm::length(delta2D);
-            if (distance2D < 1.0f) {
-                return true;
-            }
-            glm::vec3 dir = glm::normalize(delta);
-            glm::vec2 dir2D = delta2D / distance2D;
-            glm::vec2 oldPos2D = creature.position();
-            glm::vec2 newPos2D = oldPos2D + kPlayerMoveRate * dir2D * dt;
-            creature.setFacingPoint(action.location.position);
+    glm::vec3 delta = action.location.position - subject.position();
+    glm::vec2 delta2D = delta;
+    auto distance2D = glm::length(delta2D);
+    if (distance2D < 1.0f) {
+        subject.setMoveType(Creature::MoveType::None);
+        return true;
+    }
+    glm::vec3 dir = glm::normalize(delta);
+    glm::vec2 dir2D = delta2D / distance2D;
+    glm::vec2 oldPos2D = subject.position();
+    glm::vec2 newPos2D = oldPos2D + kPlayerMoveRate * dir2D * dt;
+    subject.setFacingPoint(action.location.position);
 
-            // TODO: extract method
-            // First pass: Z coord and floor obstructions
-            std::optional<float> zCoord;
-            for (const auto &ow : _objectWalkmeshes) {
-                const auto &object = _idToObject.at(ow.objectId);
-                const auto &walkmesh = *ow.walkmesh;
-
-                glm::mat4 toLocal {1.0f};
-                if (object.get().type() == ObjectType::Area) {
-                    if (!walkmesh.contains(oldPos2D) &&
-                        !walkmesh.contains(newPos2D)) {
-                        continue;
-                    }
-                } else {
-                    const auto &spatial = static_cast<SpatialObject &>(object.get());
-                    float distance = glm::distance(creature.position(), spatial.position());
-                    if (distance > 4.0f) {
-                        continue;
-                    }
-                    toLocal = glm::inverse(glm::rotate(
-                        glm::translate(spatial.position()),
-                        spatial.facing(),
-                        glm::vec3 {0.0f, 0.0f, 1.0f}));
-                }
-                glm::vec3 originLocal = toLocal * glm::vec4 {newPos2D, 1000.0f, 1.0f};
-                glm::vec3 dirLocal = toLocal * glm::vec4 {0.0f, 0.0f, -1.0f, 0.0f};
-                float distance;
-                auto face = walkmesh.raycast(
-                    walkcheckSurfaces,
-                    originLocal,
-                    dirLocal,
-                    std::numeric_limits<float>::max(),
-                    distance);
-                if (face) {
-                    bool walkable = walkSurfaces.count(face->material);
-                    if (!walkable) {
-                        return false;
-                    }
-                    zCoord = 1000.0f - distance;
-                }
+    // TODO: extract method
+    // First pass: Z coord and floor obstructions
+    std::optional<float> zCoord;
+    for (const auto &ow : _objectWalkmeshes) {
+        const auto &object = _idToObject.at(ow.objectId);
+        const auto &walkmesh = *ow.walkmesh;
+        glm::mat4 toLocal {1.0f};
+        if (object.get().type() == ObjectType::Area) {
+            if (!walkmesh.contains(oldPos2D) &&
+                !walkmesh.contains(newPos2D)) {
+                continue;
             }
-            if (!zCoord) {
+        } else {
+            const auto &spatial = static_cast<SpatialObject &>(object.get());
+            float distance = glm::distance(subject.position(), spatial.position());
+            if (distance > 4.0f) {
+                continue;
+            }
+            toLocal = glm::inverse(glm::rotate(
+                glm::translate(spatial.position()),
+                spatial.facing(),
+                glm::vec3 {0.0f, 0.0f, 1.0f}));
+        }
+        glm::vec3 originLocal = toLocal * glm::vec4 {newPos2D, 1000.0f, 1.0f};
+        glm::vec3 dirLocal = toLocal * glm::vec4 {0.0f, 0.0f, -1.0f, 0.0f};
+        float distance;
+        auto face = walkmesh.raycast(
+            walkcheckSurfaces,
+            originLocal,
+            dirLocal,
+            std::numeric_limits<float>::max(),
+            distance);
+        if (face) {
+            bool walkable = walkSurfaces.count(face->material);
+            if (!walkable) {
+                subject.setMoveType(Creature::MoveType::None);
                 return false;
             }
-            // Second pass: wall obstructions
-            for (const auto &ow : _objectWalkmeshes) {
-                const auto &object = _idToObject.at(ow.objectId);
-                const auto &walkmesh = *ow.walkmesh;
-                glm::mat4 toLocal {1.0f};
-                if (object.get().type() == ObjectType::Area) {
-                    if (!walkmesh.contains(creature.position()) &&
-                        !walkmesh.contains(newPos2D)) {
-                        continue;
-                    }
-                } else {
-                    const auto &spatial = static_cast<SpatialObject &>(object.get());
-                    float distance = glm::distance(creature.position(), spatial.position());
-                    if (distance > 4.0f) {
-                        continue;
-                    }
-                    toLocal = glm::inverse(glm::rotate(
-                        glm::translate(spatial.position()),
-                        spatial.facing(),
-                        glm::vec3 {0.0f, 0.0f, 1.0f}));
-                }
-                glm::vec3 originLocal = toLocal * glm::vec4 {creature.position(), 1.0f};
-                glm::vec3 dirLocal = toLocal * glm::vec4 {dir, 0.0f};
-                float distance;
-                auto face = walkmesh.raycast(
-                    walkcheckSurfaces,
-                    originLocal + glm::vec3 {0.0f, 0.0f, 0.5f},
-                    dirLocal,
-                    kPlayerMoveRate * dt,
-                    distance);
-                if (face &&
-                    walkSurfaces.count(face->material) == 0) {
-                    return false;
-                }
-            }
-            creature.setPosition(glm::vec3 {newPos2D, *zCoord});
+            zCoord = 1000.0f - distance;
         }
     }
+    if (!zCoord) {
+        return false;
+    }
+    // Second pass: wall obstructions
+    for (const auto &ow : _objectWalkmeshes) {
+        const auto &object = _idToObject.at(ow.objectId);
+        const auto &walkmesh = *ow.walkmesh;
+        glm::mat4 toLocal {1.0f};
+        if (object.get().type() == ObjectType::Area) {
+            if (!walkmesh.contains(oldPos2D) &&
+                !walkmesh.contains(newPos2D)) {
+                continue;
+            }
+        } else {
+            const auto &spatial = static_cast<SpatialObject &>(object.get());
+            float distance = glm::distance(subject.position(), spatial.position());
+            if (distance > 4.0f) {
+                continue;
+            }
+            toLocal = glm::inverse(glm::rotate(
+                glm::translate(spatial.position()),
+                spatial.facing(),
+                glm::vec3 {0.0f, 0.0f, 1.0f}));
+        }
+        glm::vec3 originLocal = toLocal * glm::vec4 {subject.position(), 1.0f};
+        glm::vec3 dirLocal = toLocal * glm::vec4 {dir, 0.0f};
+        float distance;
+        auto face = walkmesh.raycast(
+            walkcheckSurfaces,
+            originLocal + glm::vec3 {0.0f, 0.0f, 0.5f},
+            dirLocal,
+            kPlayerMoveRate * dt,
+            distance);
+        if (face && walkSurfaces.count(face->material) == 0) {
+            subject.setMoveType(Creature::MoveType::None);
+            return false;
+        }
+    }
+    subject.setMoveType(Creature::MoveType::Run);
+    subject.setPosition(glm::vec3 {newPos2D, *zCoord});
     return false;
 }
 

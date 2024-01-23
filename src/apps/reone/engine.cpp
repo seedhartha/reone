@@ -197,8 +197,8 @@ int Engine::run() {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
             continue;
         }
-        auto ticks = clock.millis();
-        auto frameTime = (ticks - _ticks) / 1000.0f;
+        uint64_t ticks = clock.micros();
+        auto frameTime = (ticks - _ticks) / 10e5f;
         _ticks = ticks;
         _profiler->measure(kMainThreadName, kProfilerInputTimeIndex, [this, &quit]() {
             while (!_events.empty()) {

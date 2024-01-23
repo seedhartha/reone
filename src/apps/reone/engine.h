@@ -87,7 +87,7 @@ private:
 
     std::queue<input::Event> _events;
 
-    uint32_t _ticks {0};
+    uint64_t _ticks {0};
 
     bool _showCursor {true};
     bool _relativeMouseMode {false};
