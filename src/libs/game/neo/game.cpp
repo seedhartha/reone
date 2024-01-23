@@ -43,6 +43,7 @@
 #include "reone/resource/provider/paths.h"
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/provider/visibilities.h"
+#include "reone/resource/provider/walkmeshes.h"
 #include "reone/resource/template/generated/are.h"
 #include "reone/resource/template/generated/git.h"
 #include "reone/resource/template/generated/ifo.h"
@@ -62,6 +63,7 @@
 #include "reone/system/di/services.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
 #include "reone/system/threadutil.h"
 
 using namespace reone::graphics;
@@ -432,6 +434,15 @@ void Game::onAreaLoaded(Area &area) {
         auto sceneNode = scene.newModel(*model, ModelUsage::Room);
         sceneNode->setLocalTransform(glm::translate(room.position));
         scene.addRoot(std::move(sceneNode));
+        auto walkmesh = _resourceSvc.walkmeshes.get(room.model, ResType::Wok);
+        if (walkmesh) {
+            ObjectWalkmesh ow;
+            ow.objectId = area.id();
+            ow.walkmesh = walkmesh.get();
+            _objectWalkmeshes.push_back(std::move(ow));
+        } else {
+            warn("Room walkmesh not found: " + room.model);
+        }
     }
 }
 
@@ -487,6 +498,17 @@ void Game::onDoorLoaded(Door &door) {
     sceneNode->setPickable(true);
     sceneNode->setExternalRef(&door);
     scene.addRoot(std::move(sceneNode));
+    for (int i = 0; i < 3; ++i) {
+        auto walkmesh = _resourceSvc.walkmeshes.get(modelName + std::to_string(i), ResType::Dwk);
+        if (walkmesh) {
+            ObjectWalkmesh ow;
+            ow.objectId = door.id();
+            ow.walkmesh = walkmesh.get();
+            _objectWalkmeshes.push_back(std::move(ow));
+        } else {
+            warn("Door walkmesh not found: " + modelName);
+        }
+    }
 }
 
 void Game::onPlaceableLoaded(Placeable &placeable) {
@@ -504,6 +526,15 @@ void Game::onPlaceableLoaded(Placeable &placeable) {
     sceneNode->setPickable(true);
     sceneNode->setExternalRef(&placeable);
     scene.addRoot(std::move(sceneNode));
+    auto walkmesh = _resourceSvc.walkmeshes.get(modelName, ResType::Pwk);
+    if (walkmesh) {
+        ObjectWalkmesh ow;
+        ow.objectId = placeable.id();
+        ow.walkmesh = walkmesh.get();
+        _objectWalkmeshes.push_back(std::move(ow));
+    } else {
+        warn("Placeable walkmesh not found: " + modelName);
+    }
 }
 
 void Game::onObjectLocationChanged(SpatialObject &object) {
@@ -570,17 +601,109 @@ void Game::logicThreadFunc() {
 }
 
 bool Game::executeAction(Object &subject, const Action &action, float dt) {
+    static std::set<uint32_t> walkcheckSurfaces {
+        1, 3, 4, 5, 6, 7, 8, 9,
+        10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+        30};
+    static std::set<uint32_t> walkSurfaces {
+        1, 3, 4, 5, 6, 9,
+        10, 11, 12, 13, 14, 18, 30};
+
     if (subject.type() == ObjectType::Creature) {
         if (action.type == ActionType::MoveToPoint) {
             auto &creature = static_cast<Creature &>(subject);
-            auto delta = action.location.position - creature.position();
-            auto distance = glm::length(delta);
-            if (distance < 1.0f) {
+            glm::vec3 delta = action.location.position - creature.position();
+            glm::vec2 delta2D = delta;
+            auto distance2D = glm::length(delta2D);
+            if (distance2D < 1.0f) {
                 return true;
             }
-            auto dir = delta / distance;
+            glm::vec3 dir = glm::normalize(delta);
+            glm::vec2 dir2D = delta2D / distance2D;
+            glm::vec2 oldPos2D = creature.position();
+            glm::vec2 newPos2D = oldPos2D + kPlayerMoveRate * dir2D * dt;
             creature.setFacingPoint(action.location.position);
-            creature.setPosition(creature.position() + kPlayerMoveRate * dir * dt);
+
+            // TODO: extract method
+            // First pass: Z coord and floor obstructions
+            std::optional<float> zCoord;
+            for (const auto &ow : _objectWalkmeshes) {
+                const auto &object = _idToObject.at(ow.objectId);
+                const auto &walkmesh = *ow.walkmesh;
+
+                glm::mat4 toLocal {1.0f};
+                if (object.get().type() == ObjectType::Area) {
+                    if (!walkmesh.contains(oldPos2D) &&
+                        !walkmesh.contains(newPos2D)) {
+                        continue;
+                    }
+                } else {
+                    const auto &spatial = static_cast<SpatialObject &>(object.get());
+                    float distance = glm::distance(creature.position(), spatial.position());
+                    if (distance > 4.0f) {
+                        continue;
+                    }
+                    toLocal = glm::inverse(glm::rotate(
+                        glm::translate(spatial.position()),
+                        spatial.facing(),
+                        glm::vec3 {0.0f, 0.0f, 1.0f}));
+                }
+                glm::vec3 originLocal = toLocal * glm::vec4 {newPos2D, 1000.0f, 1.0f};
+                glm::vec3 dirLocal = toLocal * glm::vec4 {0.0f, 0.0f, -1.0f, 0.0f};
+                float distance;
+                auto face = walkmesh.raycast(
+                    walkcheckSurfaces,
+                    originLocal,
+                    dirLocal,
+                    std::numeric_limits<float>::max(),
+                    distance);
+                if (face) {
+                    bool walkable = walkSurfaces.count(face->material);
+                    if (!walkable) {
+                        return false;
+                    }
+                    zCoord = 1000.0f - distance;
+                }
+            }
+            if (!zCoord) {
+                return false;
+            }
+            // Second pass: wall obstructions
+            for (const auto &ow : _objectWalkmeshes) {
+                const auto &object = _idToObject.at(ow.objectId);
+                const auto &walkmesh = *ow.walkmesh;
+                glm::mat4 toLocal {1.0f};
+                if (object.get().type() == ObjectType::Area) {
+                    if (!walkmesh.contains(creature.position()) &&
+                        !walkmesh.contains(newPos2D)) {
+                        continue;
+                    }
+                } else {
+                    const auto &spatial = static_cast<SpatialObject &>(object.get());
+                    float distance = glm::distance(creature.position(), spatial.position());
+                    if (distance > 4.0f) {
+                        continue;
+                    }
+                    toLocal = glm::inverse(glm::rotate(
+                        glm::translate(spatial.position()),
+                        spatial.facing(),
+                        glm::vec3 {0.0f, 0.0f, 1.0f}));
+                }
+                glm::vec3 originLocal = toLocal * glm::vec4 {creature.position(), 1.0f};
+                glm::vec3 dirLocal = toLocal * glm::vec4 {dir, 0.0f};
+                float distance;
+                auto face = walkmesh.raycast(
+                    walkcheckSurfaces,
+                    originLocal + glm::vec3 {0.0f, 0.0f, 0.5f},
+                    dirLocal,
+                    kPlayerMoveRate * dt,
+                    distance);
+                if (face &&
+                    walkSurfaces.count(face->material) == 0) {
+                    return false;
+                }
+            }
+            creature.setPosition(glm::vec3 {newPos2D, *zCoord});
         }
     }
     return false;

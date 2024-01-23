@@ -34,7 +34,9 @@ namespace graphics {
 
 struct GraphicsServices;
 
-}
+class Walkmesh;
+
+} // namespace graphics
 
 namespace resource {
 
@@ -236,6 +238,11 @@ public:
     // END Object factory methods
 
 private:
+    struct ObjectWalkmesh {
+        ObjectId objectId {0};
+        graphics::Walkmesh *walkmesh {nullptr};
+    };
+
     OptionsView &_options;
     SystemServices &_systemSvc;
     graphics::GraphicsServices &_graphicsSvc;
@@ -259,6 +266,7 @@ private:
     ObjectId _nextObjectId {2};
     std::list<std::unique_ptr<Object>> _objects;
     std::map<ObjectId, std::reference_wrapper<Object>> _idToObject;
+    std::list<ObjectWalkmesh> _objectWalkmeshes;
     std::optional<std::reference_wrapper<Module>> _module;
     std::optional<std::reference_wrapper<Creature>> _pc;
 
