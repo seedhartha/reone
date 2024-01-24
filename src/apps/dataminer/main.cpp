@@ -19,6 +19,7 @@
 #include "reone/resource/typeutil.h"
 #include "reone/system/checkutil.h"
 
+#include "2daparsers.h"
 #include "gffparsers.h"
 #include "guis.h"
 #include "models.h"
@@ -79,36 +80,36 @@ int main(int argc, char **argv) {
             }
         }
 
-        if (job == "routines") {
+        if (job == "models") {
+            checkThat(static_cast<bool>(k1Dir), "Missing required k1dir argument");
+            checkThat(static_cast<bool>(k2Dir), "Missing required k2dir argument");
+            analyzeModels(*k1Dir, *k2Dir);
+        } else if (job == "2daparsers") {
             checkThat(static_cast<bool>(k1Dir), "Missing required k1dir argument");
             checkThat(static_cast<bool>(k2Dir), "Missing required k2dir argument");
             checkThat(static_cast<bool>(destDir), "Missing required destdir argument");
-            generateRoutines(*k1Dir, *k2Dir, *destDir);
-
+            generate2DAParsers(*k1Dir, *k2Dir, *destDir);
         } else if (job == "gffparsers") {
             checkThat(static_cast<bool>(k1Dir), "Missing required k1dir argument");
             checkThat(static_cast<bool>(k2Dir), "Missing required k2dir argument");
             checkThat(static_cast<bool>(destDir), "Missing required destdir argument");
             checkThat(static_cast<bool>(restype), "Missing required restype argument");
             generateGffParsers(*restype, *k1Dir, *k2Dir, *destDir);
-
         } else if (job == "guis") {
             checkThat(static_cast<bool>(k1Dir), "Missing required k1dir argument");
             checkThat(static_cast<bool>(k2Dir), "Missing required k2dir argument");
             checkThat(static_cast<bool>(destDir), "Missing required destdir argument");
             generateGuis(*k1Dir, *k2Dir, *destDir);
-
-        } else if (job == "models") {
+        } else if (job == "routines") {
             checkThat(static_cast<bool>(k1Dir), "Missing required k1dir argument");
             checkThat(static_cast<bool>(k2Dir), "Missing required k2dir argument");
-            analyzeModels(*k1Dir, *k2Dir);
-
+            checkThat(static_cast<bool>(destDir), "Missing required destdir argument");
+            generateRoutines(*k1Dir, *k2Dir, *destDir);
         } else {
             throw std::runtime_error("Invalid job argument: " + job);
         }
 
         return 0;
-
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
         return -1;

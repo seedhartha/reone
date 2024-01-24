@@ -129,7 +129,7 @@ void Item::loadUTI(const resource::generated::UTI &uti) {
     _criticalThreat = baseItems->getInt(_baseItem, "critthreat");
     _damageFlags = baseItems->getInt(_baseItem, "damageflags");
     _dieToRoll = baseItems->getInt(_baseItem, "dietoroll");
-    _equipableSlots = baseItems->getHexUint(_baseItem, "equipableslots", 0);
+    _equipableSlots = baseItems->getHexInt(_baseItem, "equipableslots", 0);
     _itemClass = boost::to_lower_copy(baseItems->getString(_baseItem, "itemclass"));
     _numDice = baseItems->getInt(_baseItem, "numdice");
     _weaponType = static_cast<WeaponType>(baseItems->getInt(_baseItem, "weapontype"));

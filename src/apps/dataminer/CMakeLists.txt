@@ -16,6 +16,7 @@
 set(DATAMINER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/dataminer)
 
 set(DATAMINER_HEADERS
+    ${DATAMINER_SOURCE_DIR}/2daparsers.h
     ${DATAMINER_SOURCE_DIR}/code.h
     ${DATAMINER_SOURCE_DIR}/gffparsers.h
     ${DATAMINER_SOURCE_DIR}/guis.h
@@ -23,6 +24,7 @@ set(DATAMINER_HEADERS
     ${DATAMINER_SOURCE_DIR}/routines.h)
 
 set(DATAMINER_SOURCES
+    ${DATAMINER_SOURCE_DIR}/2daparsers.cpp
     ${DATAMINER_SOURCE_DIR}/gffparsers.cpp
     ${DATAMINER_SOURCE_DIR}/guis.cpp
     ${DATAMINER_SOURCE_DIR}/main.cpp

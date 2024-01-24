@@ -39,11 +39,11 @@ void Feats::init() {
         std::string name(_strings.getText(feats->getInt(row, "name", -1)));
         std::string description(_strings.getText(feats->getInt(row, "description", -1)));
         std::shared_ptr<Texture> icon(_textures.get(feats->getString(row, "icon"), TextureUsage::GUI));
-        uint32_t minCharLevel = feats->getHexUint(row, "mincharlevel");
-        auto preReqFeat1 = static_cast<FeatType>(feats->getHexUint(row, "prereqfeat1"));
-        auto preReqFeat2 = static_cast<FeatType>(feats->getHexUint(row, "prereqfeat2"));
-        auto successor = static_cast<FeatType>(feats->getHexUint(row, "successor"));
-        uint32_t pips = feats->getHexUint(row, "pips");
+        uint32_t minCharLevel = feats->getHexInt(row, "mincharlevel");
+        auto preReqFeat1 = static_cast<FeatType>(feats->getHexInt(row, "prereqfeat1"));
+        auto preReqFeat2 = static_cast<FeatType>(feats->getHexInt(row, "prereqfeat2"));
+        auto successor = static_cast<FeatType>(feats->getHexInt(row, "successor"));
+        uint32_t pips = feats->getHexInt(row, "pips");
 
         auto feat = std::make_shared<Feat>();
         feat->name = std::move(name);

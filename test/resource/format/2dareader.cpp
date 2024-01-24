@@ -55,7 +55,7 @@ TEST(two_da_reader, should_read_two_da) {
 
     // then
 
-    auto twoDa = reader.twoDa();
+    auto twoDa = reader.twoDA();
     EXPECT_EQ(twoDa->getColumnCount(), 2);
     EXPECT_EQ(twoDa->getRowCount(), 2);
     EXPECT_EQ(std::string("unique"), twoDa->getString(0, "key"));

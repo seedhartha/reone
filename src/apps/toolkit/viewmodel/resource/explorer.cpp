@@ -169,7 +169,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
     } else if (id.type == ResType::TwoDA) {
         auto reader = TwoDAReader(data);
         reader.load();
-        auto twoDa = reader.twoDa();
+        auto twoDa = reader.twoDA();
 
         auto columns = std::vector<TableColumn>();
         for (auto &column : twoDa->columns()) {

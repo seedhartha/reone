@@ -79,9 +79,15 @@ public:
 
     std::string getString(int row, const std::string &column, std::string defValue = "") const;
     int getInt(int row, const std::string &column, int defValue = 0) const;
-    uint32_t getHexUint(int row, const std::string &column, uint32_t defValue = 0) const;
+    uint32_t getHexInt(int row, const std::string &column, uint32_t defValue = 0) const;
     float getFloat(int row, const std::string &column, float defValue = 0.0f) const;
     bool getBool(int row, const std::string &column, bool defValue = false) const;
+
+    std::optional<std::string> getStringOpt(int row, const std::string &column) const;
+    std::optional<int> getIntOpt(int row, const std::string &column) const;
+    std::optional<uint32_t> getHexIntOpt(int row, const std::string &column) const;
+    std::optional<float> getFloatOpt(int row, const std::string &column) const;
+    std::optional<bool> getBoolOpt(int row, const std::string &column) const;
 
     const std::vector<std::string> &columns() const { return _columns; }
     const std::vector<Row> &rows() const { return _rows; }

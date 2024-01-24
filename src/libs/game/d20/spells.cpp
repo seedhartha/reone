@@ -38,7 +38,7 @@ void Spells::init() {
         std::string name(_strings.getText(spells->getInt(row, "name", -1)));
         std::string description(_strings.getText(spells->getInt(row, "spelldesc", -1)));
         std::shared_ptr<Texture> icon(_textures.get(spells->getString(row, "iconresref"), TextureUsage::GUI));
-        uint32_t pips = spells->getHexUint(row, "pips");
+        uint32_t pips = spells->getHexInt(row, "pips");
 
         auto spell = std::make_shared<Spell>();
         spell->name = std::move(name);

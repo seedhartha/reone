@@ -34,7 +34,7 @@ std::shared_ptr<TwoDA> TwoDAs::get(const std::string &resRef) {
         MemoryInputStream stream(res->data);
         TwoDAReader reader(stream);
         reader.load();
-        return reader.twoDa();
+        return reader.twoDA();
     });
 }
 

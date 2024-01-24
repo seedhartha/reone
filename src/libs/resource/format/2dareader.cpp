@@ -39,6 +39,9 @@ void TwoDAReader::load() {
 }
 
 void TwoDAReader::loadRows() {
+    if (_rowCount == 0) {
+        return;
+    }
     _rows.reserve(_rowCount);
 
     int columnCount = static_cast<int>(_columns.size());
