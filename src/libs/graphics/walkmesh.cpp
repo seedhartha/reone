@@ -34,13 +34,21 @@ const Walkmesh::Face *Walkmesh::raycast(
     }
 
     // For placeable and door walkmeshes, test all faces for intersection
-    glm::vec2 baryPosition(0.0f);
     float distance = 0.0f;
+    float minDistance = std::numeric_limits<float>::max();
+    std::optional<std::reference_wrapper<const Face>> intersected;
     for (auto &face : _faces) {
-        if (raycastFace(surfaces, face, origin, dir, maxDistance, distance)) {
-            outDistance = distance;
-            return &face;
+        if (!raycastFace(surfaces, face, origin, dir, maxDistance, distance)) {
+            continue;
         }
+        if (distance < minDistance) {
+            minDistance = distance;
+            intersected = face;
+        }
+    }
+    if (intersected) {
+        outDistance = minDistance;
+        return &intersected->get();
     }
 
     return nullptr;

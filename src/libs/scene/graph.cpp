@@ -839,8 +839,8 @@ bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollisio
 }
 
 bool SceneGraph::testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const {
-    glm::vec3 originToDest(dest - origin);
-    glm::vec3 dir(glm::normalize(originToDest));
+    auto originToDest = dest - origin;
+    auto dir = glm::normalize(originToDest);
     float maxDistance = glm::length(originToDest);
     float minDistance = std::numeric_limits<float>::max();
 
@@ -848,16 +848,24 @@ bool SceneGraph::testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest,
         if (!root->isEnabled()) {
             continue;
         }
-        if (!root->walkmesh().isAreaWalkmesh()) {
-            float distance2 = root->getSquareDistanceTo(origin);
-            if (distance2 > kMaxCollisionDistanceLineOfSight2) {
+        glm::vec3 originLocal;
+        glm::vec3 dirLocal;
+        if (root->walkmesh().isAreaWalkmesh()) {
+            if (!root->walkmesh().contains(origin) &&
+                !root->walkmesh().contains(dest)) {
                 continue;
             }
+            originLocal = origin;
+            dirLocal = dir;
+        } else {
+            if (root->getSquareDistanceTo(origin) > kMaxCollisionDistanceLineOfSight2) {
+                continue;
+            }
+            originLocal = root->absoluteTransformInverse() * glm::vec4 {origin, 1.0f};
+            dirLocal = root->absoluteTransformInverse() * glm::vec4 {dir, 0.0f};
         }
-        glm::vec3 objSpaceOrigin(root->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
-        glm::vec3 objSpaceDir(root->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
         float distance = 0.0f;
-        auto face = root->walkmesh().raycast(_lineOfSightSurfaces, objSpaceOrigin, objSpaceDir, maxDistance, distance);
+        auto face = root->walkmesh().raycast(_lineOfSightSurfaces, originLocal, dirLocal, maxDistance, distance);
         if (!face || distance > minDistance) {
             continue;
         }

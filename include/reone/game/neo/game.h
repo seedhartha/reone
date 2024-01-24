@@ -48,6 +48,8 @@ namespace scene {
 
 struct SceneServices;
 
+class ISceneGraph;
+
 class CameraSceneNode;
 class ModelSceneNode;
 
@@ -76,6 +78,10 @@ using AsyncTaskExecutor = std::function<void(AsyncTask)>;
 
 class PlayerCameraController : boost::noncopyable {
 public:
+    PlayerCameraController(scene::ISceneGraph &scene) :
+        _scene(scene) {
+    }
+
     bool handle(const input::Event &event);
     void update(float dt);
 
@@ -126,6 +132,8 @@ private:
         static constexpr int MovePlayerLeft = 1 << 10;
         static constexpr int MovePlayerRight = 1 << 11;
     };
+
+    scene::ISceneGraph &_scene;
 
     glm::vec3 _cameraPosition {0.0f};
     float _cameraFacing {0.0f};
@@ -270,7 +278,7 @@ private:
     std::optional<std::reference_wrapper<Module>> _module;
     std::optional<std::reference_wrapper<Creature>> _pc;
 
-    PlayerCameraController _playerCameraController;
+    std::unique_ptr<PlayerCameraController> _playerCameraController;
     std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
     std::optional<std::reference_wrapper<scene::ModelSceneNode>> _pickedModel;
 

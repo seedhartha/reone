@@ -37,6 +37,7 @@
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/parser/2da/portraits.h"
+#include "reone/resource/parser/2da/surfacemat.h"
 #include "reone/resource/parser/gff/are.h"
 #include "reone/resource/parser/gff/git.h"
 #include "reone/resource/parser/gff/ifo.h"
@@ -284,10 +285,19 @@ void PlayerCameraController::refreshCamera() {
         float cosFacing = glm::cos(_cameraFacing);
         float sinPitch = glm::sin(_cameraPitch - glm::half_pi<float>());
         float cosPitch = glm::cos(_cameraPitch - glm::half_pi<float>());
-        _cameraPosition = _playerSceneNode->get().origin() + glm::vec3 {0.0f, 0.0f, kCameraHeight};
-        _cameraPosition.x += kCameraDistance * sinFacing * cosPitch;
-        _cameraPosition.y -= kCameraDistance * cosFacing * cosPitch;
-        _cameraPosition.z += kCameraDistance * sinPitch;
+        auto cameraTarget = _playerSceneNode->get().origin() + glm::vec3 {0.0f, 0.0f, kCameraHeight};
+        glm::vec3 targetCameraDir {sinFacing * cosPitch,
+                                   -cosFacing * cosPitch,
+                                   sinPitch};
+        Collision collision;
+        if (_scene.testLineOfSight(
+                cameraTarget,
+                cameraTarget + kCameraDistance * targetCameraDir,
+                collision)) {
+            _cameraPosition = collision.intersection;
+        } else {
+            _cameraPosition = cameraTarget + kCameraDistance * targetCameraDir;
+        }
     }
     auto &camera = _cameraSceneNode->get();
     auto transform = glm::translate(_cameraPosition);
@@ -309,8 +319,31 @@ void PlayerCameraController::refreshPlayer() {
 void Game::init() {
     checkThat(!_inited, "Must not be initialized");
 
+    auto surfacemat = _resourceSvc.twoDas.get("surfacemat");
+    if (!surfacemat) {
+        throw ResourceNotFoundException("surfacemat 2DA not found");
+    }
+    std::set<uint32_t> walkMaterials;
+    std::set<uint32_t> walkcheckMaterials;
+    std::set<uint32_t> lineOfSightMaterials;
+    for (size_t i = 0; i < surfacemat->getRowCount(); ++i) {
+        auto row = parse_surfacemat(*surfacemat, i);
+        if (row.walk) {
+            walkMaterials.insert(i);
+        }
+        if (row.walkcheck) {
+            walkcheckMaterials.insert(i);
+        }
+        if (row.lineofsight) {
+            lineOfSightMaterials.insert(i);
+        }
+    }
+
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    scene.setLineOfSightSurfaces(std::move(lineOfSightMaterials));
     scene.setUpdateRoots(true);
+
+    _playerCameraController = std::make_unique<PlayerCameraController>(scene);
 
     startModule("end_m01aa");
 
@@ -321,16 +354,16 @@ void Game::init() {
         pc.setPosition(module.entryPosition());
         pc.setFacing(module.entryFacing());
         module.area().add(pc);
-        _playerCameraController.setPlayer(pc);
-        _playerCameraController.setGameLogicExecutor(std::bind(&Game::runOnLogicThread, this, std::placeholders::_1));
+        _playerCameraController->setPlayer(pc);
+        _playerCameraController->setGameLogicExecutor(std::bind(&Game::runOnLogicThread, this, std::placeholders::_1));
 
         auto camera = scene.newCamera();
         float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
         camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
-        _playerCameraController.setCameraSceneNode(*camera);
-        _playerCameraController.setCameraFacing(module.entryFacing());
-        _playerCameraController.setCameraPitch(glm::radians(kCameraPitch));
-        _playerCameraController.refreshCamera();
+        _playerCameraController->setCameraSceneNode(*camera);
+        _playerCameraController->setCameraFacing(module.entryFacing());
+        _playerCameraController->setCameraPitch(glm::radians(kCameraPitch));
+        _playerCameraController->refreshCamera();
         _cameraSceneNode = *camera;
         scene.setActiveCamera(camera.get());
     }
@@ -352,7 +385,7 @@ void Game::deinit() {
 
 bool Game::handle(const input::Event &event) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    if (_playerCameraController.handle(event)) {
+    if (_playerCameraController->handle(event)) {
         return true;
     }
     switch (event.type) {
@@ -389,7 +422,7 @@ void Game::update(float dt) {
     handleEvents();
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     scene.update(dt);
-    _playerCameraController.update(dt);
+    _playerCameraController->update(dt);
     if (_cameraSceneNode) {
         auto &camera = *_cameraSceneNode->get().camera();
         _pickedModel = scene.pickModelRay(camera.position(), camera.forward());
@@ -445,6 +478,8 @@ void Game::onAreaLoaded(Area &area) {
             ow.objectId = area.id();
             ow.walkmesh = walkmesh.get();
             _objectWalkmeshes.push_back(std::move(ow));
+            auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
+            scene.addRoot(std::move(walkmeshSceneNode));
         } else {
             warn("Room walkmesh not found: " + room.model);
         }
@@ -483,7 +518,7 @@ void Game::onCreatureLoaded(Creature &creature) {
     sceneNode->setPickable(true);
     sceneNode->setExternalRef(&creature);
     if (creature == _pc) {
-        _playerCameraController.setPlayerSceneNode(*sceneNode);
+        _playerCameraController->setPlayerSceneNode(*sceneNode);
     }
     scene.addRoot(std::move(sceneNode));
 }
@@ -498,7 +533,7 @@ void Game::onDoorLoaded(Door &door) {
     auto transform = glm::translate(door.position());
     transform *= glm::eulerAngleZ(door.facing());
     auto sceneNode = scene.newModel(*model, ModelUsage::Door);
-    sceneNode->setLocalTransform(std::move(transform));
+    sceneNode->setLocalTransform(transform);
     // sceneNode->setDrawDistance(_options.graphics.drawDistance);
     sceneNode->setPickable(true);
     sceneNode->setExternalRef(&door);
@@ -510,6 +545,9 @@ void Game::onDoorLoaded(Door &door) {
             ow.objectId = door.id();
             ow.walkmesh = walkmesh.get();
             _objectWalkmeshes.push_back(std::move(ow));
+            auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
+            walkmeshSceneNode->setLocalTransform(transform);
+            scene.addRoot(std::move(walkmeshSceneNode));
         } else {
             warn("Door walkmesh not found: " + modelName);
         }
@@ -526,7 +564,7 @@ void Game::onPlaceableLoaded(Placeable &placeable) {
     auto transform = glm::translate(placeable.position());
     transform *= glm::eulerAngleZ(placeable.facing());
     auto sceneNode = scene.newModel(*model, ModelUsage::Placeable);
-    sceneNode->setLocalTransform(std::move(transform));
+    sceneNode->setLocalTransform(transform);
     sceneNode->setDrawDistance(_options.graphics.drawDistance);
     sceneNode->setPickable(true);
     sceneNode->setExternalRef(&placeable);
@@ -537,6 +575,9 @@ void Game::onPlaceableLoaded(Placeable &placeable) {
         ow.objectId = placeable.id();
         ow.walkmesh = walkmesh.get();
         _objectWalkmeshes.push_back(std::move(ow));
+        auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
+        walkmeshSceneNode->setLocalTransform(transform);
+        scene.addRoot(std::move(walkmeshSceneNode));
     } else {
         warn("Placeable walkmesh not found: " + modelName);
     }
