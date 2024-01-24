@@ -19,7 +19,7 @@
 
 #include "reone/graphics/texture.h"
 
-#include "reone/resource/template/generated/are.h"
+#include "reone/resource/parser/gff/are.h"
 
 namespace reone {
 

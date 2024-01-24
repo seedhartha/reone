@@ -20,7 +20,7 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/types.h"
 
-#include "reone/resource/template/generated/gui.h"
+#include "reone/resource/parser/gff/gui.h"
 #include "types.h"
 
 namespace reone {

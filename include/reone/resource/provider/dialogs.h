@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../dialog.h"
-#include "../template/generated/dlg.h"
+#include "../parser/gff/dlg.h"
 
 namespace reone {
 

@@ -22,7 +22,7 @@
 
 #include "reone/game/neo/object/area.h"
 #include "reone/game/neo/object/module.h"
-#include "reone/resource/template/generated/ifo.h"
+#include "reone/resource/parser/gff/ifo.h"
 
 using namespace reone::game;
 using namespace reone::game::neo;

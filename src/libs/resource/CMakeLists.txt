@@ -77,21 +77,21 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/resref.h
     ${RESOURCE_INCLUDE_DIR}/strings.h
     ${RESOURCE_INCLUDE_DIR}/talktable.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/are.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/dlg.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/git.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/gui.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/ifo.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/pth.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/utc.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/utd.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/ute.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/uti.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/utm.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/utp.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/uts.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/utt.h
-    ${RESOURCE_INCLUDE_DIR}/template/generated/utw.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/are.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/dlg.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/git.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/gui.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/ifo.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/pth.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/utc.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/utd.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/ute.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/uti.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/utm.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/utp.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/uts.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/utt.h
+    ${RESOURCE_INCLUDE_DIR}/parser/gff/utw.h
     ${RESOURCE_INCLUDE_DIR}/types.h
     ${RESOURCE_INCLUDE_DIR}/typeutil.h)
 
@@ -145,21 +145,21 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/resources.cpp
     ${RESOURCE_SOURCE_DIR}/strings.cpp
     ${RESOURCE_SOURCE_DIR}/talktable.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/are.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/dlg.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/git.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/gui.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/ifo.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/pth.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/utc.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/utd.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/ute.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/uti.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/utm.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/utp.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/uts.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/utt.cpp
-    ${RESOURCE_SOURCE_DIR}/template/generated/utw.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/are.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/dlg.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/git.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/gui.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/ifo.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/pth.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/utc.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/utd.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/ute.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/uti.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/utm.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/utp.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/uts.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/utt.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/gff/utw.cpp
     ${RESOURCE_SOURCE_DIR}/typeutil.cpp)
 
 add_library(resource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES} ${CLANG_FORMAT_PATH})

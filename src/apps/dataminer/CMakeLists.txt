@@ -17,17 +17,17 @@ set(DATAMINER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/dataminer)
 
 set(DATAMINER_HEADERS
     ${DATAMINER_SOURCE_DIR}/code.h
+    ${DATAMINER_SOURCE_DIR}/gffparsers.h
     ${DATAMINER_SOURCE_DIR}/guis.h
     ${DATAMINER_SOURCE_DIR}/models.h
-    ${DATAMINER_SOURCE_DIR}/routines.h
-    ${DATAMINER_SOURCE_DIR}/templates.h)
+    ${DATAMINER_SOURCE_DIR}/routines.h)
 
 set(DATAMINER_SOURCES
+    ${DATAMINER_SOURCE_DIR}/gffparsers.cpp
     ${DATAMINER_SOURCE_DIR}/guis.cpp
     ${DATAMINER_SOURCE_DIR}/main.cpp
     ${DATAMINER_SOURCE_DIR}/models.cpp
-    ${DATAMINER_SOURCE_DIR}/routines.cpp
-    ${DATAMINER_SOURCE_DIR}/templates.cpp)
+    ${DATAMINER_SOURCE_DIR}/routines.cpp)
 
 add_executable(dataminer ${DATAMINER_SOURCES} ${DATAMINER_HEADERS} ${CLANG_FORMAT_PATH})
 set_target_properties(dataminer PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)

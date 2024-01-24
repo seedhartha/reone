@@ -20,7 +20,7 @@
 #include "reone/graphics/types.h"
 #include "reone/input/event.h"
 #include "reone/resource/format/gffreader.h"
-#include "reone/resource/template/generated/ifo.h"
+#include "reone/resource/parser/gff/ifo.h"
 #include "reone/resource/types.h"
 
 #include "../contextaction.h"

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/template/generated/utw.h"
+#include "reone/resource/parser/gff/pth.h"
 
 #include "reone/resource/gff.h"
 
@@ -25,19 +25,29 @@ namespace resource {
 
 namespace generated {
 
-UTW parseUTW(const Gff &gff) {
-    UTW strct;
-    strct.Appearance = gff.getUint("Appearance");
-    strct.Comment = gff.getString("Comment");
-    strct.Description = std::make_pair(gff.getInt("Description"), gff.getString("Description"));
-    strct.HasMapNote = gff.getUint("HasMapNote");
-    strct.LinkedTo = gff.getString("LinkedTo");
-    strct.LocalizedName = std::make_pair(gff.getInt("LocalizedName"), gff.getString("LocalizedName"));
-    strct.MapNote = std::make_pair(gff.getInt("MapNote"), gff.getString("MapNote"));
-    strct.MapNoteEnabled = gff.getUint("MapNoteEnabled");
-    strct.PaletteID = gff.getUint("PaletteID");
-    strct.Tag = gff.getString("Tag");
-    strct.TemplateResRef = gff.getString("TemplateResRef");
+static PTH_Path_Points parsePTH_Path_Points(const Gff &gff) {
+    PTH_Path_Points strct;
+    strct.Conections = gff.getUint("Conections");
+    strct.First_Conection = gff.getUint("First_Conection");
+    strct.X = gff.getFloat("X");
+    strct.Y = gff.getFloat("Y");
+    return strct;
+}
+
+static PTH_Path_Conections parsePTH_Path_Conections(const Gff &gff) {
+    PTH_Path_Conections strct;
+    strct.Destination = gff.getUint("Destination");
+    return strct;
+}
+
+PTH parsePTH(const Gff &gff) {
+    PTH strct;
+    for (auto &item : gff.getList("Path_Conections")) {
+        strct.Path_Conections.push_back(parsePTH_Path_Conections(*item));
+    }
+    for (auto &item : gff.getList("Path_Points")) {
+        strct.Path_Points.push_back(parsePTH_Path_Points(*item));
+    }
     return strct;
 }
 

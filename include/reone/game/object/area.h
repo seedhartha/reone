@@ -21,8 +21,8 @@
 #include "reone/graphics/types.h"
 #include "reone/input/event.h"
 #include "reone/resource/format/gffreader.h"
-#include "reone/resource/template/generated/are.h"
-#include "reone/resource/template/generated/git.h"
+#include "reone/resource/parser/gff/are.h"
+#include "reone/resource/parser/gff/git.h"
 #include "reone/resource/types.h"
 #include "reone/system/timer.h"
 

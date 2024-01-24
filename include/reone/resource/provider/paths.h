@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include "../parser/gff/pth.h"
 #include "../path.h"
-#include "../template/generated/pth.h"
 
 namespace reone {
 

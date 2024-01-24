@@ -20,8 +20,8 @@
 #include "reone/resource/gff.h"
 
 #include "../object.h"
-#include "reone/resource/template/generated/git.h"
-#include "reone/resource/template/generated/ute.h"
+#include "reone/resource/parser/gff/git.h"
+#include "reone/resource/parser/gff/ute.h"
 
 namespace reone {
 

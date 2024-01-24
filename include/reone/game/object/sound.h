@@ -18,8 +18,8 @@
 #pragma once
 
 #include "../object.h"
-#include "reone/resource/template/generated/git.h"
-#include "reone/resource/template/generated/uts.h"
+#include "reone/resource/parser/gff/git.h"
+#include "reone/resource/parser/gff/uts.h"
 
 namespace reone {
 

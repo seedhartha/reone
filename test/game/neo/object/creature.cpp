@@ -20,7 +20,7 @@
 #include "reone/game/neo/object/creature.h"
 #include "reone/game/neo/object/item.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/template/generated/utc.h"
+#include "reone/resource/parser/gff/utc.h"
 
 using namespace reone::game;
 using namespace reone::game::neo;

@@ -21,9 +21,9 @@
 #include "../../../fixtures/neogame.h"
 
 #include "reone/resource/layout.h"
+#include "reone/resource/parser/gff/are.h"
+#include "reone/resource/parser/gff/git.h"
 #include "reone/resource/path.h"
-#include "reone/resource/template/generated/are.h"
-#include "reone/resource/template/generated/git.h"
 
 using namespace reone::game;
 using namespace reone::game::neo;

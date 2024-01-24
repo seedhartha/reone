@@ -18,7 +18,7 @@
 #pragma once
 
 #include "reone/input/event.h"
-#include "reone/resource/template/generated/git.h"
+#include "reone/resource/parser/gff/git.h"
 
 #include "../object.h"
 

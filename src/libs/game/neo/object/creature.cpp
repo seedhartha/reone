@@ -19,7 +19,7 @@
 
 #include "reone/game/neo/object/item.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/template/generated/utc.h"
+#include "reone/resource/parser/gff/utc.h"
 #include "reone/system/exception/validation.h"
 
 using namespace reone::resource;

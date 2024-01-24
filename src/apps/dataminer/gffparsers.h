@@ -21,9 +21,9 @@
 
 namespace reone {
 
-void generateTemplates(resource::ResType resType,
-                       const std::filesystem::path &k1dir,
-                       const std::filesystem::path &k2dir,
-                       const std::filesystem::path &destDir);
+void generateGffParsers(resource::ResType resType,
+                        const std::filesystem::path &k1dir,
+                        const std::filesystem::path &k2dir,
+                        const std::filesystem::path &destDir);
 
 } // namespace reone

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/template/generated/ute.h"
+#include "reone/resource/parser/gff/ute.h"
 
 #include "reone/resource/gff.h"
 

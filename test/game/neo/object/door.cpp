@@ -19,7 +19,7 @@
 
 #include "reone/game/neo/object/door.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/template/generated/utd.h"
+#include "reone/resource/parser/gff/utd.h"
 
 using namespace reone::game;
 using namespace reone::game::neo;

@@ -21,8 +21,8 @@
 #include "reone/scene/node/walkmesh.h"
 
 #include "../object.h"
-#include "reone/resource/template/generated/git.h"
-#include "reone/resource/template/generated/utd.h"
+#include "reone/resource/parser/gff/git.h"
+#include "reone/resource/parser/gff/utd.h"
 
 namespace reone {
 

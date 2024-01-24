@@ -27,9 +27,9 @@
 #include "reone/game/neo/object/trigger.h"
 #include "reone/game/neo/object/waypoint.h"
 #include "reone/resource/layout.h"
+#include "reone/resource/parser/gff/are.h"
+#include "reone/resource/parser/gff/git.h"
 #include "reone/resource/path.h"
-#include "reone/resource/template/generated/are.h"
-#include "reone/resource/template/generated/git.h"
 #include "reone/system/exception/validation.h"
 
 using namespace reone::resource;

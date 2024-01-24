@@ -25,7 +25,7 @@
 
 #include "../object.h"
 #include "../types.h"
-#include "reone/resource/template/generated/uti.h"
+#include "reone/resource/parser/gff/uti.h"
 
 namespace reone {
 

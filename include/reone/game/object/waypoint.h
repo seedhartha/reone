@@ -20,8 +20,8 @@
 #include "reone/resource/format/gffreader.h"
 
 #include "../object.h"
-#include "reone/resource/template/generated/git.h"
-#include "reone/resource/template/generated/utw.h"
+#include "reone/resource/parser/gff/git.h"
+#include "reone/resource/parser/gff/utw.h"
 
 namespace reone {
 

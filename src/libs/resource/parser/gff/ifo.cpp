@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/template/generated/ifo.h"
+#include "reone/resource/parser/gff/ifo.h"
 
 #include "reone/resource/gff.h"
 

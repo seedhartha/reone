@@ -19,7 +19,7 @@
 
 #include "reone/game/neo/object/placeable.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/template/generated/utp.h"
+#include "reone/resource/parser/gff/utp.h"
 
 using namespace reone::game;
 using namespace reone::game::neo;

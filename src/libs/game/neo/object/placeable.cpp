@@ -18,7 +18,7 @@
 #include "reone/game/neo/object/placeable.h"
 
 #include "reone/resource/2da.h"
-#include "reone/resource/template/generated/utp.h"
+#include "reone/resource/parser/gff/utp.h"
 #include "reone/system/exception/validation.h"
 
 using namespace reone::resource;

@@ -19,10 +19,10 @@
 #include "reone/resource/typeutil.h"
 #include "reone/system/checkutil.h"
 
+#include "gffparsers.h"
 #include "guis.h"
 #include "models.h"
 #include "routines.h"
-#include "templates.h"
 
 using namespace reone;
 using namespace reone::resource;
@@ -85,12 +85,12 @@ int main(int argc, char **argv) {
             checkThat(static_cast<bool>(destDir), "Missing required destdir argument");
             generateRoutines(*k1Dir, *k2Dir, *destDir);
 
-        } else if (job == "templates") {
+        } else if (job == "gffparsers") {
             checkThat(static_cast<bool>(k1Dir), "Missing required k1dir argument");
             checkThat(static_cast<bool>(k2Dir), "Missing required k2dir argument");
             checkThat(static_cast<bool>(destDir), "Missing required destdir argument");
             checkThat(static_cast<bool>(restype), "Missing required restype argument");
-            generateTemplates(*restype, *k1Dir, *k2Dir, *destDir);
+            generateGffParsers(*restype, *k1Dir, *k2Dir, *destDir);
 
         } else if (job == "guis") {
             checkThat(static_cast<bool>(k1Dir), "Missing required k1dir argument");

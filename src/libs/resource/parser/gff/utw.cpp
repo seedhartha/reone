@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/template/generated/utm.h"
+#include "reone/resource/parser/gff/utw.h"
 
 #include "reone/resource/gff.h"
 
@@ -25,29 +25,19 @@ namespace resource {
 
 namespace generated {
 
-static UTM_ItemList parseUTM_ItemList(const Gff &gff) {
-    UTM_ItemList strct;
-    strct.Infinite = gff.getUint("Infinite");
-    strct.InventoryRes = gff.getString("InventoryRes");
-    strct.Repos_PosX = gff.getUint("Repos_PosX");
-    strct.Repos_Posy = gff.getUint("Repos_Posy");
-    return strct;
-}
-
-UTM parseUTM(const Gff &gff) {
-    UTM strct;
-    strct.BuySellFlag = gff.getUint("BuySellFlag");
+UTW parseUTW(const Gff &gff) {
+    UTW strct;
+    strct.Appearance = gff.getUint("Appearance");
     strct.Comment = gff.getString("Comment");
-    strct.ID = gff.getUint("ID");
-    for (auto &item : gff.getList("ItemList")) {
-        strct.ItemList.push_back(parseUTM_ItemList(*item));
-    }
-    strct.LocName = std::make_pair(gff.getInt("LocName"), gff.getString("LocName"));
-    strct.MarkDown = gff.getInt("MarkDown");
-    strct.MarkUp = gff.getInt("MarkUp");
-    strct.OnOpenStore = gff.getString("OnOpenStore");
-    strct.ResRef = gff.getString("ResRef");
+    strct.Description = std::make_pair(gff.getInt("Description"), gff.getString("Description"));
+    strct.HasMapNote = gff.getUint("HasMapNote");
+    strct.LinkedTo = gff.getString("LinkedTo");
+    strct.LocalizedName = std::make_pair(gff.getInt("LocalizedName"), gff.getString("LocalizedName"));
+    strct.MapNote = std::make_pair(gff.getInt("MapNote"), gff.getString("MapNote"));
+    strct.MapNoteEnabled = gff.getUint("MapNoteEnabled");
+    strct.PaletteID = gff.getUint("PaletteID");
     strct.Tag = gff.getString("Tag");
+    strct.TemplateResRef = gff.getString("TemplateResRef");
     return strct;
 }
 

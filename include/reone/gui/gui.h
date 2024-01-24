@@ -21,7 +21,7 @@
 #include "reone/graphics/options.h"
 #include "reone/input/event.h"
 #include "reone/resource/di/services.h"
-#include "reone/resource/template/generated/gui.h"
+#include "reone/resource/parser/gff/gui.h"
 
 #include "control.h"
 

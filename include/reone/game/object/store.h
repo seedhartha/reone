@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../object.h"
-#include "reone/resource/template/generated/utm.h"
+#include "reone/resource/parser/gff/utm.h"
 
 namespace reone {
 

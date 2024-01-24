@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "templates.h"
+#include "gffparsers.h"
 
 #include "reone/resource/container/erf.h"
 #include "reone/resource/container/keybif.h"
@@ -290,10 +290,10 @@ static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>
     writer.write("} // namespace reone\n");
 }
 
-void generateTemplates(resource::ResType resType,
-                       const std::filesystem::path &k1dir,
-                       const std::filesystem::path &k2dir,
-                       const std::filesystem::path &destDir) {
+void generateGffParsers(resource::ResType resType,
+                        const std::filesystem::path &k1dir,
+                        const std::filesystem::path &k2dir,
+                        const std::filesystem::path &destDir) {
     std::map<std::string, std::shared_ptr<Gff>> trees;
 
     auto keyPath = getFileIgnoreCase(k2dir, "chitin.key");

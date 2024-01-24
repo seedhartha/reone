@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/template/generated/pth.h"
+#include "reone/resource/parser/gff/utm.h"
 
 #include "reone/resource/gff.h"
 
@@ -25,29 +25,29 @@ namespace resource {
 
 namespace generated {
 
-static PTH_Path_Points parsePTH_Path_Points(const Gff &gff) {
-    PTH_Path_Points strct;
-    strct.Conections = gff.getUint("Conections");
-    strct.First_Conection = gff.getUint("First_Conection");
-    strct.X = gff.getFloat("X");
-    strct.Y = gff.getFloat("Y");
+static UTM_ItemList parseUTM_ItemList(const Gff &gff) {
+    UTM_ItemList strct;
+    strct.Infinite = gff.getUint("Infinite");
+    strct.InventoryRes = gff.getString("InventoryRes");
+    strct.Repos_PosX = gff.getUint("Repos_PosX");
+    strct.Repos_Posy = gff.getUint("Repos_Posy");
     return strct;
 }
 
-static PTH_Path_Conections parsePTH_Path_Conections(const Gff &gff) {
-    PTH_Path_Conections strct;
-    strct.Destination = gff.getUint("Destination");
-    return strct;
-}
-
-PTH parsePTH(const Gff &gff) {
-    PTH strct;
-    for (auto &item : gff.getList("Path_Conections")) {
-        strct.Path_Conections.push_back(parsePTH_Path_Conections(*item));
+UTM parseUTM(const Gff &gff) {
+    UTM strct;
+    strct.BuySellFlag = gff.getUint("BuySellFlag");
+    strct.Comment = gff.getString("Comment");
+    strct.ID = gff.getUint("ID");
+    for (auto &item : gff.getList("ItemList")) {
+        strct.ItemList.push_back(parseUTM_ItemList(*item));
     }
-    for (auto &item : gff.getList("Path_Points")) {
-        strct.Path_Points.push_back(parsePTH_Path_Points(*item));
-    }
+    strct.LocName = std::make_pair(gff.getInt("LocName"), gff.getString("LocName"));
+    strct.MarkDown = gff.getInt("MarkDown");
+    strct.MarkUp = gff.getInt("MarkUp");
+    strct.OnOpenStore = gff.getString("OnOpenStore");
+    strct.ResRef = gff.getString("ResRef");
+    strct.Tag = gff.getString("Tag");
     return strct;
 }
 
