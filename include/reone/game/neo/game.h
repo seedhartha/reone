@@ -23,6 +23,7 @@
 
 #include "../options.h"
 
+#include "controller/playercamera.h"
 #include "object/area.h"
 #include "object/module.h"
 
@@ -48,8 +49,6 @@ namespace scene {
 
 struct SceneServices;
 
-class ISceneGraph;
-
 class CameraSceneNode;
 class ModelSceneNode;
 
@@ -72,82 +71,6 @@ class Sound;
 class Store;
 class Trigger;
 class Waypoint;
-
-using AsyncTask = std::function<void()>;
-using AsyncTaskExecutor = std::function<void(AsyncTask)>;
-
-class PlayerCameraController : boost::noncopyable {
-public:
-    PlayerCameraController(scene::ISceneGraph &scene) :
-        _scene(scene) {
-    }
-
-    bool handle(const input::Event &event);
-    void update(float dt);
-
-    void setCameraSceneNode(scene::CameraSceneNode &sceneNode) {
-        _cameraSceneNode = sceneNode;
-    }
-
-    void setCameraPosition(glm::vec3 position) {
-        _cameraPosition = std::move(position);
-    }
-
-    void setCameraFacing(float facing) {
-        _cameraFacing = facing;
-    }
-
-    void setCameraPitch(float pitch) {
-        _cameraPitch = pitch;
-    }
-
-    void setPlayerSceneNode(scene::ModelSceneNode &sceneNode) {
-        _playerSceneNode = sceneNode;
-    }
-
-    void setPlayer(Creature &player) {
-        _player = player;
-    }
-
-    void setGameLogicExecutor(AsyncTaskExecutor executor) {
-        _gameLogicExecutor = std::move(executor);
-    }
-
-    void refreshCamera();
-    void refreshPlayer();
-
-private:
-    struct CommandTypes {
-        static constexpr int None = 0;
-        static constexpr int MoveCameraRight = 1 << 0;
-        static constexpr int MoveCameraLeft = 1 << 1;
-        static constexpr int MoveCameraFront = 1 << 2;
-        static constexpr int MoveCameraBack = 1 << 3;
-        static constexpr int MoveCameraUp = 1 << 4;
-        static constexpr int MoveCameraDown = 1 << 5;
-        static constexpr int RotateCameraCW = 1 << 6;
-        static constexpr int RotateCameraCCW = 1 << 7;
-        static constexpr int MovePlayerFront = 1 << 8;
-        static constexpr int MovePlayerBack = 1 << 9;
-        static constexpr int MovePlayerLeft = 1 << 10;
-        static constexpr int MovePlayerRight = 1 << 11;
-    };
-
-    scene::ISceneGraph &_scene;
-
-    glm::vec3 _cameraPosition {0.0f};
-    float _cameraFacing {0.0f};
-    float _cameraPitch {0.0f};
-
-    glm::vec3 _playerMoveDir {0.0f};
-
-    int _commandMask {0};
-
-    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
-    std::optional<std::reference_wrapper<scene::ModelSceneNode>> _playerSceneNode;
-    std::optional<std::reference_wrapper<Creature>> _player;
-    std::optional<AsyncTaskExecutor> _gameLogicExecutor;
-};
 
 class Game : public IAreaLoader,
              public IAreaObjectLoader,
