@@ -205,6 +205,10 @@ private:
     std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
     std::optional<std::reference_wrapper<scene::ModelSceneNode>> _pickedModel;
 
+    std::set<uint32_t> _walkSurfaceMaterials;
+    std::set<uint32_t> _walkcheckSurfaceMaterials;
+    std::set<uint32_t> _lineOfSightSurfaceMaterials;
+
     // Logic thread
 
     void logicThreadFunc();

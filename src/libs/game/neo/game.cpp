@@ -103,24 +103,21 @@ void Game::init() {
     if (!surfacemat) {
         throw ResourceNotFoundException("surfacemat 2DA not found");
     }
-    std::set<uint32_t> walkMaterials;
-    std::set<uint32_t> walkcheckMaterials;
-    std::set<uint32_t> lineOfSightMaterials;
     for (size_t i = 0; i < surfacemat->getRowCount(); ++i) {
         auto row = parse_surfacemat(*surfacemat, i);
         if (row.walk) {
-            walkMaterials.insert(i);
+            _walkSurfaceMaterials.insert(i);
         }
         if (row.walkcheck) {
-            walkcheckMaterials.insert(i);
+            _walkcheckSurfaceMaterials.insert(i);
         }
         if (row.lineofsight) {
-            lineOfSightMaterials.insert(i);
+            _lineOfSightSurfaceMaterials.insert(i);
         }
     }
 
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    scene.setLineOfSightSurfaces(std::move(lineOfSightMaterials));
+    scene.setLineOfSightSurfaces(_lineOfSightSurfaceMaterials);
     scene.setUpdateRoots(true);
 
     _playerCameraController = std::make_unique<PlayerCameraController>(scene);
@@ -447,14 +444,6 @@ bool Game::executeAction(Object &subject, const Action &action, float dt) {
 }
 
 bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt) {
-    static std::set<uint32_t> walkcheckSurfaces {
-        1, 3, 4, 5, 6, 7, 8, 9,
-        10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-        30};
-    static std::set<uint32_t> walkSurfaces {
-        1, 3, 4, 5, 6, 9,
-        10, 11, 12, 13, 14, 18, 30};
-
     glm::vec3 delta = action.location.position - subject.position();
     glm::vec2 delta2D = delta;
     auto distance2D = glm::length(delta2D);
@@ -495,13 +484,13 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
         glm::vec3 dirLocal = toLocal * glm::vec4 {0.0f, 0.0f, -1.0f, 0.0f};
         float distance;
         auto face = walkmesh.raycast(
-            walkcheckSurfaces,
+            _walkcheckSurfaceMaterials,
             originLocal,
             dirLocal,
             std::numeric_limits<float>::max(),
             distance);
         if (face) {
-            bool walkable = walkSurfaces.count(face->material);
+            bool walkable = _walkSurfaceMaterials.count(face->material);
             if (!walkable) {
                 subject.setMoveType(Creature::MoveType::None);
                 return false;
@@ -537,12 +526,12 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
         glm::vec3 dirLocal = toLocal * glm::vec4 {dir, 0.0f};
         float distance;
         auto face = walkmesh.raycast(
-            walkcheckSurfaces,
+            _walkcheckSurfaceMaterials,
             originLocal + glm::vec3 {0.0f, 0.0f, 0.5f},
             dirLocal,
             kPlayerMoveRate * dt,
             distance);
-        if (face && walkSurfaces.count(face->material) == 0) {
+        if (face && _walkSurfaceMaterials.count(face->material) == 0) {
             subject.setMoveType(Creature::MoveType::None);
             return false;
         }
