@@ -78,12 +78,10 @@ void Context::clearColor(glm::vec4 color) {
 }
 
 void Context::clearDepth() {
-    checkMainThread();
     glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void Context::clearColorDepth(glm::vec4 color) {
-    checkMainThread();
     glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

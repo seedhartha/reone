@@ -108,7 +108,6 @@ void AudioSource::render() {
     if (!_source) {
         return;
     }
-    checkMainThread();
     if (!_streaming) {
         ALint state = 0;
         alGetSourcei(_source, AL_SOURCE_STATE, &state);
@@ -142,7 +141,6 @@ void AudioSource::play() {
     if (!_source) {
         return;
     }
-    checkMainThread();
     alSourcePlay(_source);
     _playing = true;
 }
@@ -152,7 +150,6 @@ void AudioSource::stop() {
     if (!_source) {
         return;
     }
-    checkMainThread();
     alSourceStop(_source);
 }
 
@@ -165,7 +162,6 @@ void AudioSource::setPosition(glm::vec3 position) {
         return;
     }
     if (_source) {
-        checkMainThread();
         alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
     }
     _position = std::move(position);
