@@ -36,6 +36,7 @@
 #include "reone/graphics/shaderregistry.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
+#include "reone/resource/parser/2da/portraits.h"
 #include "reone/resource/parser/gff/are.h"
 #include "reone/resource/parser/gff/git.h"
 #include "reone/resource/parser/gff/ifo.h"
@@ -829,7 +830,6 @@ Creature &Game::loadCreature(ObjectTag tag, PortraitId portraitId) {
     if (!portraits) {
         throw ResourceNotFoundException("portraits 2DA not found");
     }
-    auto appearanceId = portraits->getInt(portraitId, "appearancenumber");
     auto appearance = _resourceSvc.twoDas.get("appearance");
     if (!appearance) {
         throw ResourceNotFoundException("appearance 2DA not found");
@@ -838,7 +838,8 @@ Creature &Game::loadCreature(ObjectTag tag, PortraitId portraitId) {
     if (!heads) {
         throw ResourceNotFoundException("heads 2DA not found");
     }
-    creature.load(appearanceId, *appearance, *heads);
+    auto portraitsRow = parse_portraits(*portraits, portraitId);
+    creature.load(*portraitsRow.appearancenumber, *appearance, *heads);
     return creature;
 }
 

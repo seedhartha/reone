@@ -57,8 +57,8 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
     utc.BodyVariation = 1;
     utc.TextureVar = 1;
     auto appearance = TwoDA::Builder()
-                          .columns({"modeltype", "modela", "texa"})
-                          .row({"B", "pmbal", "pmbal"})
+                          .columns({"modeltype", "modela", "texa", "normalhead"})
+                          .row({"B", "pmbal", "pmbal", "0"})
                           .build();
     auto heads = TwoDA::Builder()
                      .columns({"head"})

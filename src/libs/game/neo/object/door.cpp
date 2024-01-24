@@ -17,7 +17,7 @@
 
 #include "reone/game/neo/object/door.h"
 
-#include "reone/resource/2da.h"
+#include "reone/resource/parser/2da/genericdoors.h"
 #include "reone/resource/parser/gff/utd.h"
 #include "reone/system/exception/validation.h"
 
@@ -32,11 +32,8 @@ namespace neo {
 
 void Door::load(const UTD &utd,
                 const TwoDA &genericDoors) {
-    auto modelName = genericDoors.getString(utd.GenericType, "modelname");
-    if (modelName.empty()) {
-        throw ValidationException("Empty door model name");
-    }
-    _modelName = std::move(modelName);
+    auto genericDoorsRow = parse_genericdoors(genericDoors, utd.GenericType);
+    _modelName = genericDoorsRow.modelname;
     setState(ObjectState::Loaded);
 }
 

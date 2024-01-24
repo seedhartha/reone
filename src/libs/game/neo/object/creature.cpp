@@ -18,7 +18,8 @@
 #include "reone/game/neo/object/creature.h"
 
 #include "reone/game/neo/object/item.h"
-#include "reone/resource/2da.h"
+#include "reone/resource/parser/2da/appearance.h"
+#include "reone/resource/parser/2da/heads.h"
 #include "reone/resource/parser/gff/utc.h"
 #include "reone/system/exception/validation.h"
 
@@ -54,18 +55,19 @@ void Creature::load(AppearanceId appearanceId,
                     const resource::TwoDA &heads,
                     std::optional<int> bodyVariation,
                     std::optional<int> texVariation) {
+    auto appearanceRow = parse_appearance(appearance, appearanceId);
+
     ModelType modelType;
-    auto modelTypeStr = appearance.getString(appearanceId, "modeltype");
-    if (modelTypeStr == "F") {
+    if (appearanceRow.modeltype == "F") {
         modelType = ModelType::FullBody;
-    } else if (modelTypeStr == "B") {
+    } else if (appearanceRow.modeltype == "B") {
         modelType = ModelType::BodyAndHead;
-    } else if (modelTypeStr == "S") {
+    } else if (appearanceRow.modeltype == "S") {
         modelType = ModelType::S;
-    } else if (modelTypeStr == "L") {
+    } else if (appearanceRow.modeltype == "L") {
         modelType = ModelType::L;
     } else {
-        throw ValidationException("Unexpected creature model type: " + modelTypeStr);
+        throw ValidationException("Unexpected creature model type: " + appearanceRow.modeltype);
     }
 
     std::string modelColumn;
@@ -82,24 +84,25 @@ void Creature::load(AppearanceId appearanceId,
             texture.append(str(boost::format("%02d") % std::max(1, static_cast<int>(texVariation.value_or(1)))));
         }
 
-        uint32_t normalhead = appearance.getInt(appearanceId, "normalhead");
-        auto normalHeadModel = heads.getString(normalhead, "head");
-        if (normalHeadModel.empty()) {
+        if (!appearanceRow.normalhead) {
+            throw ValidationException("Normal head not defined");
+        }
+        auto normalHeadRow = parse_heads(heads, *appearanceRow.normalhead);
+        if (!normalHeadRow.head) {
             throw ValidationException("Empty normal head model name");
         }
-        _appearance.normalHeadModel = std::move(normalHeadModel);
+        _appearance.normalHeadModel = *normalHeadRow.head;
 
-        uint32_t backuphead = appearance.getInt(appearanceId, "backuphead", -1);
-        if (backuphead != -1) {
-            auto backupHeadModel = heads.getString(backuphead, "head");
-            if (backupHeadModel.empty()) {
+        if (appearanceRow.backuphead) {
+            auto backupHeadRow = parse_heads(heads, *appearanceRow.backuphead);
+            if (!backupHeadRow.head) {
                 throw ValidationException("Empty backup head model name");
             }
-            _appearance.backupHeadModel = std::move(backupHeadModel);
+            _appearance.backupHeadModel = *backupHeadRow.head;
         }
     } else {
         modelColumn = "race";
-        texture = appearance.getString(appearanceId, "racetex");
+        texture = appearanceRow.racetex.value_or("");
     }
     auto model = appearance.getString(appearanceId, modelColumn);
     if (model.empty()) {

@@ -17,7 +17,7 @@
 
 #include "reone/game/neo/object/placeable.h"
 
-#include "reone/resource/2da.h"
+#include "reone/resource/parser/2da/placeables.h"
 #include "reone/resource/parser/gff/utp.h"
 #include "reone/system/exception/validation.h"
 
@@ -32,11 +32,11 @@ namespace neo {
 
 void Placeable::load(const UTP &utp,
                      const TwoDA &placeables) {
-    auto modelName = placeables.getString(utp.Appearance, "modelname");
-    if (modelName.empty()) {
+    auto placeablesRow = parse_placeables(placeables, utp.Appearance);
+    if (!placeablesRow.modelname) {
         throw ValidationException("Empty placeable model name");
     }
-    _modelName = std::move(modelName);
+    _modelName = *placeablesRow.modelname;
     setState(ObjectState::Loaded);
 }
 
