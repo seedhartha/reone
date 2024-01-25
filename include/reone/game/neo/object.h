@@ -70,6 +70,10 @@ public:
         return this == &that;
     }
 
+    bool operator!=(const Object &that) const {
+        return this != &that;
+    }
+
     // Actions
 
     void clearAllActions() {

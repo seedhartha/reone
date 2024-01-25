@@ -139,8 +139,8 @@ void Engine::init() {
         *_console,
         *_profiler);
     _neoGame->init();
-    showCursor(false);
-    setRelativeMouseMode(true);
+    // showCursor(false);
+    // setRelativeMouseMode(true);
 #else
     _game = std::make_unique<Game>(
         gameId,

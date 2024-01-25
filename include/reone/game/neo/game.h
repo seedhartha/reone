@@ -24,6 +24,7 @@
 #include "../options.h"
 
 #include "controller/playercamera.h"
+#include "controller/selection.h"
 #include "object/area.h"
 #include "object/module.h"
 
@@ -201,13 +202,18 @@ private:
     std::optional<std::reference_wrapper<Module>> _module;
     std::optional<std::reference_wrapper<Creature>> _pc;
 
-    std::unique_ptr<PlayerCameraController> _playerCameraController;
     std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
-    std::optional<std::reference_wrapper<scene::ModelSceneNode>> _pickedModel;
 
     std::set<uint32_t> _walkSurfaceMaterials;
     std::set<uint32_t> _walkcheckSurfaceMaterials;
     std::set<uint32_t> _lineOfSightSurfaceMaterials;
+
+    // Controllers
+
+    std::unique_ptr<PlayerCameraController> _playerCameraController;
+    std::unique_ptr<SelectionController> _selectionController;
+
+    // END Controllers
 
     // Logic thread
 

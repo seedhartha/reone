@@ -34,6 +34,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
+#include "reone/graphics/uniforms.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/parser/2da/portraits.h"
@@ -121,6 +122,7 @@ void Game::init() {
     scene.setUpdateRoots(true);
 
     _playerCameraController = std::make_unique<PlayerCameraController>(scene);
+    _selectionController = std::make_unique<SelectionController>(_options.graphics, scene);
 
     startModule("end_m01aa");
 
@@ -138,6 +140,7 @@ void Game::init() {
         float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
         camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
         _playerCameraController->setCameraSceneNode(*camera);
+        _selectionController->setCamera(*camera);
         _playerCameraController->setCameraFacing(module.entryFacing());
         _playerCameraController->setCameraPitch(glm::radians(kCameraPitch));
         _playerCameraController->refreshCamera();
@@ -161,34 +164,13 @@ void Game::deinit() {
 }
 
 bool Game::handle(const input::Event &event) {
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
     if (_playerCameraController->handle(event)) {
         return true;
     }
+    if (_selectionController->handle(event)) {
+        return true;
+    }
     switch (event.type) {
-    case input::EventType::MouseButtonDown:
-        if (event.button.button != input::MouseButton::Left) {
-            break;
-        }
-        if (_pickedModel) {
-            std::string message;
-            void *externalRef = _pickedModel->get().externalRef();
-            if (!externalRef) {
-                message = str(boost::format(kPickedModelFormat) % _pickedModel->get().model().name());
-            } else {
-                auto &object = *reinterpret_cast<SpatialObject *>(externalRef);
-                message = str(boost::format(kPickedObjectFormat) %
-                              object.id() %
-                              static_cast<int>(object.type()) %
-                              object.tag());
-                runOnLogicThread([&object]() {
-                    object.setFacing(object.facing() + glm::half_pi<float>());
-                });
-            }
-            _console.printLine(message);
-            return true;
-        }
-        break;
     default:
         break;
     }
@@ -200,10 +182,6 @@ void Game::update(float dt) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     scene.update(dt);
     _playerCameraController->update(dt);
-    if (_cameraSceneNode) {
-        auto &camera = *_cameraSceneNode->get().camera();
-        _pickedModel = scene.pickModelRay(camera.position(), camera.forward());
-    }
 }
 
 void Game::handleEvents() {
@@ -386,11 +364,75 @@ void Game::onObjectAnimationChanged(Object &object, const std::string &animName)
 void Game::render() {
     glm::ivec2 screenSize {_options.graphics.width, _options.graphics.height};
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
+
+    // Scene
     auto &output = scene.render(screenSize);
     auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::ndcTexture);
     _graphicsSvc.context.useProgram(program);
     _graphicsSvc.context.bindTexture(output);
     _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw();
+
+    // Reticles
+    auto hoveredObject = _selectionController->hoveredObject();
+    auto selectedObject = _selectionController->selectedObject();
+    if ((hoveredObject || selectedObject) && _cameraSceneNode) {
+        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
+        _graphicsSvc.uniforms.setGlobals([&screenSize](auto &globals) {
+            globals.reset();
+            globals.projection = glm::ortho(0.0f, static_cast<float>(screenSize.x),
+                                            static_cast<float>(screenSize.y), 0.0f,
+                                            0.0f, 1.0f);
+        });
+        _graphicsSvc.context.withBlendMode(BlendMode::Additive, [this, &screenSize, &scene, &hoveredObject, &selectedObject]() {
+            const auto &camera = *_cameraSceneNode->get().camera();
+            if (hoveredObject) {
+                auto model = scene.modelByExternalRef(&hoveredObject->get());
+                if (model) {
+                    auto reticle = _resourceSvc.textures.get("friendlyreticle", TextureUsage::GUI);
+                    auto objectWorld = model->get().getWorldCenterOfAABB();
+                    auto objectNDC = camera.projection() * camera.view() * glm::vec4 {objectWorld, 1.0f};
+                    if (objectNDC.w > 0.0f) {
+                        objectNDC /= objectNDC.w;
+                        glm::vec3 objectScreen {screenSize.x * 0.5f * (objectNDC.x + 1.0f),
+                                                screenSize.y * (1.0f - 0.5f * (objectNDC.y + 1.0f)),
+                                                0.0f};
+                        auto transform = glm::scale(
+                            glm::translate(objectScreen - 0.5f * glm::vec3 {reticle->width(), reticle->height(), 0.0f}),
+                            glm::vec3 {reticle->width(), reticle->height(), 1.0f});
+                        _graphicsSvc.context.bindTexture(*reticle);
+                        _graphicsSvc.uniforms.setLocals([&transform](auto &locals) {
+                            locals.reset();
+                            locals.model = std::move(transform);
+                        });
+                        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+                    }
+                }
+            }
+            if (selectedObject) {
+                auto model = scene.modelByExternalRef(&selectedObject->get());
+                if (model) {
+                    auto reticle2 = _resourceSvc.textures.get("friendlyreticle2", TextureUsage::GUI);
+                    auto objectWorld = model->get().getWorldCenterOfAABB();
+                    auto objectNDC = camera.projection() * camera.view() * glm::vec4 {objectWorld, 1.0f};
+                    if (objectNDC.w > 0.0f) {
+                        objectNDC /= objectNDC.w;
+                        glm::vec3 objectScreen {screenSize.x * 0.5f * (objectNDC.x + 1.0f),
+                                                screenSize.y * (1.0f - 0.5f * (objectNDC.y + 1.0f)),
+                                                0.0f};
+                        auto transform = glm::scale(
+                            glm::translate(objectScreen - 0.5f * glm::vec3 {reticle2->width(), reticle2->height(), 0.0f}),
+                            glm::vec3 {reticle2->width(), reticle2->height(), 1.0f});
+                        _graphicsSvc.context.bindTexture(*reticle2);
+                        _graphicsSvc.uniforms.setLocals([&transform](auto &locals) {
+                            locals.reset();
+                            locals.model = std::move(transform);
+                        });
+                        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+                    }
+                }
+            }
+        });
+    }
 }
 
 void Game::pause(bool pause) {

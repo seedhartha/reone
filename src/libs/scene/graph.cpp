@@ -47,32 +47,6 @@ namespace reone {
 
 namespace scene {
 
-struct ModelDistancePair {
-    ModelSceneNode &model;
-    float distance;
-
-    ModelDistancePair(ModelSceneNode &model, float distance) :
-        model(model),
-        distance(distance) {
-    }
-};
-
-} // namespace scene
-
-} // namespace reone
-
-template <>
-struct std::less<reone::scene::ModelDistancePair> {
-    bool operator()(const reone::scene::ModelDistancePair &lhs,
-                    const reone::scene::ModelDistancePair &rhs) const {
-        return lhs.distance < rhs.distance;
-    }
-};
-
-namespace reone {
-
-namespace scene {
-
 static constexpr int kMaxFlareLights = 4;
 static constexpr int kMaxSoundCount = 4;
 
@@ -925,7 +899,7 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
 
     std::vector<std::pair<ModelSceneNode *, float>> distances;
     for (auto &model : _modelRoots) {
-        if (!model->isPickable() || model->user() == except) {
+        if (!model->isPickable() || (except && model->user())) {
             continue;
         }
         if (model->getSquareDistanceTo(start) > kMaxCollisionDistanceLineOfSight2) {
@@ -951,21 +925,24 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
 }
 
 std::optional<std::reference_wrapper<ModelSceneNode>> SceneGraph::pickModelRay(const glm::vec3 &origin, const glm::vec3 &dir) const {
-    std::set<ModelDistancePair> models;
+    ModelSceneNode *model {nullptr};
+    float minDistance = std::numeric_limits<float>::max();
     for (auto &root : _modelRoots) {
         if (!root->isEnabled() || root->isCulled() || !root->isPickable()) {
             continue;
         }
         auto aabbWorld = root->aabb() * root->absoluteTransform();
         float distance;
-        if (aabbWorld.raycast(origin, 1.0f / dir, std::numeric_limits<float>::max(), distance)) {
-            models.insert({*root, distance});
+        if (aabbWorld.raycast(origin, 1.0f / dir, std::numeric_limits<float>::max(), distance) &&
+            distance < minDistance) {
+            model = root.get();
+            minDistance = distance;
         }
     }
-    if (models.empty()) {
+    if (!model) {
         return std::nullopt;
     }
-    return models.begin()->model;
+    return *model;
 }
 
 std::shared_ptr<CameraSceneNode> SceneGraph::newCamera() {

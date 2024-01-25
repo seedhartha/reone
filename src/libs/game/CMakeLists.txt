@@ -280,6 +280,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/location.h
     ${GAME_INCLUDE_DIR}/neo/action.h
     ${GAME_INCLUDE_DIR}/neo/controller/playercamera.h
+    ${GAME_INCLUDE_DIR}/neo/controller/selection.h
     ${GAME_INCLUDE_DIR}/neo/effect.h
     ${GAME_INCLUDE_DIR}/neo/event.h
     ${GAME_INCLUDE_DIR}/neo/game.h
@@ -490,6 +491,7 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/gui/selectoverlay.cpp
     ${GAME_SOURCE_DIR}/gui/sounds.cpp
     ${GAME_SOURCE_DIR}/neo/controller/playercamera.cpp
+    ${GAME_SOURCE_DIR}/neo/controller/selection.cpp
     ${GAME_SOURCE_DIR}/neo/game.cpp
     ${GAME_SOURCE_DIR}/neo/object.cpp
     ${GAME_SOURCE_DIR}/neo/object/area.cpp

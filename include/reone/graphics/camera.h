@@ -40,7 +40,7 @@ public:
     const glm::mat4 &projectionInv() const { return _projectionInv; }
     const glm::mat4 &view() const { return _view; }
     const glm::mat4 &viewInv() const { return _viewInv; }
-    const glm::vec3 &position() { return _position; }
+    const glm::vec3 &position() const { return _position; }
     float zNear() const { return _zNear; }
     float zFar() const { return _zFar; }
 
