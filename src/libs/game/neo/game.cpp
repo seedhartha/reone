@@ -105,7 +105,7 @@ void Game::init() {
         throw ResourceNotFoundException("surfacemat 2DA not found");
     }
     for (size_t i = 0; i < surfacemat->getRowCount(); ++i) {
-        auto row = parse_surfacemat(*surfacemat, i);
+        auto row = parseSurfacematTwoDARow(*surfacemat, i);
         if (row.walk) {
             _walkSurfaceMaterials.insert(i);
         }
@@ -690,7 +690,7 @@ Creature &Game::loadCreature(ObjectTag tag, PortraitId portraitId) {
     if (!heads) {
         throw ResourceNotFoundException("heads 2DA not found");
     }
-    auto portraitsRow = parse_portraits(*portraits, portraitId);
+    auto portraitsRow = parsePortraitsTwoDARow(*portraits, portraitId);
     creature.load(*portraitsRow.appearancenumber, *appearance, *heads);
     return creature;
 }

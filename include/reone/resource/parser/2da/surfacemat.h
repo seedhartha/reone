@@ -25,7 +25,7 @@ namespace resource {
 
 namespace generated {
 
-struct surfacemat {
+struct SurfacematTwoDARow {
     bool grass;
     std::string label;
     bool lineofsight;
@@ -35,15 +35,27 @@ struct surfacemat {
     bool walkcheck;
 };
 
-surfacemat parse_surfacemat(const TwoDA &twoDA, int row) {
-    surfacemat strct;
-    strct.grass = twoDA.getBool(row, "grass");
-    strct.label = twoDA.getString(row, "label");
-    strct.lineofsight = twoDA.getBool(row, "lineofsight");
-    strct.name = twoDA.getStringOpt(row, "name");
-    strct.sound = twoDA.getStringOpt(row, "sound");
-    strct.walk = twoDA.getBool(row, "walk");
-    strct.walkcheck = twoDA.getBool(row, "walkcheck");
+struct SurfacematTwoDA {
+    std::vector<SurfacematTwoDARow> rows;
+};
+
+SurfacematTwoDARow parseSurfacematTwoDARow(const TwoDA &twoDA, int rownum) {
+    SurfacematTwoDARow row;
+    row.grass = twoDA.getBool(rownum, "grass");
+    row.label = twoDA.getString(rownum, "label");
+    row.lineofsight = twoDA.getBool(rownum, "lineofsight");
+    row.name = twoDA.getStringOpt(rownum, "name");
+    row.sound = twoDA.getStringOpt(rownum, "sound");
+    row.walk = twoDA.getBool(rownum, "walk");
+    row.walkcheck = twoDA.getBool(rownum, "walkcheck");
+    return row;
+}
+
+SurfacematTwoDA parseSurfacematTwoDA(const TwoDA &twoDA) {
+    SurfacematTwoDA strct;
+    for (int i = 0; i < twoDA.getRowCount(); ++i) {
+        strct.rows.push_back(parseSurfacematTwoDARow(twoDA, i));
+    }
     return strct;
 }
 

@@ -32,7 +32,7 @@ namespace neo {
 
 void Door::load(const UTD &utd,
                 const TwoDA &genericDoors) {
-    auto genericDoorsRow = parse_genericdoors(genericDoors, utd.GenericType);
+    auto genericDoorsRow = parseGenericdoorsTwoDARow(genericDoors, utd.GenericType);
     _modelName = genericDoorsRow.modelname;
     setState(ObjectState::Loaded);
 }

@@ -25,9 +25,9 @@ namespace resource {
 
 namespace generated {
 
-struct portraits {
-    std::optional<int> appearance_l;
-    std::optional<int> appearance_s;
+struct PortraitsTwoDARow {
+    std::optional<int> appearanceL;
+    std::optional<int> appearanceS;
     std::optional<int> appearancenumber;
     std::optional<std::string> baseresref;
     std::optional<std::string> baseresrefe;
@@ -42,22 +42,34 @@ struct portraits {
     int sex;
 };
 
-portraits parse_portraits(const TwoDA &twoDA, int row) {
-    portraits strct;
-    strct.appearance_l = twoDA.getIntOpt(row, "appearance_l");
-    strct.appearance_s = twoDA.getIntOpt(row, "appearance_s");
-    strct.appearancenumber = twoDA.getIntOpt(row, "appearancenumber");
-    strct.baseresref = twoDA.getStringOpt(row, "baseresref");
-    strct.baseresrefe = twoDA.getStringOpt(row, "baseresrefe");
-    strct.baseresrefve = twoDA.getStringOpt(row, "baseresrefve");
-    strct.baseresrefvve = twoDA.getStringOpt(row, "baseresrefvve");
-    strct.baseresrefvvve = twoDA.getStringOpt(row, "baseresrefvvve");
-    strct.forpc = twoDA.getBool(row, "forpc");
-    strct.inanimatetype = twoDA.getStringOpt(row, "inanimatetype");
-    strct.lowgore = twoDA.getStringOpt(row, "lowgore");
-    strct.plot = twoDA.getBoolOpt(row, "plot");
-    strct.race = twoDA.getIntOpt(row, "race");
-    strct.sex = twoDA.getInt(row, "sex");
+struct PortraitsTwoDA {
+    std::vector<PortraitsTwoDARow> rows;
+};
+
+PortraitsTwoDARow parsePortraitsTwoDARow(const TwoDA &twoDA, int rownum) {
+    PortraitsTwoDARow row;
+    row.appearanceL = twoDA.getIntOpt(rownum, "appearanceL");
+    row.appearanceS = twoDA.getIntOpt(rownum, "appearanceS");
+    row.appearancenumber = twoDA.getIntOpt(rownum, "appearancenumber");
+    row.baseresref = twoDA.getStringOpt(rownum, "baseresref");
+    row.baseresrefe = twoDA.getStringOpt(rownum, "baseresrefe");
+    row.baseresrefve = twoDA.getStringOpt(rownum, "baseresrefve");
+    row.baseresrefvve = twoDA.getStringOpt(rownum, "baseresrefvve");
+    row.baseresrefvvve = twoDA.getStringOpt(rownum, "baseresrefvvve");
+    row.forpc = twoDA.getBool(rownum, "forpc");
+    row.inanimatetype = twoDA.getStringOpt(rownum, "inanimatetype");
+    row.lowgore = twoDA.getStringOpt(rownum, "lowgore");
+    row.plot = twoDA.getBoolOpt(rownum, "plot");
+    row.race = twoDA.getIntOpt(rownum, "race");
+    row.sex = twoDA.getInt(rownum, "sex");
+    return row;
+}
+
+PortraitsTwoDA parsePortraitsTwoDA(const TwoDA &twoDA) {
+    PortraitsTwoDA strct;
+    for (int i = 0; i < twoDA.getRowCount(); ++i) {
+        strct.rows.push_back(parsePortraitsTwoDARow(twoDA, i));
+    }
     return strct;
 }
 

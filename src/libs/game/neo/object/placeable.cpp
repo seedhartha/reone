@@ -32,7 +32,7 @@ namespace neo {
 
 void Placeable::load(const UTP &utp,
                      const TwoDA &placeables) {
-    auto placeablesRow = parse_placeables(placeables, utp.Appearance);
+    auto placeablesRow = parsePlaceablesTwoDARow(placeables, utp.Appearance);
     if (!placeablesRow.modelname) {
         throw ValidationException("Empty placeable model name");
     }

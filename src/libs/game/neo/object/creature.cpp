@@ -55,7 +55,7 @@ void Creature::load(AppearanceId appearanceId,
                     const resource::TwoDA &heads,
                     std::optional<int> bodyVariation,
                     std::optional<int> texVariation) {
-    auto appearanceRow = parse_appearance(appearance, appearanceId);
+    auto appearanceRow = parseAppearanceTwoDARow(appearance, appearanceId);
 
     ModelType modelType;
     if (appearanceRow.modeltype == "F") {
@@ -87,14 +87,14 @@ void Creature::load(AppearanceId appearanceId,
         if (!appearanceRow.normalhead) {
             throw ValidationException("Normal head not defined");
         }
-        auto normalHeadRow = parse_heads(heads, *appearanceRow.normalhead);
+        auto normalHeadRow = parseHeadsTwoDARow(heads, *appearanceRow.normalhead);
         if (!normalHeadRow.head) {
             throw ValidationException("Empty normal head model name");
         }
         _appearance.normalHeadModel = *normalHeadRow.head;
 
         if (appearanceRow.backuphead) {
-            auto backupHeadRow = parse_heads(heads, *appearanceRow.backuphead);
+            auto backupHeadRow = parseHeadsTwoDARow(heads, *appearanceRow.backuphead);
             if (!backupHeadRow.head) {
                 throw ValidationException("Empty backup head model name");
             }

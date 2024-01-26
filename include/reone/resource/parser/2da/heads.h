@@ -25,7 +25,7 @@ namespace resource {
 
 namespace generated {
 
-struct heads {
+struct HeadsTwoDARow {
     std::optional<std::string> alttexture;
     std::optional<std::string> head;
     std::optional<std::string> headtexe;
@@ -36,16 +36,28 @@ struct heads {
     std::optional<std::string> headtexvvve;
 };
 
-heads parse_heads(const TwoDA &twoDA, int row) {
-    heads strct;
-    strct.alttexture = twoDA.getStringOpt(row, "alttexture");
-    strct.head = twoDA.getStringOpt(row, "head");
-    strct.headtexe = twoDA.getStringOpt(row, "headtexe");
-    strct.headtexg = twoDA.getStringOpt(row, "headtexg");
-    strct.headtexve = twoDA.getStringOpt(row, "headtexve");
-    strct.headtexvg = twoDA.getStringOpt(row, "headtexvg");
-    strct.headtexvve = twoDA.getStringOpt(row, "headtexvve");
-    strct.headtexvvve = twoDA.getStringOpt(row, "headtexvvve");
+struct HeadsTwoDA {
+    std::vector<HeadsTwoDARow> rows;
+};
+
+HeadsTwoDARow parseHeadsTwoDARow(const TwoDA &twoDA, int rownum) {
+    HeadsTwoDARow row;
+    row.alttexture = twoDA.getStringOpt(rownum, "alttexture");
+    row.head = twoDA.getStringOpt(rownum, "head");
+    row.headtexe = twoDA.getStringOpt(rownum, "headtexe");
+    row.headtexg = twoDA.getStringOpt(rownum, "headtexg");
+    row.headtexve = twoDA.getStringOpt(rownum, "headtexve");
+    row.headtexvg = twoDA.getStringOpt(rownum, "headtexvg");
+    row.headtexvve = twoDA.getStringOpt(rownum, "headtexvve");
+    row.headtexvvve = twoDA.getStringOpt(rownum, "headtexvvve");
+    return row;
+}
+
+HeadsTwoDA parseHeadsTwoDA(const TwoDA &twoDA) {
+    HeadsTwoDA strct;
+    for (int i = 0; i < twoDA.getRowCount(); ++i) {
+        strct.rows.push_back(parseHeadsTwoDARow(twoDA, i));
+    }
     return strct;
 }
 

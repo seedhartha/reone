@@ -46,15 +46,6 @@ struct TwoDAColumn {
     bool optional {false};
 };
 
-static std::string sanitizeColumnName(const std::string &name) {
-    std::string sanitized {name};
-    static std::set<std::string> reserved {"default"};
-    if (std::isdigit(name[0]) || reserved.count(name) > 0) {
-        sanitized.insert(0, "_");
-    }
-    return sanitized;
-}
-
 static TwoDAColumnType guessColumnType(const std::string &value) {
     std::smatch match;
     std::regex boolRegEx {"^[01]$"};
@@ -113,7 +104,36 @@ static std::string cppTypeFromColumnType(TwoDAColumnType type) {
     }
 }
 
+static std::string fieldNameFromColumnName(const std::string &column) {
+    auto field = column;
+    std::set<std::string> reserved {"default"};
+    if (std::isdigit(field[0]) || reserved.count(field) > 0) {
+        field.insert(0, "_");
+    }
+    for (size_t i = 1; i < field.length(); ++i) {
+        if (field[i] == '_') {
+            field.erase(i, 1);
+            field[i] = std::toupper(field[i]);
+        }
+    }
+    return field;
+}
+
+static std::string cppNameFromResRef(const ResRef &resRef) {
+    auto structName = resRef.value();
+    structName[0] = std::toupper(structName[0]);
+    for (size_t i = 1; i < structName.length() - 1; ++i) {
+        if (structName[i] == '_') {
+            structName.erase(i, 1);
+            structName[i] = std::toupper(structName[i]);
+        }
+    }
+    structName.append("TwoDA");
+    return structName;
+}
+
 static void writeParserHeader(const ResRef &resRef,
+                              const std::string &cppName,
                               const std::vector<TwoDAColumn> &columns,
                               const std::filesystem::path &destdir) {
     auto hPath = destdir;
@@ -132,18 +152,23 @@ static void writeParserHeader(const ResRef &resRef,
     writer.writeLine("");
     writer.writeLine("namespace generated {");
     writer.writeLine("");
-    writer.writeLine("struct " + resRef.value() + " {");
+    writer.writeLine("struct " + cppName + "Row {");
     for (const auto &column : columns) {
         auto cppType = cppTypeFromColumnType(column.type);
         if (column.optional) {
             cppType = str(boost::format("std::optional<%s>") % cppType);
         }
-        writer.writeLine(str(boost::format("%s%s %s;") % kIndent % cppType % column.name));
+        auto fieldName = fieldNameFromColumnName(column.name);
+        writer.writeLine(str(boost::format("%s%s %s;") % kIndent % cppType % fieldName));
     }
     writer.writeLine("};");
     writer.writeLine("");
-    writer.writeLine(str(boost::format("%1% parse_%1%(const TwoDA &twoDA, int row) {") % resRef.value()));
-    writer.writeLine(str(boost::format("%s%s strct;") % kIndent % resRef.value()));
+    writer.writeLine("struct " + cppName + " {");
+    writer.writeLine(str(boost::format("%sstd::vector<%sRow> rows;") % kIndent % cppName));
+    writer.writeLine("};");
+    writer.writeLine("");
+    writer.writeLine(str(boost::format("%1%Row parse%1%Row(const TwoDA &twoDA, int rownum) {") % cppName));
+    writer.writeLine(str(boost::format("%s%sRow row;") % kIndent % cppName));
     for (const auto &column : columns) {
         std::string getMethod;
         switch (column.type) {
@@ -169,8 +194,17 @@ static void writeParserHeader(const ResRef &resRef,
         if (column.optional) {
             getMethod.append("Opt");
         }
-        writer.writeLine(str(boost::format("%1%strct.%2% = twoDA.get%3%(row, \"%2%\");") % kIndent % column.name % getMethod));
+        auto fieldName = fieldNameFromColumnName(column.name);
+        writer.writeLine(str(boost::format("%1%row.%2% = twoDA.get%3%(rownum, \"%2%\");") % kIndent % fieldName % getMethod));
     }
+    writer.writeLine(str(boost::format("%sreturn row;") % kIndent));
+    writer.writeLine("}");
+    writer.writeLine("");
+    writer.writeLine(str(boost::format("%1% parse%1%(const TwoDA &twoDA) {") % cppName));
+    writer.writeLine(str(boost::format("%s%s strct;") % kIndent % cppName));
+    writer.writeLine(str(boost::format("%sfor (int i = 0; i < twoDA.getRowCount(); ++i) {") % kIndent));
+    writer.writeLine(str(boost::format("%1%%1%strct.rows.push_back(parse%2%Row(twoDA, i));") % kIndent % cppName));
+    writer.writeLine(str(boost::format("%s}") % kIndent));
     writer.writeLine(str(boost::format("%sreturn strct;") % kIndent));
     writer.writeLine("}");
     writer.writeLine("");
@@ -264,10 +298,10 @@ void generate2DAParsers(const std::filesystem::path &k1dir,
         std::vector<TwoDAColumn> columns;
         for (const auto &[name, column] : nameToColumn) {
             TwoDAColumn copy {column};
-            copy.name = sanitizeColumnName(name);
             columns.push_back(std::move(copy));
         }
-        writeParserHeader(resRef, columns, destdir);
+        auto cppName = cppNameFromResRef(resRef);
+        writeParserHeader(resRef, cppName, columns, destdir);
     }
 }
 

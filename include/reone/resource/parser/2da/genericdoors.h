@@ -25,7 +25,7 @@ namespace resource {
 
 namespace generated {
 
-struct genericdoors {
+struct GenericdoorsTwoDARow {
     bool blocksight;
     std::string label;
     std::string modelname;
@@ -38,18 +38,30 @@ struct genericdoors {
     bool visiblemodel;
 };
 
-genericdoors parse_genericdoors(const TwoDA &twoDA, int row) {
-    genericdoors strct;
-    strct.blocksight = twoDA.getBool(row, "blocksight");
-    strct.label = twoDA.getString(row, "label");
-    strct.modelname = twoDA.getString(row, "modelname");
-    strct.name = twoDA.getStringOpt(row, "name");
-    strct.nobin = twoDA.getBool(row, "nobin");
-    strct.preciseuse = twoDA.getBool(row, "preciseuse");
-    strct.soundapptype = twoDA.getIntOpt(row, "soundapptype");
-    strct.staticanim = twoDA.getStringOpt(row, "staticanim");
-    strct.strref = twoDA.getIntOpt(row, "strref");
-    strct.visiblemodel = twoDA.getBool(row, "visiblemodel");
+struct GenericdoorsTwoDA {
+    std::vector<GenericdoorsTwoDARow> rows;
+};
+
+GenericdoorsTwoDARow parseGenericdoorsTwoDARow(const TwoDA &twoDA, int rownum) {
+    GenericdoorsTwoDARow row;
+    row.blocksight = twoDA.getBool(rownum, "blocksight");
+    row.label = twoDA.getString(rownum, "label");
+    row.modelname = twoDA.getString(rownum, "modelname");
+    row.name = twoDA.getStringOpt(rownum, "name");
+    row.nobin = twoDA.getBool(rownum, "nobin");
+    row.preciseuse = twoDA.getBool(rownum, "preciseuse");
+    row.soundapptype = twoDA.getIntOpt(rownum, "soundapptype");
+    row.staticanim = twoDA.getStringOpt(rownum, "staticanim");
+    row.strref = twoDA.getIntOpt(rownum, "strref");
+    row.visiblemodel = twoDA.getBool(rownum, "visiblemodel");
+    return row;
+}
+
+GenericdoorsTwoDA parseGenericdoorsTwoDA(const TwoDA &twoDA) {
+    GenericdoorsTwoDA strct;
+    for (int i = 0; i < twoDA.getRowCount(); ++i) {
+        strct.rows.push_back(parseGenericdoorsTwoDARow(twoDA, i));
+    }
     return strct;
 }
 

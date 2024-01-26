@@ -25,7 +25,7 @@ namespace resource {
 
 namespace generated {
 
-struct placeables {
+struct PlaceablesTwoDARow {
     bool bodybag;
     float canseeheight;
     bool hitcheck;
@@ -46,26 +46,38 @@ struct placeables {
     bool usesearch;
 };
 
-placeables parse_placeables(const TwoDA &twoDA, int row) {
-    placeables strct;
-    strct.bodybag = twoDA.getBool(row, "bodybag");
-    strct.canseeheight = twoDA.getFloat(row, "canseeheight");
-    strct.hitcheck = twoDA.getBool(row, "hitcheck");
-    strct.hostile = twoDA.getBool(row, "hostile");
-    strct.ignorestatichitcheck = twoDA.getBool(row, "ignorestatichitcheck");
-    strct.label = twoDA.getStringOpt(row, "label");
-    strct.lightcolor = twoDA.getStringOpt(row, "lightcolor");
-    strct.lightoffsetx = twoDA.getStringOpt(row, "lightoffsetx");
-    strct.lightoffsety = twoDA.getStringOpt(row, "lightoffsety");
-    strct.lightoffsetz = twoDA.getStringOpt(row, "lightoffsetz");
-    strct.lowgore = twoDA.getStringOpt(row, "lowgore");
-    strct.modelname = twoDA.getStringOpt(row, "modelname");
-    strct.noncull = twoDA.getBool(row, "noncull");
-    strct.preciseuse = twoDA.getBool(row, "preciseuse");
-    strct.shadowsize = twoDA.getBool(row, "shadowsize");
-    strct.soundapptype = twoDA.getIntOpt(row, "soundapptype");
-    strct.strref = twoDA.getInt(row, "strref");
-    strct.usesearch = twoDA.getBool(row, "usesearch");
+struct PlaceablesTwoDA {
+    std::vector<PlaceablesTwoDARow> rows;
+};
+
+PlaceablesTwoDARow parsePlaceablesTwoDARow(const TwoDA &twoDA, int rownum) {
+    PlaceablesTwoDARow row;
+    row.bodybag = twoDA.getBool(rownum, "bodybag");
+    row.canseeheight = twoDA.getFloat(rownum, "canseeheight");
+    row.hitcheck = twoDA.getBool(rownum, "hitcheck");
+    row.hostile = twoDA.getBool(rownum, "hostile");
+    row.ignorestatichitcheck = twoDA.getBool(rownum, "ignorestatichitcheck");
+    row.label = twoDA.getStringOpt(rownum, "label");
+    row.lightcolor = twoDA.getStringOpt(rownum, "lightcolor");
+    row.lightoffsetx = twoDA.getStringOpt(rownum, "lightoffsetx");
+    row.lightoffsety = twoDA.getStringOpt(rownum, "lightoffsety");
+    row.lightoffsetz = twoDA.getStringOpt(rownum, "lightoffsetz");
+    row.lowgore = twoDA.getStringOpt(rownum, "lowgore");
+    row.modelname = twoDA.getStringOpt(rownum, "modelname");
+    row.noncull = twoDA.getBool(rownum, "noncull");
+    row.preciseuse = twoDA.getBool(rownum, "preciseuse");
+    row.shadowsize = twoDA.getBool(rownum, "shadowsize");
+    row.soundapptype = twoDA.getIntOpt(rownum, "soundapptype");
+    row.strref = twoDA.getInt(rownum, "strref");
+    row.usesearch = twoDA.getBool(rownum, "usesearch");
+    return row;
+}
+
+PlaceablesTwoDA parsePlaceablesTwoDA(const TwoDA &twoDA) {
+    PlaceablesTwoDA strct;
+    for (int i = 0; i < twoDA.getRowCount(); ++i) {
+        strct.rows.push_back(parsePlaceablesTwoDARow(twoDA, i));
+    }
     return strct;
 }
 
