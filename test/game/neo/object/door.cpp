@@ -19,6 +19,7 @@
 
 #include "reone/game/neo/object/door.h"
 #include "reone/resource/2da.h"
+#include "reone/resource/parser/2da/genericdoors.h"
 #include "reone/resource/parser/gff/utd.h"
 
 using namespace reone::game;
@@ -31,13 +32,13 @@ TEST(door, should_load_utd) {
     Door door {0, ""};
     UTD utd;
     utd.GenericType = 0;
-    auto genericdoors = TwoDA::Builder()
-                            .columns({"modelname"})
-                            .row({"dor_lhr01"})
-                            .build();
+    GenericdoorsTwoDARow genericDoorsRow;
+    genericDoorsRow.modelname = "dor_lhr01";
+    GenericdoorsTwoDA genericDoors;
+    genericDoors.rows.push_back(std::move(genericDoorsRow));
 
     // when
-    door.load(utd, *genericdoors);
+    door.load(utd, genericDoors);
 
     // then
     EXPECT_TRUE(door.is(ObjectState::Loaded));

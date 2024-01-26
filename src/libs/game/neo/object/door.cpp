@@ -31,8 +31,8 @@ namespace game {
 namespace neo {
 
 void Door::load(const UTD &utd,
-                const TwoDA &genericDoors) {
-    auto genericDoorsRow = parseGenericdoorsTwoDARow(genericDoors, utd.GenericType);
+                const GenericdoorsTwoDA &genericDoors) {
+    const auto &genericDoorsRow = genericDoors.rows[utd.GenericType];
     _modelName = genericDoorsRow.modelname;
     setState(ObjectState::Loaded);
 }

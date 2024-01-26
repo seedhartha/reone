@@ -40,8 +40,8 @@ enum class ModelType {
 };
 
 void Creature::load(const UTC &utc,
-                    const TwoDA &appearance,
-                    const TwoDA &heads) {
+                    const AppearanceTwoDA &appearance,
+                    const HeadsTwoDA &heads) {
     load(
         utc.Appearance_Type,
         appearance,
@@ -50,12 +50,110 @@ void Creature::load(const UTC &utc,
         utc.TextureVar);
 }
 
+static std::string modelFromAppearance(const AppearanceTwoDARow &row, const std::string &column) {
+    if (column == "race") {
+        return row.race.value_or("");
+    }
+    if (column == "modela") {
+        return row.modela.value_or("");
+    }
+    if (column == "modelb") {
+        return row.modelb.value_or("");
+    }
+    if (column == "modelc") {
+        return row.modelc.value_or("");
+    }
+    if (column == "modeld") {
+        return row.modeld.value_or("");
+    }
+    if (column == "modele") {
+        return row.modele.value_or("");
+    }
+    if (column == "modelf") {
+        return row.modelf.value_or("");
+    }
+    if (column == "modelg") {
+        return row.modelg.value_or("");
+    }
+    if (column == "modelh") {
+        return row.modelh.value_or("");
+    }
+    if (column == "modeli") {
+        return row.modeli.value_or("");
+    }
+    if (column == "modelj") {
+        return row.modelj.value_or("");
+    }
+    if (column == "modelk") {
+        return row.modelk.value_or("");
+    }
+    if (column == "modell") {
+        return row.modell.value_or("");
+    }
+    if (column == "modelm") {
+        return row.modelm.value_or("");
+    }
+    if (column == "modeln") {
+        return row.modeln.value_or("");
+    }
+    throw std::invalid_argument("Unsupported model column: " + column);
+}
+
+static std::string textureFromAppearance(const AppearanceTwoDARow &row, const std::string &column) {
+    if (column == "racetex") {
+        return row.racetex.value_or("");
+    }
+    if (column == "texa") {
+        return row.texa.value_or("");
+    }
+    if (column == "texb") {
+        return row.texb.value_or("");
+    }
+    if (column == "texc") {
+        return row.texc.value_or("");
+    }
+    if (column == "texd") {
+        return row.texd.value_or("");
+    }
+    if (column == "texe") {
+        return row.texe.value_or("");
+    }
+    if (column == "texf") {
+        return row.texf.value_or("");
+    }
+    if (column == "texg") {
+        return row.texg.value_or("");
+    }
+    if (column == "texh") {
+        return row.texh.value_or("");
+    }
+    if (column == "texi") {
+        return row.texi.value_or("");
+    }
+    if (column == "texj") {
+        return row.texj.value_or("");
+    }
+    if (column == "texk") {
+        return row.texk.value_or("");
+    }
+    if (column == "texl") {
+        return row.texl.value_or("");
+    }
+    if (column == "texm") {
+        return row.texm.value_or("");
+    }
+    if (column == "texn") {
+        return row.texn.value_or("");
+    }
+    throw std::invalid_argument("Unsupported texture column: " + column);
+}
+
 void Creature::load(AppearanceId appearanceId,
-                    const resource::TwoDA &appearance,
-                    const resource::TwoDA &heads,
+                    const AppearanceTwoDA &appearance,
+                    const HeadsTwoDA &heads,
                     std::optional<int> bodyVariation,
                     std::optional<int> texVariation) {
-    auto appearanceRow = parseAppearanceTwoDARow(appearance, appearanceId);
+    const auto &appearanceRow = appearance.rows[appearanceId];
 
     ModelType modelType;
     if (appearanceRow.modeltype == "F") {
@@ -79,7 +177,7 @@ void Creature::load(AppearanceId appearanceId,
 
         std::string texColumn {"tex"};
         texColumn.push_back(bodyVarChar);
-        texture = appearance.getString(appearanceId, texColumn);
+        texture = textureFromAppearance(appearanceRow, texColumn);
         if (!texture.empty()) {
             texture.append(str(boost::format("%02d") % std::max(1, static_cast<int>(texVariation.value_or(1)))));
         }
@@ -87,14 +185,14 @@ void Creature::load(AppearanceId appearanceId,
         if (!appearanceRow.normalhead) {
             throw ValidationException("Normal head not defined");
         }
-        auto normalHeadRow = parseHeadsTwoDARow(heads, *appearanceRow.normalhead);
+        const auto &normalHeadRow = heads.rows[*appearanceRow.normalhead];
         if (!normalHeadRow.head) {
             throw ValidationException("Empty normal head model name");
         }
         _appearance.normalHeadModel = *normalHeadRow.head;
 
         if (appearanceRow.backuphead) {
-            auto backupHeadRow = parseHeadsTwoDARow(heads, *appearanceRow.backuphead);
+            const auto &backupHeadRow = heads.rows[*appearanceRow.backuphead];
             if (!backupHeadRow.head) {
                 throw ValidationException("Empty backup head model name");
             }
@@ -104,7 +202,7 @@ void Creature::load(AppearanceId appearanceId,
         modelColumn = "race";
         texture = appearanceRow.racetex.value_or("");
     }
-    auto model = appearance.getString(appearanceId, modelColumn);
+    auto model = modelFromAppearance(appearanceRow, modelColumn);
     if (model.empty()) {
         throw ValidationException("Empty creature model name");
     }

@@ -25,13 +25,13 @@ namespace reone {
 
 namespace resource {
 
-class TwoDA;
-
 namespace generated {
 
 struct UTD;
 
-}
+struct GenericdoorsTwoDA;
+
+} // namespace generated
 
 } // namespace resource
 
@@ -49,7 +49,7 @@ public:
     }
 
     void load(const resource::generated::UTD &utd,
-              const resource::TwoDA &genericDoors);
+              const resource::generated::GenericdoorsTwoDA &genericDoors);
 
     const resource::ResRef &modelName() const {
         return _modelName;

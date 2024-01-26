@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "reone/resource/2da.h"
-
 namespace reone {
 
 namespace resource {
+
+class TwoDA;
 
 namespace generated {
 
@@ -38,36 +38,16 @@ struct GenericdoorsTwoDARow {
     bool visiblemodel;
 };
 
+GenericdoorsTwoDARow parseGenericdoorsTwoDARow(const TwoDA &twoDA, int rownum);
+
 struct GenericdoorsTwoDA {
     std::vector<GenericdoorsTwoDARow> rows;
 };
 
-GenericdoorsTwoDARow parseGenericdoorsTwoDARow(const TwoDA &twoDA, int rownum) {
-    GenericdoorsTwoDARow row;
-    row.blocksight = twoDA.getBool(rownum, "blocksight");
-    row.label = twoDA.getString(rownum, "label");
-    row.modelname = twoDA.getString(rownum, "modelname");
-    row.name = twoDA.getStringOpt(rownum, "name");
-    row.nobin = twoDA.getBool(rownum, "nobin");
-    row.preciseuse = twoDA.getBool(rownum, "preciseuse");
-    row.soundapptype = twoDA.getIntOpt(rownum, "soundapptype");
-    row.staticanim = twoDA.getStringOpt(rownum, "staticanim");
-    row.strref = twoDA.getIntOpt(rownum, "strref");
-    row.visiblemodel = twoDA.getBool(rownum, "visiblemodel");
-    return row;
-}
-
-GenericdoorsTwoDA parseGenericdoorsTwoDA(const TwoDA &twoDA) {
-    GenericdoorsTwoDA strct;
-    for (int i = 0; i < twoDA.getRowCount(); ++i) {
-        strct.rows.push_back(parseGenericdoorsTwoDARow(twoDA, i));
-    }
-    return strct;
-}
+GenericdoorsTwoDA parseGenericdoorsTwoDA(const TwoDA &twoDA);
 
 } // namespace generated
 
 } // namespace resource
 
 } // namespace reone
-

@@ -130,6 +130,10 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/gameprobe.cpp
     ${RESOURCE_SOURCE_DIR}/gff.cpp
     ${RESOURCE_SOURCE_DIR}/ltr.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/2da/appearance.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/2da/genericdoors.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/2da/heads.cpp
+    ${RESOURCE_SOURCE_DIR}/parser/2da/placeables.cpp
     ${RESOURCE_SOURCE_DIR}/parser/gff/are.cpp
     ${RESOURCE_SOURCE_DIR}/parser/gff/dlg.cpp
     ${RESOURCE_SOURCE_DIR}/parser/gff/git.cpp

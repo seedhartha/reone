@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "reone/resource/2da.h"
-
 namespace reone {
 
 namespace resource {
+
+class TwoDA;
 
 namespace generated {
 
@@ -46,44 +46,16 @@ struct PlaceablesTwoDARow {
     bool usesearch;
 };
 
+PlaceablesTwoDARow parsePlaceablesTwoDARow(const TwoDA &twoDA, int rownum);
+
 struct PlaceablesTwoDA {
     std::vector<PlaceablesTwoDARow> rows;
 };
 
-PlaceablesTwoDARow parsePlaceablesTwoDARow(const TwoDA &twoDA, int rownum) {
-    PlaceablesTwoDARow row;
-    row.bodybag = twoDA.getBool(rownum, "bodybag");
-    row.canseeheight = twoDA.getFloat(rownum, "canseeheight");
-    row.hitcheck = twoDA.getBool(rownum, "hitcheck");
-    row.hostile = twoDA.getBool(rownum, "hostile");
-    row.ignorestatichitcheck = twoDA.getBool(rownum, "ignorestatichitcheck");
-    row.label = twoDA.getStringOpt(rownum, "label");
-    row.lightcolor = twoDA.getStringOpt(rownum, "lightcolor");
-    row.lightoffsetx = twoDA.getStringOpt(rownum, "lightoffsetx");
-    row.lightoffsety = twoDA.getStringOpt(rownum, "lightoffsety");
-    row.lightoffsetz = twoDA.getStringOpt(rownum, "lightoffsetz");
-    row.lowgore = twoDA.getStringOpt(rownum, "lowgore");
-    row.modelname = twoDA.getStringOpt(rownum, "modelname");
-    row.noncull = twoDA.getBool(rownum, "noncull");
-    row.preciseuse = twoDA.getBool(rownum, "preciseuse");
-    row.shadowsize = twoDA.getBool(rownum, "shadowsize");
-    row.soundapptype = twoDA.getIntOpt(rownum, "soundapptype");
-    row.strref = twoDA.getInt(rownum, "strref");
-    row.usesearch = twoDA.getBool(rownum, "usesearch");
-    return row;
-}
-
-PlaceablesTwoDA parsePlaceablesTwoDA(const TwoDA &twoDA) {
-    PlaceablesTwoDA strct;
-    for (int i = 0; i < twoDA.getRowCount(); ++i) {
-        strct.rows.push_back(parsePlaceablesTwoDARow(twoDA, i));
-    }
-    return strct;
-}
+PlaceablesTwoDA parsePlaceablesTwoDA(const TwoDA &twoDA);
 
 } // namespace generated
 
 } // namespace resource
 
 } // namespace reone
-

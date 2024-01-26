@@ -20,6 +20,8 @@
 #include "reone/game/neo/object/creature.h"
 #include "reone/game/neo/object/item.h"
 #include "reone/resource/2da.h"
+#include "reone/resource/parser/2da/appearance.h"
+#include "reone/resource/parser/2da/heads.h"
 #include "reone/resource/parser/gff/utc.h"
 
 using namespace reone::game;
@@ -34,14 +36,16 @@ TEST(creature, should_load_utc) {
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
     utc.TextureVar = 1;
-    auto appearance = TwoDA::Builder()
-                          .columns({"modeltype", "race", "racetex"})
-                          .row({"F", "n_mandalorian", "n_mandalorian01"})
-                          .build();
-    auto heads = TwoDA::Builder().build();
+    AppearanceTwoDARow appearanceRow;
+    appearanceRow.modeltype = "F";
+    appearanceRow.race = "n_mandalorian";
+    appearanceRow.racetex = "n_mandalorian01";
+    AppearanceTwoDA appearance;
+    appearance.rows.push_back(std::move(appearanceRow));
+    HeadsTwoDA heads;
 
     // when
-    creature.load(utc, *appearance, *heads);
+    creature.load(utc, appearance, heads);
 
     // then
     EXPECT_TRUE(creature.is(ObjectState::Loaded));
@@ -56,17 +60,20 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
     utc.TextureVar = 1;
-    auto appearance = TwoDA::Builder()
-                          .columns({"modeltype", "modela", "texa", "normalhead"})
-                          .row({"B", "pmbal", "pmbal", "0"})
-                          .build();
-    auto heads = TwoDA::Builder()
-                     .columns({"head"})
-                     .row({"pmhc01"})
-                     .build();
+    AppearanceTwoDARow appearanceRow;
+    appearanceRow.modeltype = "B";
+    appearanceRow.modela = "pmbal";
+    appearanceRow.texa = "pmbal";
+    appearanceRow.normalhead = 0;
+    AppearanceTwoDA appearance;
+    appearance.rows.push_back(std::move(appearanceRow));
+    HeadsTwoDARow headsRow;
+    headsRow.head = "pmhc01";
+    HeadsTwoDA heads;
+    heads.rows.push_back(std::move(headsRow));
 
     // when
-    creature.load(utc, *appearance, *heads);
+    creature.load(utc, appearance, heads);
 
     // then
     EXPECT_EQ(creature.appearance().model.value(), std::string {"pmbal"});

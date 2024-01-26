@@ -37,6 +37,10 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
+#include "reone/resource/parser/2da/appearance.h"
+#include "reone/resource/parser/2da/genericdoors.h"
+#include "reone/resource/parser/2da/heads.h"
+#include "reone/resource/parser/2da/placeables.h"
 #include "reone/resource/parser/2da/portraits.h"
 #include "reone/resource/parser/2da/surfacemat.h"
 #include "reone/resource/parser/gff/are.h"
@@ -100,12 +104,13 @@ static const std::string kLogicThreadName {"game"};
 void Game::init() {
     checkThat(!_inited, "Must not be initialized");
 
-    auto surfacemat = _resourceSvc.twoDas.get("surfacemat");
-    if (!surfacemat) {
+    auto surfacematRaw = _resourceSvc.twoDas.get("surfacemat");
+    if (!surfacematRaw) {
         throw ResourceNotFoundException("surfacemat 2DA not found");
     }
-    for (size_t i = 0; i < surfacemat->getRowCount(); ++i) {
-        auto row = parseSurfacematTwoDARow(*surfacemat, i);
+    auto surfacemat = parseSurfacematTwoDA(*surfacematRaw);
+    for (size_t i = 0; i < surfacemat.rows.size(); ++i) {
+        const auto &row = surfacemat.rows[i];
         if (row.walk) {
             _walkSurfaceMaterials.insert(i);
         }
@@ -664,15 +669,17 @@ Creature &Game::loadCreature(const resource::ResRef &tmplt) {
     }
     auto parsedUTC = parseUTC(*utc);
     auto &creature = newCreature(parsedUTC.Tag);
-    auto appearance = _resourceSvc.twoDas.get("appearance");
-    if (!appearance) {
+    auto appearanceRaw = _resourceSvc.twoDas.get("appearance");
+    if (!appearanceRaw) {
         throw ResourceNotFoundException("appearance 2DA not found");
     }
-    auto heads = _resourceSvc.twoDas.get("heads");
-    if (!heads) {
+    auto appearance = parseAppearanceTwoDA(*appearanceRaw);
+    auto headsRaw = _resourceSvc.twoDas.get("heads");
+    if (!headsRaw) {
         throw ResourceNotFoundException("heads 2DA not found");
     }
-    creature.load(parsedUTC, *appearance, *heads);
+    auto heads = parseHeadsTwoDA(*headsRaw);
+    creature.load(parsedUTC, appearance, heads);
     return creature;
 }
 
@@ -682,16 +689,18 @@ Creature &Game::loadCreature(ObjectTag tag, PortraitId portraitId) {
     if (!portraits) {
         throw ResourceNotFoundException("portraits 2DA not found");
     }
-    auto appearance = _resourceSvc.twoDas.get("appearance");
-    if (!appearance) {
+    auto appearanceRaw = _resourceSvc.twoDas.get("appearance");
+    if (!appearanceRaw) {
         throw ResourceNotFoundException("appearance 2DA not found");
     }
-    auto heads = _resourceSvc.twoDas.get("heads");
-    if (!heads) {
+    auto appearance = parseAppearanceTwoDA(*appearanceRaw);
+    auto headsRaw = _resourceSvc.twoDas.get("heads");
+    if (!headsRaw) {
         throw ResourceNotFoundException("heads 2DA not found");
     }
+    auto heads = parseHeadsTwoDA(*headsRaw);
     auto portraitsRow = parsePortraitsTwoDARow(*portraits, portraitId);
-    creature.load(*portraitsRow.appearancenumber, *appearance, *heads);
+    creature.load(*portraitsRow.appearancenumber, appearance, heads);
     return creature;
 }
 
@@ -702,11 +711,12 @@ Door &Game::loadDoor(const resource::ResRef &tmplt) {
     }
     auto parsedUTD = parseUTD(*utd);
     auto &door = newDoor(parsedUTD.Tag);
-    auto genericDoors = _resourceSvc.twoDas.get("genericdoors");
-    if (!genericDoors) {
+    auto genericDoorsRaw = _resourceSvc.twoDas.get("genericdoors");
+    if (!genericDoorsRaw) {
         throw ResourceNotFoundException("genericdoors 2DA not found");
     }
-    door.load(parsedUTD, *genericDoors);
+    auto genericDoors = parseGenericdoorsTwoDA(*genericDoorsRaw);
+    door.load(parsedUTD, genericDoors);
     return door;
 }
 
@@ -727,11 +737,12 @@ Placeable &Game::loadPlaceable(const resource::ResRef &tmplt) {
     }
     auto parsedUTP = parseUTP(*utp);
     auto &placeable = newPlaceable(parsedUTP.Tag);
-    auto placeables = _resourceSvc.twoDas.get("placeables");
-    if (!placeables) {
+    auto placeablesRaw = _resourceSvc.twoDas.get("placeables");
+    if (!placeablesRaw) {
         throw ResourceNotFoundException("placeables 2DA not found");
     }
-    placeable.load(parsedUTP, *placeables);
+    auto placeables = parsePlaceablesTwoDA(*placeablesRaw);
+    placeable.load(parsedUTP, placeables);
     return placeable;
 }
 

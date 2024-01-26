@@ -19,6 +19,7 @@
 
 #include "reone/game/neo/object/placeable.h"
 #include "reone/resource/2da.h"
+#include "reone/resource/parser/2da/placeables.h"
 #include "reone/resource/parser/gff/utp.h"
 
 using namespace reone::game;
@@ -31,13 +32,13 @@ TEST(placeable, should_load_utp) {
     Placeable placeable {0, ""};
     UTP utp;
     utp.Appearance = 0;
-    auto placeables = TwoDA::Builder()
-                          .columns({"modelname"})
-                          .row({"plc_footlker"})
-                          .build();
+    PlaceablesTwoDARow placeablesRow;
+    placeablesRow.modelname = "plc_footlker";
+    PlaceablesTwoDA placeables;
+    placeables.rows.push_back(std::move(placeablesRow));
 
     // when
-    placeable.load(utp, *placeables);
+    placeable.load(utp, placeables);
 
     // then
     EXPECT_TRUE(placeable.is(ObjectState::Loaded));

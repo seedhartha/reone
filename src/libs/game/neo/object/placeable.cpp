@@ -31,8 +31,8 @@ namespace game {
 namespace neo {
 
 void Placeable::load(const UTP &utp,
-                     const TwoDA &placeables) {
-    auto placeablesRow = parsePlaceablesTwoDARow(placeables, utp.Appearance);
+                     const PlaceablesTwoDA &placeables) {
+    const auto &placeablesRow = placeables.rows[utp.Appearance];
     if (!placeablesRow.modelname) {
         throw ValidationException("Empty placeable model name");
     }

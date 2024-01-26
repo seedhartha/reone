@@ -26,13 +26,14 @@ namespace reone {
 
 namespace resource {
 
-class TwoDA;
-
 namespace generated {
 
 struct UTC;
 
-}
+struct AppearanceTwoDA;
+struct HeadsTwoDA;
+
+} // namespace generated
 
 } // namespace resource
 
@@ -69,12 +70,12 @@ public:
     }
 
     void load(const resource::generated::UTC &utc,
-              const resource::TwoDA &appearance,
-              const resource::TwoDA &heads);
+              const resource::generated::AppearanceTwoDA &appearance,
+              const resource::generated::HeadsTwoDA &heads);
 
     void load(AppearanceId appearanceId,
-              const resource::TwoDA &appearance,
-              const resource::TwoDA &heads,
+              const resource::generated::AppearanceTwoDA &appearance,
+              const resource::generated::HeadsTwoDA &heads,
               std::optional<int> bodyVariation = std::nullopt,
               std::optional<int> texVariation = std::nullopt);
 

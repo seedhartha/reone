@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "reone/resource/2da.h"
-
 namespace reone {
 
 namespace resource {
+
+class TwoDA;
 
 namespace generated {
 
@@ -36,34 +36,16 @@ struct HeadsTwoDARow {
     std::optional<std::string> headtexvvve;
 };
 
+HeadsTwoDARow parseHeadsTwoDARow(const TwoDA &twoDA, int rownum);
+
 struct HeadsTwoDA {
     std::vector<HeadsTwoDARow> rows;
 };
 
-HeadsTwoDARow parseHeadsTwoDARow(const TwoDA &twoDA, int rownum) {
-    HeadsTwoDARow row;
-    row.alttexture = twoDA.getStringOpt(rownum, "alttexture");
-    row.head = twoDA.getStringOpt(rownum, "head");
-    row.headtexe = twoDA.getStringOpt(rownum, "headtexe");
-    row.headtexg = twoDA.getStringOpt(rownum, "headtexg");
-    row.headtexve = twoDA.getStringOpt(rownum, "headtexve");
-    row.headtexvg = twoDA.getStringOpt(rownum, "headtexvg");
-    row.headtexvve = twoDA.getStringOpt(rownum, "headtexvve");
-    row.headtexvvve = twoDA.getStringOpt(rownum, "headtexvvve");
-    return row;
-}
-
-HeadsTwoDA parseHeadsTwoDA(const TwoDA &twoDA) {
-    HeadsTwoDA strct;
-    for (int i = 0; i < twoDA.getRowCount(); ++i) {
-        strct.rows.push_back(parseHeadsTwoDARow(twoDA, i));
-    }
-    return strct;
-}
+HeadsTwoDA parseHeadsTwoDA(const TwoDA &twoDA);
 
 } // namespace generated
 
 } // namespace resource
 
 } // namespace reone
-
