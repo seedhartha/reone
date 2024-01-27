@@ -23,10 +23,13 @@
 
 #include "../options.h"
 
+#include "actionexecutor.h"
 #include "controller/playercamera.h"
 #include "controller/selection.h"
+#include "eventhandler.h"
 #include "object/area.h"
 #include "object/module.h"
+#include "objectrepository.h"
 
 namespace reone {
 
@@ -74,7 +77,8 @@ class Store;
 class Trigger;
 class Waypoint;
 
-class Game : public IAreaLoader,
+class Game : public IObjectRepository,
+             public IAreaLoader,
              public IAreaObjectLoader,
              public IActionExecutor,
              public IEventCollector,
@@ -127,6 +131,22 @@ public:
     Creature &loadCreature(ObjectTag tag, PortraitId portraitId);
 
     // END Player character
+
+    // IObjectRepository
+
+    Object &get(ObjectId objectId) override {
+        return find(objectId).value();
+    }
+
+    std::optional<std::reference_wrapper<Object>> find(ObjectId objectId) override {
+        auto it = _idToObject.find(objectId);
+        if (it == _idToObject.end()) {
+            return std::nullopt;
+        }
+        return it->second;
+    }
+
+    // END IObjectRepository
 
     // IAreaLoader
 
@@ -210,6 +230,34 @@ private:
 
     bool _inited {false};
 
+    ObjectId _nextObjectId {2};
+    std::list<std::unique_ptr<Object>> _objects;
+    std::map<ObjectId, std::reference_wrapper<Object>> _idToObject;
+    std::optional<std::reference_wrapper<Module>> _module;
+    std::optional<std::reference_wrapper<Creature>> _pc;
+
+    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
+
+    std::set<uint32_t> _walkSurfaceMaterials;
+    std::set<uint32_t> _walkcheckSurfaceMaterials;
+    std::set<uint32_t> _lineOfSightSurfaceMaterials;
+
+    // Services
+
+    std::unique_ptr<ActionExecutor> _actionExecutor;
+    std::unique_ptr<EventHandler> _eventHandler;
+
+    // END Services
+
+    // Controllers
+
+    std::unique_ptr<PlayerCameraController> _playerCameraController;
+    std::unique_ptr<SelectionController> _selectionController;
+
+    // END Controllers
+
+    // Logic thread
+
     uint64_t _ticks {0};
     std::atomic_bool _quit {false};
     std::atomic_bool _paused {false};
@@ -221,26 +269,9 @@ private:
     std::list<Event> _eventsFrontBuf;
     std::mutex _eventsMutex;
 
-    ObjectId _nextObjectId {2};
-    std::list<std::unique_ptr<Object>> _objects;
-    std::map<ObjectId, std::reference_wrapper<Object>> _idToObject;
-    std::list<ObjectWalkmesh> _objectWalkmeshes;
-    std::map<ObjectId, std::vector<std::reference_wrapper<scene::WalkmeshSceneNode>>> _doorIdToWalkmesh;
-    std::optional<std::reference_wrapper<Module>> _module;
-    std::optional<std::reference_wrapper<Creature>> _pc;
+    // END Logic thread
 
-    std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
-
-    std::set<uint32_t> _walkSurfaceMaterials;
-    std::set<uint32_t> _walkcheckSurfaceMaterials;
-    std::set<uint32_t> _lineOfSightSurfaceMaterials;
-
-    // Controllers
-
-    std::unique_ptr<PlayerCameraController> _playerCameraController;
-    std::unique_ptr<SelectionController> _selectionController;
-
-    // END Controllers
+    void handleEvents();
 
     // Logic thread
 
@@ -256,21 +287,6 @@ private:
     bool executeMoveToPoint(Creature &subject, const Action &action, float dt);
 
     // END Action execution
-
-    // Event handling
-
-    void handleEvents();
-
-    void onAreaLoaded(Area &area);
-    void onCreatureLoaded(Creature &creature);
-    void onDoorLoaded(Door &door);
-    void onPlaceableLoaded(Placeable &placeable);
-    void onObjectLocationChanged(SpatialObject &object);
-    void onObjectAnimationReset(Object &object, const std::string &animName);
-    void onObjectFireForgetAnimationFired(Object &object, const std::string &animName);
-    void onDoorStateChanged(Door &door, DoorState state);
-
-    // END Event handling
 };
 
 } // namespace neo

@@ -126,6 +126,9 @@ void Game::init() {
     scene.setLineOfSightSurfaces(_lineOfSightSurfaceMaterials);
     scene.setUpdateRoots(true);
 
+    _actionExecutor = std::make_unique<ActionExecutor>();
+    _eventHandler = std::make_unique<EventHandler>(*this, _options.graphics, _resourceSvc, _sceneSvc);
+
     _playerCameraController = std::make_unique<PlayerCameraController>(scene);
     _selectionController = std::make_unique<SelectionController>(_options.graphics, scene);
 
@@ -204,207 +207,16 @@ void Game::handleEvents() {
         std::lock_guard<std::mutex> lock {_eventsMutex};
         std::swap(events, _eventsFrontBuf);
     }
-    for (auto &event : events) {
-        if (event.type == EventType::ObjectStateChanged && event.object.state == ObjectState::Loaded) {
-            auto &object = _idToObject.at(event.object.objectId).get();
-            if (object.type() == ObjectType::Area) {
-                auto &area = static_cast<Area &>(object);
-                onAreaLoaded(area);
-            } else if (object.type() == ObjectType::Creature) {
-                auto &creature = static_cast<Creature &>(object);
-                onCreatureLoaded(creature);
-            } else if (object.type() == ObjectType::Door) {
-                auto &door = static_cast<Door &>(object);
-                onDoorLoaded(door);
-            } else if (object.type() == ObjectType::Placeable) {
-                auto &placeable = static_cast<Placeable &>(object);
-                onPlaceableLoaded(placeable);
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    for (const auto &event : events) {
+        _eventHandler.get()->handle(event);
+        if (event.type == EventType::ObjectStateChanged &&
+            event.object.state == ObjectState::Loaded &&
+            (_pc && event.object.objectId == _pc->get().id())) {
+            auto sceneNode = scene.modelByExternalRef(&_pc->get());
+            if (sceneNode) {
+                _playerCameraController->setPlayerSceneNode(sceneNode->get());
             }
-        } else if (event.type == EventType::ObjectLocationChanged) {
-            auto &object = _idToObject.at(event.object.objectId).get();
-            auto &spatial = static_cast<SpatialObject &>(object);
-            onObjectLocationChanged(spatial);
-        } else if (event.type == EventType::ObjectAnimationReset) {
-            auto &object = _idToObject.at(event.animation.objectId).get();
-            onObjectAnimationReset(object, event.animation.name);
-        } else if (event.type == EventType::ObjectFireForgetAnimationFired) {
-            auto &object = _idToObject.at(event.animation.objectId).get();
-            onObjectFireForgetAnimationFired(object, event.animation.name);
-        } else if (event.type == EventType::DoorStateChanged) {
-            auto &object = _idToObject.at(event.object.objectId).get();
-            auto &door = static_cast<Door &>(object);
-            onDoorStateChanged(door, event.door.state);
-        }
-    }
-}
-
-void Game::onAreaLoaded(Area &area) {
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    for (auto &room : area.rooms()) {
-        auto model = _resourceSvc.models.get(room.model);
-        if (!model) {
-            throw ResourceNotFoundException("Room model not found: " + room.model);
-        }
-        auto sceneNode = scene.newModel(*model, ModelUsage::Room);
-        sceneNode->setLocalTransform(glm::translate(room.position));
-        scene.addRoot(std::move(sceneNode));
-        auto walkmesh = _resourceSvc.walkmeshes.get(room.model, ResType::Wok);
-        if (walkmesh) {
-            ObjectWalkmesh ow {area.id(), *walkmesh};
-            _objectWalkmeshes.push_back(std::move(ow));
-            auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
-            scene.addRoot(std::move(walkmeshSceneNode));
-        } else {
-            warn("Room walkmesh not found: " + room.model);
-        }
-    }
-}
-
-void Game::onCreatureLoaded(Creature &creature) {
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    const auto &appearance = creature.appearance();
-    auto modelName = appearance.model.value();
-    auto model = _resourceSvc.models.get(modelName);
-    if (!model) {
-        throw ResourceNotFoundException("Creature model not found: " + modelName);
-    }
-    auto transform = glm::translate(creature.position());
-    transform *= glm::eulerAngleZ(creature.facing());
-    auto sceneNode = scene.newModel(*model, ModelUsage::Creature);
-    if (appearance.texture) {
-        auto &texName = appearance.texture->value();
-        auto texture = _resourceSvc.textures.get(texName, TextureUsage::MainTex);
-        if (!texture) {
-            throw ResourceNotFoundException("Creature texture not found: " + texName);
-        }
-        sceneNode->setMainTexture(texture.get());
-    }
-    if (appearance.normalHeadModel) {
-        auto headModel = _resourceSvc.models.get(appearance.normalHeadModel->value());
-        if (!headModel) {
-            throw ResourceNotFoundException("Creature head model not found: " + modelName);
-        }
-        auto headSceneNode = scene.newModel(*headModel, ModelUsage::Creature);
-        sceneNode->attach("headhook", *headSceneNode);
-    }
-    sceneNode->setLocalTransform(std::move(transform));
-    sceneNode->setDrawDistance(_options.graphics.drawDistance);
-    sceneNode->setPickable(true);
-    sceneNode->setExternalRef(&creature);
-    if (creature == _pc) {
-        _playerCameraController->setPlayerSceneNode(*sceneNode);
-    }
-    scene.addRoot(std::move(sceneNode));
-}
-
-void Game::onDoorLoaded(Door &door) {
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    auto modelName = door.modelName().value();
-    auto model = _resourceSvc.models.get(modelName);
-    if (!model) {
-        throw ResourceNotFoundException("Door model not found: " + modelName);
-    }
-    auto transform = glm::translate(door.position());
-    transform *= glm::eulerAngleZ(door.facing());
-    auto sceneNode = scene.newModel(*model, ModelUsage::Door);
-    sceneNode->setLocalTransform(transform);
-    // sceneNode->setDrawDistance(_options.graphics.drawDistance);
-    sceneNode->setPickable(true);
-    sceneNode->setExternalRef(&door);
-    scene.addRoot(std::move(sceneNode));
-    for (int i = 0; i < 3; ++i) {
-        auto walkmesh = _resourceSvc.walkmeshes.get(modelName + std::to_string(i), ResType::Dwk);
-        if (walkmesh) {
-            ObjectWalkmesh ow {door.id(),
-                               *walkmesh,
-                               static_cast<DoorWalkmeshType>(i)};
-            _objectWalkmeshes.push_back(std::move(ow));
-            auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
-            walkmeshSceneNode->setLocalTransform(transform);
-            if (door.doorState() == DoorState::Closed) {
-                walkmeshSceneNode->setEnabled(i == 0);
-            } else {
-                walkmeshSceneNode->setEnabled(i == 1);
-            }
-            _doorIdToWalkmesh[door.id()].push_back(*walkmeshSceneNode);
-            scene.addRoot(std::move(walkmeshSceneNode));
-        } else {
-            warn("Door walkmesh not found: " + modelName);
-        }
-    }
-}
-
-void Game::onPlaceableLoaded(Placeable &placeable) {
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    auto modelName = placeable.modelName().value();
-    auto model = _resourceSvc.models.get(modelName);
-    if (!model) {
-        throw ResourceNotFoundException("Placeable model not found: " + modelName);
-    }
-    auto transform = glm::translate(placeable.position());
-    transform *= glm::eulerAngleZ(placeable.facing());
-    auto sceneNode = scene.newModel(*model, ModelUsage::Placeable);
-    sceneNode->setLocalTransform(transform);
-    sceneNode->setDrawDistance(_options.graphics.drawDistance);
-    sceneNode->setPickable(true);
-    sceneNode->setExternalRef(&placeable);
-    scene.addRoot(std::move(sceneNode));
-    auto walkmesh = _resourceSvc.walkmeshes.get(modelName, ResType::Pwk);
-    if (walkmesh) {
-        ObjectWalkmesh ow {placeable.id(), *walkmesh};
-        _objectWalkmeshes.push_back(std::move(ow));
-        auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
-        walkmeshSceneNode->setLocalTransform(transform);
-        scene.addRoot(std::move(walkmeshSceneNode));
-    } else {
-        warn("Placeable walkmesh not found: " + modelName);
-    }
-}
-
-void Game::onObjectLocationChanged(SpatialObject &object) {
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    auto sceneNode = scene.modelByExternalRef(&object);
-    if (!sceneNode) {
-        return;
-    }
-    auto transform = glm::rotate(
-        glm::translate(object.position()),
-        object.facing(),
-        glm::vec3 {0.0f, 0.0f, 1.0f});
-    sceneNode->get().setLocalTransform(std::move(transform));
-}
-
-void Game::onObjectAnimationReset(Object &object, const std::string &animName) {
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    auto sceneNode = scene.modelByExternalRef(&object);
-    if (!sceneNode) {
-        return;
-    }
-    int flags = AnimationFlags::loop |
-                AnimationFlags::propagate;
-    auto props = AnimationProperties::fromFlags(flags);
-    sceneNode->get().playAnimation(animName, nullptr, std::move(props));
-}
-
-void Game::onObjectFireForgetAnimationFired(Object &object, const std::string &animName) {
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    auto sceneNode = scene.modelByExternalRef(&object);
-    if (!sceneNode) {
-        return;
-    }
-    int flags = AnimationFlags::fireForget |
-                AnimationFlags::propagate;
-    auto props = AnimationProperties::fromFlags(flags);
-    sceneNode->get().playAnimation(animName, nullptr, std::move(props));
-}
-
-void Game::onDoorStateChanged(Door &door, DoorState state) {
-    auto &walkmeshes = _doorIdToWalkmesh.at(door.id());
-    for (size_t i = 0; i < walkmeshes.size(); ++i) {
-        if (state == DoorState::Closed) {
-            walkmeshes[i].get().setEnabled(i == 0);
-        } else {
-            walkmeshes[i].get().setEnabled(i == 1);
         }
     }
 }
@@ -547,10 +359,41 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
     glm::vec2 newPos2D = oldPos2D + kPlayerMoveRate * dir2D * dt;
     subject.setFacingPoint(action.location.position);
 
+    std::vector<ObjectWalkmesh> walkmeshes;
+    auto &area = _module->get().area();
+    for (const auto &room : area.rooms()) {
+        auto walkmesh = _resourceSvc.walkmeshes.get(room.model, ResType::Wok);
+        if (walkmesh) {
+            walkmeshes.emplace_back(area.id(), *walkmesh);
+        }
+    }
+    for (const auto &door : area.doors()) {
+        auto walkmeshResRef = door.get().modelName().value();
+        DoorWalkmeshType walkmeshType;
+        if (door.get().isClosed()) {
+            walkmeshResRef += "0";
+            walkmeshType = DoorWalkmeshType::Closed;
+        } else {
+            walkmeshResRef += "1";
+            walkmeshType = DoorWalkmeshType::Open1;
+        }
+        auto walkmesh = _resourceSvc.walkmeshes.get(walkmeshResRef, ResType::Dwk);
+        if (walkmesh) {
+            walkmeshes.emplace_back(door.get().id(), *walkmesh, walkmeshType);
+        }
+    }
+    for (const auto &placeable : area.placeables()) {
+        auto walkmeshResRef = placeable.get().modelName().value();
+        auto walkmesh = _resourceSvc.walkmeshes.get(walkmeshResRef, ResType::Pwk);
+        if (walkmesh) {
+            walkmeshes.emplace_back(placeable.get().id(), *walkmesh);
+        }
+    }
+
     // TODO: extract method
     // First pass: Z coord and floor obstructions
     std::optional<float> zCoord;
-    for (const auto &ow : _objectWalkmeshes) {
+    for (const auto &ow : walkmeshes) {
         const auto &object = _idToObject.at(ow.objectId);
         const auto &walkmesh = ow.walkmesh;
         glm::mat4 toLocal {1.0f};
@@ -560,20 +403,6 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
                 continue;
             }
         } else {
-            if (object.get().type() == ObjectType::Door) {
-                const auto &door = static_cast<Door &>(object.get());
-                if (!ow.doorType) {
-                    continue;
-                }
-                if (door.doorState() == DoorState::Closed &&
-                    *ow.doorType != DoorWalkmeshType::Closed) {
-                    continue;
-                }
-                if (door.doorState() == DoorState::Open &&
-                    *ow.doorType != DoorWalkmeshType::Open1) {
-                    continue;
-                }
-            }
             const auto &spatial = static_cast<SpatialObject &>(object.get());
             float distance = glm::distance(subject.position(), spatial.position());
             if (distance > 4.0f) {
@@ -606,7 +435,7 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
         return false;
     }
     // Second pass: wall obstructions
-    for (const auto &ow : _objectWalkmeshes) {
+    for (const auto &ow : walkmeshes) {
         const auto &object = _idToObject.at(ow.objectId);
         const auto &walkmesh = ow.walkmesh;
         glm::mat4 toLocal {1.0f};
@@ -616,20 +445,6 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
                 continue;
             }
         } else {
-            if (object.get().type() == ObjectType::Door) {
-                const auto &door = static_cast<Door &>(object.get());
-                if (!ow.doorType) {
-                    continue;
-                }
-                if (door.doorState() == DoorState::Closed &&
-                    *ow.doorType != DoorWalkmeshType::Closed) {
-                    continue;
-                }
-                if (door.doorState() == DoorState::Open &&
-                    *ow.doorType != DoorWalkmeshType::Open1) {
-                    continue;
-                }
-            }
             const auto &spatial = static_cast<SpatialObject &>(object.get());
             float distance = glm::distance(subject.position(), spatial.position());
             if (distance > 4.0f) {

@@ -68,8 +68,12 @@ public:
         playFireForgetAnimation("closing1");
     }
 
-    DoorState doorState() const {
-        return _doorState;
+    bool isClosed() const {
+        return _doorState == DoorState::Closed;
+    }
+
+    bool isOpen() const {
+        return _doorState == DoorState::Open;
     }
 
     const resource::ResRef &modelName() const {

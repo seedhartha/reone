@@ -69,7 +69,7 @@ std::optional<std::reference_wrapper<SpatialObject>> SelectionController::findOb
     auto &object = *reinterpret_cast<SpatialObject *>(ref);
     if (object.type() == ObjectType::Door) {
         auto &door = static_cast<Door &>(object);
-        if (door.doorState() != DoorState::Closed) {
+        if (!door.isClosed()) {
             return std::nullopt;
         }
     }
