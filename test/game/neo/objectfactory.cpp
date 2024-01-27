@@ -31,15 +31,14 @@
 #include "reone/game/neo/object/store.h"
 #include "reone/game/neo/object/trigger.h"
 #include "reone/game/neo/object/waypoint.h"
-#include "reone/game/neo/objectrepository.h"
+#include "reone/game/neo/objectfactory.h"
 
 using namespace reone::game::neo;
 
-TEST(object_repository, should_instantiate_objects_with_incrementing_id) {
+TEST(object_factory, should_instantiate_objects_with_incrementing_id) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    ObjectRepository subject {actionExecutor, eventCollector};
+    ObjectFactory subject {eventCollector};
 
     // when
     auto &area = subject.newArea("");

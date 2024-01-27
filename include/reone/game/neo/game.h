@@ -29,8 +29,8 @@
 #include "eventhandler.h"
 #include "object/area.h"
 #include "object/module.h"
+#include "objectfactory.h"
 #include "objectloader.h"
-#include "objectrepository.h"
 #include "selectionoverlay.h"
 
 namespace reone {
@@ -149,7 +149,7 @@ private:
     // Services
 
     std::unique_ptr<ObjectLoader> _objectLoader;
-    std::unique_ptr<ObjectRepository> _objectRepository;
+    std::unique_ptr<ObjectFactory> _objectFactory;
     std::unique_ptr<ActionExecutor> _actionExecutor;
     std::unique_ptr<EventHandler> _eventHandler;
 

@@ -68,26 +68,26 @@ protected:
         _trigger = std::make_unique<Trigger>(10, "", _eventCollector);
         _waypoint = std::make_unique<Waypoint>(11, "", _eventCollector);
 
-        ON_CALL(_objectRepository, newArea(_)).WillByDefault(ReturnRef(*_area));
-        ON_CALL(_objectRepository, newCamera(_)).WillByDefault(ReturnRef(*_camera));
-        ON_CALL(_objectRepository, newCreature(_)).WillByDefault(ReturnRef(*_creature));
-        ON_CALL(_objectRepository, newDoor(_)).WillByDefault(ReturnRef(*_door));
-        ON_CALL(_objectRepository, newEncounter(_)).WillByDefault(ReturnRef(*_encounter));
-        ON_CALL(_objectRepository, newItem(_)).WillByDefault(ReturnRef(*_item));
-        ON_CALL(_objectRepository, newModule(_)).WillByDefault(ReturnRef(*_module));
-        ON_CALL(_objectRepository, newPlaceable(_)).WillByDefault(ReturnRef(*_placeable));
-        ON_CALL(_objectRepository, newSound(_)).WillByDefault(ReturnRef(*_sound));
-        ON_CALL(_objectRepository, newStore(_)).WillByDefault(ReturnRef(*_store));
-        ON_CALL(_objectRepository, newTrigger(_)).WillByDefault(ReturnRef(*_trigger));
-        ON_CALL(_objectRepository, newWaypoint(_)).WillByDefault(ReturnRef(*_waypoint));
+        ON_CALL(_objectFactory, newArea(_)).WillByDefault(ReturnRef(*_area));
+        ON_CALL(_objectFactory, newCamera(_)).WillByDefault(ReturnRef(*_camera));
+        ON_CALL(_objectFactory, newCreature(_)).WillByDefault(ReturnRef(*_creature));
+        ON_CALL(_objectFactory, newDoor(_)).WillByDefault(ReturnRef(*_door));
+        ON_CALL(_objectFactory, newEncounter(_)).WillByDefault(ReturnRef(*_encounter));
+        ON_CALL(_objectFactory, newItem(_)).WillByDefault(ReturnRef(*_item));
+        ON_CALL(_objectFactory, newModule(_)).WillByDefault(ReturnRef(*_module));
+        ON_CALL(_objectFactory, newPlaceable(_)).WillByDefault(ReturnRef(*_placeable));
+        ON_CALL(_objectFactory, newSound(_)).WillByDefault(ReturnRef(*_sound));
+        ON_CALL(_objectFactory, newStore(_)).WillByDefault(ReturnRef(*_store));
+        ON_CALL(_objectFactory, newTrigger(_)).WillByDefault(ReturnRef(*_trigger));
+        ON_CALL(_objectFactory, newWaypoint(_)).WillByDefault(ReturnRef(*_waypoint));
 
         _subject = std::make_unique<ObjectLoader>(
-            _objectRepository,
+            _objectFactory,
             _resourceModule.services());
     }
 
     TestResourceModule _resourceModule;
-    MockObjectRepository _objectRepository;
+    MockObjectFactory _objectFactory;
     MockObjectLoader _objectLoader;
     MockActionExecutor _actionExecutor;
     MockEventCollector _eventCollector;

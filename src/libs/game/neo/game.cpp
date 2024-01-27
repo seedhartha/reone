@@ -108,11 +108,11 @@ void Game::init() {
         }
     }
 
-    _objectRepository = std::make_unique<ObjectRepository>(*this);
-    _objectLoader = std::make_unique<ObjectLoader>(*_objectRepository, _resourceSvc);
-    _eventHandler = std::make_unique<EventHandler>(*_objectRepository, _options.graphics, _resourceSvc, _sceneSvc);
+    _objectFactory = std::make_unique<ObjectFactory>(*this);
+    _objectLoader = std::make_unique<ObjectLoader>(*_objectFactory, _resourceSvc);
+    _eventHandler = std::make_unique<EventHandler>(_options.graphics, _resourceSvc, _sceneSvc);
 
-    _actionExecutor = std::make_unique<ActionExecutor>(*_objectRepository, _resourceSvc);
+    _actionExecutor = std::make_unique<ActionExecutor>(_resourceSvc);
     _actionExecutor->setWalkSurfaceMaterials(walkSurfaceMaterials);
     _actionExecutor->setWalkcheckSurfaceMaterials(walkcheckSurfaceMaterials);
 
@@ -131,6 +131,7 @@ void Game::init() {
     if (_module) {
         auto &module = _module->get();
         _actionExecutor->setModule(module);
+        _eventHandler->setModule(module);
 
         auto &pc = _objectLoader->loadCreature("", 23);
         _pc = pc;
@@ -171,7 +172,7 @@ void Game::deinit() {
     _actionExecutor.reset();
     _eventHandler.reset();
     _objectLoader.reset();
-    _objectRepository.reset();
+    _objectFactory.reset();
     _inited = false;
 }
 

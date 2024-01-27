@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/neo/objectrepository.h"
+#include "reone/game/neo/objectfactory.h"
 
 #include "reone/game/neo/actionexecutor.h"
 #include "reone/game/neo/object/area.h"
@@ -38,73 +38,73 @@ namespace game {
 
 namespace neo {
 
-Area &ObjectRepository::newArea(ObjectTag tag) {
+Area &ObjectFactory::newArea(ObjectTag tag) {
     return newObject<Area>(
         std::move(tag),
         _eventCollector);
 }
 
-Camera &ObjectRepository::newCamera(ObjectTag tag) {
+Camera &ObjectFactory::newCamera(ObjectTag tag) {
     return newObject<Camera>(
         std::move(tag),
         _eventCollector);
 }
 
-Creature &ObjectRepository::newCreature(ObjectTag tag) {
+Creature &ObjectFactory::newCreature(ObjectTag tag) {
     return newObject<Creature>(
         std::move(tag),
         _eventCollector);
 }
 
-Door &ObjectRepository::newDoor(ObjectTag tag) {
+Door &ObjectFactory::newDoor(ObjectTag tag) {
     return newObject<Door>(
         std::move(tag),
         _eventCollector);
 }
 
-Encounter &ObjectRepository::newEncounter(ObjectTag tag) {
+Encounter &ObjectFactory::newEncounter(ObjectTag tag) {
     return newObject<Encounter>(
         std::move(tag),
         _eventCollector);
 }
 
-Item &ObjectRepository::newItem(ObjectTag tag) {
+Item &ObjectFactory::newItem(ObjectTag tag) {
     return newObject<Item>(
         std::move(tag),
         _eventCollector);
 }
 
-Module &ObjectRepository::newModule(ObjectTag tag) {
+Module &ObjectFactory::newModule(ObjectTag tag) {
     return newObject<Module>(
         std::move(tag),
         _eventCollector);
 }
 
-Placeable &ObjectRepository::newPlaceable(ObjectTag tag) {
+Placeable &ObjectFactory::newPlaceable(ObjectTag tag) {
     return newObject<Placeable>(
         std::move(tag),
         _eventCollector);
 }
 
-Sound &ObjectRepository::newSound(ObjectTag tag) {
+Sound &ObjectFactory::newSound(ObjectTag tag) {
     return newObject<Sound>(
         std::move(tag),
         _eventCollector);
 }
 
-Store &ObjectRepository::newStore(ObjectTag tag) {
+Store &ObjectFactory::newStore(ObjectTag tag) {
     return newObject<Store>(
         std::move(tag),
         _eventCollector);
 }
 
-Trigger &ObjectRepository::newTrigger(ObjectTag tag) {
+Trigger &ObjectFactory::newTrigger(ObjectTag tag) {
     return newObject<Trigger>(
         std::move(tag),
         _eventCollector);
 }
 
-Waypoint &ObjectRepository::newWaypoint(ObjectTag tag) {
+Waypoint &ObjectFactory::newWaypoint(ObjectTag tag) {
     return newObject<Waypoint>(
         std::move(tag),
         _eventCollector);

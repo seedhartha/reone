@@ -43,23 +43,20 @@ namespace neo {
 
 enum class DoorState;
 
-class IObjectRepository;
-
 class Area;
 class Creature;
 class Door;
 class Event;
+class Module;
 class Object;
 class Placeable;
 class SpatialObject;
 
 class EventHandler : boost::noncopyable {
 public:
-    EventHandler(IObjectRepository &objectRepository,
-                 graphics::GraphicsOptions &graphicsOpt,
+    EventHandler(graphics::GraphicsOptions &graphicsOpt,
                  resource::ResourceServices &resourceSvc,
                  scene::SceneServices &sceneSvc) :
-        _objectRepository(objectRepository),
         _graphicsOpt(graphicsOpt),
         _resourceSvc(resourceSvc),
         _sceneSvc(sceneSvc) {
@@ -67,11 +64,16 @@ public:
 
     void handle(const Event &event);
 
+    void setModule(Module &module) {
+        _module = module;
+    }
+
 private:
-    IObjectRepository &_objectRepository;
     graphics::GraphicsOptions &_graphicsOpt;
     resource::ResourceServices &_resourceSvc;
     scene::SceneServices &_sceneSvc;
+
+    std::optional<std::reference_wrapper<Module>> _module;
 
     void onAreaLoaded(Area &area);
     void onCreatureLoaded(Creature &creature);

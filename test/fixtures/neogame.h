@@ -32,7 +32,7 @@
 #include "reone/game/neo/object/store.h"
 #include "reone/game/neo/object/trigger.h"
 #include "reone/game/neo/object/waypoint.h"
-#include "reone/game/neo/objectrepository.h"
+#include "reone/game/neo/objectfactory.h"
 #include "reone/game/profiler.h"
 
 using namespace reone::resource;
@@ -43,7 +43,7 @@ namespace game {
 
 namespace neo {
 
-class MockObjectRepository : public IObjectRepository, boost::noncopyable {
+class MockObjectFactory : public IObjectFactory, boost::noncopyable {
 public:
     MOCK_METHOD(Area &, newArea, (ObjectTag), (override));
     MOCK_METHOD(Camera &, newCamera, (ObjectTag), (override));
@@ -57,9 +57,6 @@ public:
     MOCK_METHOD(Store &, newStore, (ObjectTag), (override));
     MOCK_METHOD(Trigger &, newTrigger, (ObjectTag), (override));
     MOCK_METHOD(Waypoint &, newWaypoint, (ObjectTag), (override));
-
-    MOCK_METHOD(Object &, get, (ObjectId), (override));
-    MOCK_METHOD(std::optional<std::reference_wrapper<Object>>, find, (ObjectId), (override));
 };
 
 class MockObjectLoader : public IAreaLoader, public IAreaObjectLoader, boost::noncopyable {

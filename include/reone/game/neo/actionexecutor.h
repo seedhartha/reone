@@ -39,8 +39,6 @@ namespace neo {
 
 struct Action;
 
-class IObjectRepository;
-
 class Creature;
 class Module;
 class Object;
@@ -54,9 +52,7 @@ public:
 
 class ActionExecutor : public IActionExecutor, boost::noncopyable {
 public:
-    ActionExecutor(IObjectRepository &objectRepository,
-                   resource::ResourceServices &resourceSvc) :
-        _objectRepository(objectRepository),
+    ActionExecutor(resource::ResourceServices &resourceSvc) :
         _resourceSvc(resourceSvc) {
     }
 
@@ -95,7 +91,6 @@ private:
         }
     };
 
-    IObjectRepository &_objectRepository;
     resource::ResourceServices &_resourceSvc;
 
     std::optional<std::reference_wrapper<Module>> _module;

@@ -40,9 +40,9 @@ class Store;
 class Trigger;
 class Waypoint;
 
-class IObjectRepository {
+class IObjectFactory {
 public:
-    virtual ~IObjectRepository() = default;
+    virtual ~IObjectFactory() = default;
 
     virtual Area &newArea(ObjectTag tag) = 0;
     virtual Camera &newCamera(ObjectTag tag) = 0;
@@ -56,14 +56,11 @@ public:
     virtual Store &newStore(ObjectTag tag) = 0;
     virtual Trigger &newTrigger(ObjectTag tag) = 0;
     virtual Waypoint &newWaypoint(ObjectTag tag) = 0;
-
-    virtual Object &get(ObjectId objectId) = 0;
-    virtual std::optional<std::reference_wrapper<Object>> find(ObjectId objectId) = 0;
 };
 
-class ObjectRepository : public IObjectRepository, boost::noncopyable {
+class ObjectFactory : public IObjectFactory, boost::noncopyable {
 public:
-    ObjectRepository(IEventCollector &eventCollector) :
+    ObjectFactory(IEventCollector &eventCollector) :
         _eventCollector(eventCollector) {
     }
 
@@ -80,24 +77,11 @@ public:
     Trigger &newTrigger(ObjectTag tag) override;
     Waypoint &newWaypoint(ObjectTag tag) override;
 
-    Object &get(ObjectId objectId) override {
-        return find(objectId).value();
-    }
-
-    std::optional<std::reference_wrapper<Object>> find(ObjectId objectId) override {
-        auto it = _idToObject.find(objectId);
-        if (it == _idToObject.end()) {
-            return std::nullopt;
-        }
-        return it->second;
-    }
-
 private:
     IEventCollector &_eventCollector;
 
     ObjectId _nextObjectId {2};
     std::list<std::unique_ptr<Object>> _objects;
-    std::map<ObjectId, std::reference_wrapper<Object>> _idToObject;
 
     template <class O, class... Args>
     inline O &newObject(ObjectTag tag, Args &&...args) {
@@ -106,9 +90,7 @@ private:
             std::move(tag),
             std::forward<Args>(args)...);
         _objects.push_back(std::move(object));
-        auto &inserted = *_objects.back();
-        _idToObject.insert({inserted.id(), inserted});
-        return static_cast<O &>(inserted);
+        return static_cast<O &>(*_objects.back());
     }
 };
 

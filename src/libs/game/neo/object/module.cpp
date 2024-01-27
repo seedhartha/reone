@@ -19,6 +19,7 @@
 
 #include "reone/game/neo/object/area.h"
 #include "reone/resource/parser/gff/ifo.h"
+#include "reone/system/logutil.h"
 
 using namespace reone::resource::generated;
 
@@ -31,9 +32,10 @@ namespace neo {
 void Module::load(IAreaLoader &areaLoader, const IFO &ifo) {
     for (const auto &ifoArea : ifo.Mod_Area_list) {
         auto &area = areaLoader.loadArea(ifoArea.Area_Name);
-        _areas.push_back(area);
         if (ifoArea.Area_Name == ifo.Mod_Entry_Area) {
             _area = area;
+        } else {
+            warn("More than one area per module is not supported");
         }
     }
     _entryPosition = {ifo.Mod_Entry_X,
@@ -50,6 +52,19 @@ void Module::update(IActionExecutor &actionExecutor, float dt) {
         return;
     }
     _area->get().update(actionExecutor, dt);
+}
+
+std::optional<std::reference_wrapper<Object>> Module::objectById(ObjectId objectId) {
+    if (_id == objectId) {
+        return *this;
+    }
+    if (!_area) {
+        return std::nullopt;
+    }
+    if (_area->get().id() == objectId) {
+        return _area;
+    }
+    return _area->get().objectById(objectId);
 }
 
 } // namespace neo

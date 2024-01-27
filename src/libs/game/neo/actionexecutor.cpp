@@ -23,7 +23,7 @@
 #include "reone/game/neo/object/door.h"
 #include "reone/game/neo/object/module.h"
 #include "reone/game/neo/object/placeable.h"
-#include "reone/game/neo/objectrepository.h"
+#include "reone/game/neo/objectfactory.h"
 #include "reone/graphics/walkmesh.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/provider/walkmeshes.h"
@@ -99,7 +99,7 @@ bool ActionExecutor::executeMoveToPoint(Creature &subject, const Action &action,
     // First pass: Z coord and floor obstructions
     std::optional<float> zCoord;
     for (const auto &ow : walkmeshes) {
-        const auto &object = _objectRepository.get(ow.objectId);
+        const auto &object = _module->get().objectById(ow.objectId)->get();
         const auto &walkmesh = ow.walkmesh;
         glm::mat4 toLocal {1.0f};
         if (object.type() == ObjectType::Area) {
@@ -141,7 +141,7 @@ bool ActionExecutor::executeMoveToPoint(Creature &subject, const Action &action,
     }
     // Second pass: wall obstructions
     for (const auto &ow : walkmeshes) {
-        const auto &object = _objectRepository.get(ow.objectId);
+        const auto &object = _module->get().objectById(ow.objectId)->get();
         const auto &walkmesh = ow.walkmesh;
         glm::mat4 toLocal {1.0f};
         if (object.type() == ObjectType::Area) {

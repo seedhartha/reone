@@ -67,7 +67,7 @@ public:
         return *_area;
     }
 
-    // Entry
+    // Entry location
 
     const glm::vec3 &entryPosition() const {
         return _entryPosition;
@@ -77,18 +77,19 @@ public:
         return _entryFacing;
     }
 
-    // END Entry
+    // END Entry location
+
+    // Objects
+
+    std::optional<std::reference_wrapper<Object>> objectById(ObjectId objectId);
+
+    // END Objects
 
 private:
     glm::vec3 _entryPosition {0.0f};
     float _entryFacing {0.0f};
 
-    std::list<std::reference_wrapper<Area>> _areas;
     std::optional<std::reference_wrapper<Area>> _area;
-
-    void add(Area &area) {
-        _areas.push_back(area);
-    }
 };
 
 } // namespace neo

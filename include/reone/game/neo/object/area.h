@@ -123,6 +123,25 @@ public:
     void add(Store &store);
     void add(Waypoint &waypoint);
 
+    std::optional<std::reference_wrapper<Object>> objectById(ObjectId objectId) const {
+        auto it = _idToObject.find(objectId);
+        if (it == _idToObject.end()) {
+            return std::nullopt;
+        }
+        return it->second;
+    }
+
+    std::optional<std::reference_wrapper<Object>> objectByTag(ObjectTag tag, int nth = 0) const {
+        auto range = _tagToObject.equal_range(tag);
+        int index = 0;
+        for (auto it = range.first; it != range.second; ++it) {
+            if (index++ == nth) {
+                return it->second;
+            }
+        }
+        return std::nullopt;
+    }
+
     const RoomList &rooms() const {
         return _rooms;
     }
@@ -181,6 +200,15 @@ private:
     StoreList _stores;
     WaypointList _waypoints;
     ObjectList _objects;
+
+    std::unordered_map<ObjectId, std::reference_wrapper<Object>> _idToObject;
+    std::multimap<ObjectTag, std::reference_wrapper<Object>> _tagToObject;
+
+    void addInternal(Object &object) {
+        _objects.push_back(object);
+        _idToObject.insert({object.id(), object});
+        _tagToObject.insert({object.tag(), object});
+    }
 };
 
 } // namespace neo

@@ -506,7 +506,7 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/neo/object/module.cpp
     ${GAME_SOURCE_DIR}/neo/object/placeable.cpp
     ${GAME_SOURCE_DIR}/neo/objectloader.cpp
-    ${GAME_SOURCE_DIR}/neo/objectrepository.cpp
+    ${GAME_SOURCE_DIR}/neo/objectfactory.cpp
     ${GAME_SOURCE_DIR}/neo/selectionoverlay.cpp
     ${GAME_SOURCE_DIR}/object.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp

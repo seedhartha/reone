@@ -21,8 +21,8 @@
 #include "reone/game/neo/object/area.h"
 #include "reone/game/neo/object/creature.h"
 #include "reone/game/neo/object/door.h"
+#include "reone/game/neo/object/module.h"
 #include "reone/game/neo/object/placeable.h"
-#include "reone/game/neo/objectrepository.h"
 #include "reone/graphics/options.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
@@ -45,7 +45,7 @@ namespace neo {
 
 void EventHandler::handle(const Event &event) {
     if (event.type == EventType::ObjectStateChanged && event.object.state == ObjectState::Loaded) {
-        auto &object = _objectRepository.get(event.object.objectId);
+        auto &object = _module->get().objectById(event.object.objectId)->get();
         if (object.type() == ObjectType::Area) {
             auto &area = static_cast<Area &>(object);
             onAreaLoaded(area);
@@ -60,17 +60,17 @@ void EventHandler::handle(const Event &event) {
             onPlaceableLoaded(placeable);
         }
     } else if (event.type == EventType::ObjectLocationChanged) {
-        auto &object = _objectRepository.get(event.object.objectId);
+        auto &object = _module->get().objectById(event.object.objectId)->get();
         auto &spatial = static_cast<SpatialObject &>(object);
         onObjectLocationChanged(spatial);
     } else if (event.type == EventType::ObjectAnimationReset) {
-        auto &object = _objectRepository.get(event.object.objectId);
+        auto &object = _module->get().objectById(event.object.objectId)->get();
         onObjectAnimationReset(object, event.animation.name);
     } else if (event.type == EventType::ObjectFireForgetAnimationFired) {
-        auto &object = _objectRepository.get(event.object.objectId);
+        auto &object = _module->get().objectById(event.object.objectId)->get();
         onObjectFireForgetAnimationFired(object, event.animation.name);
     } else if (event.type == EventType::DoorStateChanged) {
-        auto &object = _objectRepository.get(event.object.objectId);
+        auto &object = _module->get().objectById(event.object.objectId)->get();
         auto &door = static_cast<Door &>(object);
         onDoorStateChanged(door, event.door.state);
     }
