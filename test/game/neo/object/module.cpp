@@ -31,19 +31,12 @@ using namespace reone::resource::generated;
 using testing::_;
 using testing::ReturnRef;
 
-class MockArea : public Area {
-public:
-    MockArea(MockGame &game) :
-        Area(1, "", game, game, game) {
-    }
-
-    MOCK_METHOD(void, update, (float), (override));
-};
-
 TEST(module, should_load_ifo) {
     // given
-    MockGame game;
-    Module module {0, "", game, game, game};
+    MockObjectLoader objectLoader;
+    MockActionExecutor actionExecutor;
+    MockEventCollector eventCollector;
+    Module module {0, "", objectLoader, actionExecutor, eventCollector};
     IFO ifo;
     ifo.Mod_Entry_Area = "m01aa";
     ifo.Mod_Entry_X = 1.0f;
@@ -52,10 +45,10 @@ TEST(module, should_load_ifo) {
     ifo.Mod_Entry_Dir_X = 0.70710677f;
     ifo.Mod_Entry_Dir_Y = -0.70710677f;
     ifo.Mod_Area_list.push_back({"m01aa"});
-    MockArea area {game};
+    Area area {1, "", objectLoader, actionExecutor, eventCollector};
 
     // expect
-    EXPECT_CALL(game, loadArea(_)).WillOnce(ReturnRef(area));
+    EXPECT_CALL(objectLoader, loadArea(_)).WillOnce(ReturnRef(area));
     module.load(ifo);
     EXPECT_TRUE(module.is(ObjectState::Loaded));
     EXPECT_EQ(module.area(), area);
@@ -65,19 +58,40 @@ TEST(module, should_load_ifo) {
 
 TEST(module, should_throw_for_area_when_has_no_areas) {
     // given
-    MockGame game;
-    Module module {0, "", game, game, game};
+    MockObjectLoader objectLoader;
+    MockActionExecutor actionExecutor;
+    MockEventCollector eventCollector;
+    Module module {0, "", objectLoader, actionExecutor, eventCollector};
 
     // expect
     EXPECT_THROW(module.area(), std::logic_error);
 }
 
+class MockArea : public Area {
+public:
+    MockArea(ObjectId objectId,
+             ObjectTag tag,
+             MockObjectLoader &objectLoader,
+             MockActionExecutor &actionExecutor,
+             MockEventCollector &eventCollector) :
+        Area(
+            objectId,
+            std::move(tag),
+            objectLoader,
+            actionExecutor,
+            eventCollector) {
+    }
+
+    MOCK_METHOD(void, update, (float), (override));
+};
 TEST(module, should_update_current_area_on_update) {
     // given
-    MockGame game;
-    MockArea area {game};
-    EXPECT_CALL(game, loadArea(_)).WillOnce(ReturnRef(area));
-    Module module {0, "", game, game, game};
+    MockObjectLoader objectLoader;
+    MockActionExecutor actionExecutor;
+    MockEventCollector eventCollector;
+    Module module {0, "", objectLoader, actionExecutor, eventCollector};
+    MockArea area {1, "", objectLoader, actionExecutor, eventCollector};
+    EXPECT_CALL(objectLoader, loadArea(_)).WillOnce(ReturnRef(area));
     IFO ifo;
     ifo.Mod_Area_list.push_back({"m01aa"});
     ifo.Mod_Entry_Area = "m01aa";

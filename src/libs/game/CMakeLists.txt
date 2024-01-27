@@ -301,6 +301,8 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/neo/object/store.h
     ${GAME_INCLUDE_DIR}/neo/object/trigger.h
     ${GAME_INCLUDE_DIR}/neo/object/waypoint.h
+    ${GAME_INCLUDE_DIR}/neo/objectfactory.h
+    ${GAME_INCLUDE_DIR}/neo/objectloader.h
     ${GAME_INCLUDE_DIR}/neo/types.h
     ${GAME_INCLUDE_DIR}/object.h
     ${GAME_INCLUDE_DIR}/object/area.h
@@ -503,6 +505,7 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/neo/object/door.cpp
     ${GAME_SOURCE_DIR}/neo/object/module.cpp
     ${GAME_SOURCE_DIR}/neo/object/placeable.cpp
+    ${GAME_SOURCE_DIR}/neo/objectloader.cpp
     ${GAME_SOURCE_DIR}/object.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp
     ${GAME_SOURCE_DIR}/object/camera/animated.cpp

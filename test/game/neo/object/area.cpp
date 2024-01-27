@@ -33,19 +33,12 @@ using namespace reone::resource::generated;
 using testing::_;
 using testing::ReturnRef;
 
-class MockCreature : public Creature {
-public:
-    MockCreature(MockGame &game) :
-        Creature(1, "", game, game) {
-    }
-
-    MOCK_METHOD(void, update, (float), (override));
-};
-
 TEST(area, should_load_are_and_git) {
     // given
-    MockGame game;
-    Area area {0, "", game, game, game};
+    MockObjectLoader objectLoader;
+    MockActionExecutor actionExecutor;
+    MockEventCollector eventCollector;
+    Area area {0, "", objectLoader, actionExecutor, eventCollector};
     ARE_Rooms room;
     room.RoomName = "m01aa_01a";
     ARE_Rooms room2;
@@ -79,26 +72,26 @@ TEST(area, should_load_are_and_git) {
     vis.insert({"m01aa_01a", "m01aa_02a"});
     vis.insert({"m01aa_02a", "m01aa_01a"});
     Path pth;
-    Camera camera {0, "", game, game};
-    Creature creature {1, "", game, game};
-    Door door {2, "", game, game};
-    Encounter encounter {3, "", game, game};
-    Placeable placeable {4, "", game, game};
-    Sound sound {5, "", game, game};
-    Store store {6, "", game, game};
-    Trigger trigger {7, "", game, game};
-    Waypoint waypoint {8, "", game, game};
+    Camera camera {1, "", actionExecutor, eventCollector};
+    Creature creature {2, "", actionExecutor, eventCollector};
+    Door door {3, "", actionExecutor, eventCollector};
+    Encounter encounter {4, "", actionExecutor, eventCollector};
+    Placeable placeable {5, "", actionExecutor, eventCollector};
+    Sound sound {6, "", actionExecutor, eventCollector};
+    Store store {7, "", actionExecutor, eventCollector};
+    Trigger trigger {8, "", actionExecutor, eventCollector};
+    Waypoint waypoint {9, "", actionExecutor, eventCollector};
 
     // expect
-    EXPECT_CALL(game, loadCamera()).WillOnce(ReturnRef(camera));
-    EXPECT_CALL(game, loadCreature(_)).WillOnce(ReturnRef(creature));
-    EXPECT_CALL(game, loadDoor(_)).WillOnce(ReturnRef(door));
-    EXPECT_CALL(game, loadEncounter(_)).WillOnce(ReturnRef(encounter));
-    EXPECT_CALL(game, loadPlaceable(_)).WillOnce(ReturnRef(placeable));
-    EXPECT_CALL(game, loadSound(_)).WillOnce(ReturnRef(sound));
-    EXPECT_CALL(game, loadStore(_)).WillOnce(ReturnRef(store));
-    EXPECT_CALL(game, loadTrigger(_)).WillOnce(ReturnRef(trigger));
-    EXPECT_CALL(game, loadWaypoint(_)).WillOnce(ReturnRef(waypoint));
+    EXPECT_CALL(objectLoader, loadCamera()).WillOnce(ReturnRef(camera));
+    EXPECT_CALL(objectLoader, loadCreature(_)).WillOnce(ReturnRef(creature));
+    EXPECT_CALL(objectLoader, loadDoor(_)).WillOnce(ReturnRef(door));
+    EXPECT_CALL(objectLoader, loadEncounter(_)).WillOnce(ReturnRef(encounter));
+    EXPECT_CALL(objectLoader, loadPlaceable(_)).WillOnce(ReturnRef(placeable));
+    EXPECT_CALL(objectLoader, loadSound(_)).WillOnce(ReturnRef(sound));
+    EXPECT_CALL(objectLoader, loadStore(_)).WillOnce(ReturnRef(store));
+    EXPECT_CALL(objectLoader, loadTrigger(_)).WillOnce(ReturnRef(trigger));
+    EXPECT_CALL(objectLoader, loadWaypoint(_)).WillOnce(ReturnRef(waypoint));
     area.load(are, git, lyt, vis, pth);
     EXPECT_TRUE(area.is(ObjectState::Loaded));
     EXPECT_EQ(area.rooms().size(), 2);
@@ -112,17 +105,19 @@ TEST(area, should_load_are_and_git) {
 
 TEST(area, should_add_objects) {
     // given
-    MockGame game;
-    Area area {0, "", game, game, game};
-    Camera camera {1, "", game, game};
-    Creature creature {2, "", game, game};
-    Door door {3, "", game, game};
-    Encounter encounter {4, "", game, game};
-    Placeable placeable {5, "", game, game};
-    Sound sound {6, "", game, game};
-    Store store {7, "", game, game};
-    Trigger trigger {8, "", game, game};
-    Waypoint waypoint {9, "", game, game};
+    MockObjectLoader objectLoader;
+    MockActionExecutor actionExecutor;
+    MockEventCollector eventCollector;
+    Area area {0, "", objectLoader, actionExecutor, eventCollector};
+    Camera camera {1, "", actionExecutor, eventCollector};
+    Creature creature {2, "", actionExecutor, eventCollector};
+    Door door {3, "", actionExecutor, eventCollector};
+    Encounter encounter {4, "", actionExecutor, eventCollector};
+    Placeable placeable {5, "", actionExecutor, eventCollector};
+    Sound sound {6, "", actionExecutor, eventCollector};
+    Store store {7, "", actionExecutor, eventCollector};
+    Trigger trigger {8, "", actionExecutor, eventCollector};
+    Waypoint waypoint {9, "", actionExecutor, eventCollector};
 
     // when
     area.add(camera);
@@ -167,11 +162,29 @@ TEST(area, should_add_objects) {
     EXPECT_EQ(waypoints.front().get(), waypoint);
 }
 
+class MockCreature : public Creature {
+public:
+    MockCreature(ObjectId objectId,
+                 ObjectTag tag,
+                 MockActionExecutor &actionExecutor,
+                 MockEventCollector &eventCollector) :
+        Creature(
+            objectId,
+            std::move(tag),
+            actionExecutor,
+            eventCollector) {
+    }
+
+    MOCK_METHOD(void, update, (float), (override));
+};
+
 TEST(area, should_update_objects_on_update) {
     // given
-    MockGame game;
-    Area area {0, "", game, game, game};
-    MockCreature creature {game};
+    MockObjectLoader objectLoader;
+    MockActionExecutor actionExecutor;
+    MockEventCollector eventCollector;
+    Area area {0, "", objectLoader, actionExecutor, eventCollector};
+    MockCreature creature {1, "", actionExecutor, eventCollector};
     area.add(creature);
 
     // expect

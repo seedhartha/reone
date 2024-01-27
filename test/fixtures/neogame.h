@@ -32,6 +32,7 @@
 #include "reone/game/neo/object/store.h"
 #include "reone/game/neo/object/trigger.h"
 #include "reone/game/neo/object/waypoint.h"
+#include "reone/game/neo/objectfactory.h"
 #include "reone/game/profiler.h"
 
 using namespace reone::resource;
@@ -42,10 +43,23 @@ namespace game {
 
 namespace neo {
 
-class MockGame : public IAreaLoader,
-                 public IAreaObjectLoader,
-                 public IActionExecutor,
-                 public IEventCollector {
+class MockObjectFactory : public IObjectFactory, boost::noncopyable {
+public:
+    MOCK_METHOD(Area &, newArea, (ObjectTag), (override));
+    MOCK_METHOD(Camera &, newCamera, (ObjectTag), (override));
+    MOCK_METHOD(Creature &, newCreature, (ObjectTag), (override));
+    MOCK_METHOD(Door &, newDoor, (ObjectTag), (override));
+    MOCK_METHOD(Encounter &, newEncounter, (ObjectTag), (override));
+    MOCK_METHOD(Item &, newItem, (ObjectTag), (override));
+    MOCK_METHOD(Module &, newModule, (ObjectTag), (override));
+    MOCK_METHOD(Placeable &, newPlaceable, (ObjectTag), (override));
+    MOCK_METHOD(Sound &, newSound, (ObjectTag), (override));
+    MOCK_METHOD(Store &, newStore, (ObjectTag), (override));
+    MOCK_METHOD(Trigger &, newTrigger, (ObjectTag), (override));
+    MOCK_METHOD(Waypoint &, newWaypoint, (ObjectTag), (override));
+};
+
+class MockObjectLoader : public IAreaLoader, public IAreaObjectLoader, boost::noncopyable {
 public:
     MOCK_METHOD(Area &, loadArea, (const std::string &), (override));
 
@@ -58,9 +72,15 @@ public:
     MOCK_METHOD(Store &, loadStore, (const ResRef &), (override));
     MOCK_METHOD(Trigger &, loadTrigger, (const ResRef &), (override));
     MOCK_METHOD(Waypoint &, loadWaypoint, (const ResRef &), (override));
+};
 
+class MockActionExecutor : public IActionExecutor, boost::noncopyable {
+public:
     MOCK_METHOD(bool, executeAction, (Object &, const Action &, float), (override));
+};
 
+class MockEventCollector : public IEventCollector {
+public:
     MOCK_METHOD(void, collectEvent, (Event), (override));
 };
 

@@ -29,6 +29,8 @@
 #include "eventhandler.h"
 #include "object/area.h"
 #include "object/module.h"
+#include "objectfactory.h"
+#include "objectloader.h"
 #include "objectrepository.h"
 
 namespace reone {
@@ -77,9 +79,8 @@ class Store;
 class Trigger;
 class Waypoint;
 
-class Game : public IObjectRepository,
-             public IAreaLoader,
-             public IAreaObjectLoader,
+class Game : public IObjectFactory,
+             public IObjectRepository,
              public IEventCollector,
              boost::noncopyable {
 public:
@@ -117,19 +118,11 @@ public:
 
     void startModule(const std::string &name);
 
-    Module &loadModule(const std::string &name);
-
     std::optional<std::reference_wrapper<Module>> module() const {
         return _module;
     }
 
     // END Module
-
-    // Player character
-
-    Creature &loadCreature(ObjectTag tag, PortraitId portraitId);
-
-    // END Player character
 
     // IObjectRepository
 
@@ -147,26 +140,6 @@ public:
 
     // END IObjectRepository
 
-    // IAreaLoader
-
-    Area &loadArea(const std::string &name) override;
-
-    // END IAreaLoader
-
-    // IAreaObjectLoader
-
-    Camera &loadCamera() override;
-    Creature &loadCreature(const resource::ResRef &tmplt) override;
-    Door &loadDoor(const resource::ResRef &tmplt) override;
-    Encounter &loadEncounter(const resource::ResRef &tmplt) override;
-    Placeable &loadPlaceable(const resource::ResRef &tmplt) override;
-    Sound &loadSound(const resource::ResRef &tmplt) override;
-    Store &loadStore(const resource::ResRef &tmplt) override;
-    Trigger &loadTrigger(const resource::ResRef &tmplt) override;
-    Waypoint &loadWaypoint(const resource::ResRef &tmplt) override;
-
-    // END IAreaObjectLoader
-
     // IEventCollector
 
     void collectEvent(Event event) override {
@@ -175,22 +148,22 @@ public:
 
     // END IEventCollector
 
-    // Object factory methods
+    // IObjectFactory
 
-    Area &newArea(ObjectTag tag);
-    Camera &newCamera(ObjectTag tag);
-    Creature &newCreature(ObjectTag tag);
-    Door &newDoor(ObjectTag tag);
-    Encounter &newEncounter(ObjectTag tag);
-    Item &newItem(ObjectTag tag);
-    Module &newModule(ObjectTag tag);
-    Placeable &newPlaceable(ObjectTag tag);
-    Sound &newSound(ObjectTag tag);
-    Store &newStore(ObjectTag tag);
-    Trigger &newTrigger(ObjectTag tag);
-    Waypoint &newWaypoint(ObjectTag tag);
+    Area &newArea(ObjectTag tag) override;
+    Camera &newCamera(ObjectTag tag) override;
+    Creature &newCreature(ObjectTag tag) override;
+    Door &newDoor(ObjectTag tag) override;
+    Encounter &newEncounter(ObjectTag tag) override;
+    Item &newItem(ObjectTag tag) override;
+    Module &newModule(ObjectTag tag) override;
+    Placeable &newPlaceable(ObjectTag tag) override;
+    Sound &newSound(ObjectTag tag) override;
+    Store &newStore(ObjectTag tag) override;
+    Trigger &newTrigger(ObjectTag tag) override;
+    Waypoint &newWaypoint(ObjectTag tag) override;
 
-    // END Object factory methods
+    // END IObjectFactory
 
 private:
     OptionsView &_options;
@@ -213,6 +186,7 @@ private:
 
     // Services
 
+    std::unique_ptr<ObjectLoader> _objectLoader;
     std::unique_ptr<ActionExecutor> _actionExecutor;
     std::unique_ptr<EventHandler> _eventHandler;
 
@@ -238,21 +212,6 @@ private:
     std::list<Event> _eventsFrontBuf;
     std::mutex _eventsMutex;
 
-    // END Logic thread
-
-    void handleEvents();
-
-    // Logic thread
-
-    void logicThreadFunc();
-    void flushEvents();
-
-    void runOnLogicThread(AsyncTask task);
-
-    // END Logic thread
-
-    // Object factory methods
-
     template <class O, class... Args>
     inline O &newObject(ObjectTag tag, Args &&...args) {
         auto object = std::make_unique<O>(
@@ -265,7 +224,18 @@ private:
         return static_cast<O &>(inserted);
     }
 
-    // END Object factory methods
+    // END Logic thread
+
+    void handleEvents();
+
+    // Logic thread
+
+    void logicThreadFunc();
+    void flushEvents();
+
+    void runOnLogicThread(AsyncTask task);
+
+    // END Logic thread
 };
 
 } // namespace neo

@@ -37,23 +37,7 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
-#include "reone/resource/parser/2da/appearance.h"
-#include "reone/resource/parser/2da/genericdoors.h"
-#include "reone/resource/parser/2da/heads.h"
-#include "reone/resource/parser/2da/placeables.h"
-#include "reone/resource/parser/2da/portraits.h"
 #include "reone/resource/parser/2da/surfacemat.h"
-#include "reone/resource/parser/gff/are.h"
-#include "reone/resource/parser/gff/git.h"
-#include "reone/resource/parser/gff/ifo.h"
-#include "reone/resource/parser/gff/utc.h"
-#include "reone/resource/parser/gff/utd.h"
-#include "reone/resource/parser/gff/ute.h"
-#include "reone/resource/parser/gff/utm.h"
-#include "reone/resource/parser/gff/utp.h"
-#include "reone/resource/parser/gff/uts.h"
-#include "reone/resource/parser/gff/utt.h"
-#include "reone/resource/parser/gff/utw.h"
 #include "reone/resource/provider/2das.h"
 #include "reone/resource/provider/gffs.h"
 #include "reone/resource/provider/layouts.h"
@@ -124,11 +108,12 @@ void Game::init() {
         }
     }
 
+    _objectLoader = std::make_unique<ObjectLoader>(*this, _resourceSvc);
+    _eventHandler = std::make_unique<EventHandler>(*this, _options.graphics, _resourceSvc, _sceneSvc);
+
     _actionExecutor = std::make_unique<ActionExecutor>(*this, _resourceSvc);
     _actionExecutor->setWalkSurfaceMaterials(walkSurfaceMaterials);
     _actionExecutor->setWalkcheckSurfaceMaterials(walkcheckSurfaceMaterials);
-
-    _eventHandler = std::make_unique<EventHandler>(*this, _options.graphics, _resourceSvc, _sceneSvc);
 
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     scene.setLineOfSightSurfaces(lineOfSightSurfaceMaterials);
@@ -143,7 +128,7 @@ void Game::init() {
         auto &module = _module->get();
         _actionExecutor->setModule(module);
 
-        auto &pc = loadCreature("", 23);
+        auto &pc = _objectLoader->loadCreature("", 23);
         _pc = pc;
         pc.setPosition(module.entryPosition());
         pc.setFacing(module.entryFacing());
@@ -356,179 +341,13 @@ void Game::runOnLogicThread(AsyncTask task) {
 }
 
 void Game::startModule(const std::string &name) {
-    _module = loadModule(name);
-}
-
-Module &Game::loadModule(const std::string &name) {
-    auto ifo = _resourceSvc.gffs.get("module", ResType::Ifo);
-    if (!ifo) {
-        throw ResourceNotFoundException("Module IFO not found: " + name);
-    }
-    auto parsedIFO = parseIFO(*ifo);
-    auto &module = newModule(parsedIFO.Mod_Tag);
-    module.load(parsedIFO);
-    return module;
-}
-
-Area &Game::loadArea(const std::string &name) {
-    auto are = _resourceSvc.gffs.get(name, ResType::Are);
-    if (!are) {
-        throw ResourceNotFoundException("Area ARE not found: " + name);
-    }
-    auto parsedARE = parseARE(*are);
-    auto git = _resourceSvc.gffs.get(name, ResType::Git);
-    if (!git) {
-        throw ResourceNotFoundException("Area GIT not found: " + name);
-    }
-    auto parsedGIT = parseGIT(*git);
-    auto lyt = _resourceSvc.layouts.get(name);
-    if (!lyt) {
-        throw ResourceNotFoundException("Area LYT not found: " + name);
-    }
-    auto vis = _resourceSvc.visibilities.get(name);
-    if (!vis) {
-    }
-    auto pth = _resourceSvc.paths.get(name);
-    if (!pth) {
-    }
-    auto &area = newArea(parsedARE.Tag);
-    area.load(parsedARE, parsedGIT, *lyt, *vis, *pth);
-    return area;
-}
-
-Camera &Game::loadCamera() {
-    auto &camera = newCamera("");
-    return camera;
-}
-
-Creature &Game::loadCreature(const resource::ResRef &tmplt) {
-    auto utc = _resourceSvc.gffs.get(tmplt.value(), ResType::Utc);
-    if (!utc) {
-        throw ResourceNotFoundException("Creature UTC not found: " + tmplt.value());
-    }
-    auto parsedUTC = parseUTC(*utc);
-    auto &creature = newCreature(parsedUTC.Tag);
-    auto appearanceRaw = _resourceSvc.twoDas.get("appearance");
-    if (!appearanceRaw) {
-        throw ResourceNotFoundException("appearance 2DA not found");
-    }
-    auto appearance = parseAppearanceTwoDA(*appearanceRaw);
-    auto headsRaw = _resourceSvc.twoDas.get("heads");
-    if (!headsRaw) {
-        throw ResourceNotFoundException("heads 2DA not found");
-    }
-    auto heads = parseHeadsTwoDA(*headsRaw);
-    creature.load(parsedUTC, appearance, heads);
-    return creature;
-}
-
-Creature &Game::loadCreature(ObjectTag tag, PortraitId portraitId) {
-    auto &creature = newCreature(std::move(tag));
-    auto portraits = _resourceSvc.twoDas.get("portraits");
-    if (!portraits) {
-        throw ResourceNotFoundException("portraits 2DA not found");
-    }
-    auto appearanceRaw = _resourceSvc.twoDas.get("appearance");
-    if (!appearanceRaw) {
-        throw ResourceNotFoundException("appearance 2DA not found");
-    }
-    auto appearance = parseAppearanceTwoDA(*appearanceRaw);
-    auto headsRaw = _resourceSvc.twoDas.get("heads");
-    if (!headsRaw) {
-        throw ResourceNotFoundException("heads 2DA not found");
-    }
-    auto heads = parseHeadsTwoDA(*headsRaw);
-    auto portraitsRow = parsePortraitsTwoDARow(*portraits, portraitId);
-    creature.load(*portraitsRow.appearancenumber, appearance, heads);
-    return creature;
-}
-
-Door &Game::loadDoor(const resource::ResRef &tmplt) {
-    auto utd = _resourceSvc.gffs.get(tmplt.value(), ResType::Utd);
-    if (!utd) {
-        throw ResourceNotFoundException("Door UTD not found: " + tmplt.value());
-    }
-    auto parsedUTD = parseUTD(*utd);
-    auto &door = newDoor(parsedUTD.Tag);
-    auto genericDoorsRaw = _resourceSvc.twoDas.get("genericdoors");
-    if (!genericDoorsRaw) {
-        throw ResourceNotFoundException("genericdoors 2DA not found");
-    }
-    auto genericDoors = parseGenericdoorsTwoDA(*genericDoorsRaw);
-    door.load(parsedUTD, genericDoors);
-    return door;
-}
-
-Encounter &Game::loadEncounter(const resource::ResRef &tmplt) {
-    auto ute = _resourceSvc.gffs.get(tmplt.value(), ResType::Ute);
-    if (!ute) {
-        throw ResourceNotFoundException("Encounter UTE not found: " + tmplt.value());
-    }
-    auto parsedUTE = parseUTE(*ute);
-    auto &encounter = newEncounter(parsedUTE.Tag);
-    return encounter;
-}
-
-Placeable &Game::loadPlaceable(const resource::ResRef &tmplt) {
-    auto utp = _resourceSvc.gffs.get(tmplt.value(), ResType::Utp);
-    if (!utp) {
-        throw ResourceNotFoundException("Placeable UTP not found: " + tmplt.value());
-    }
-    auto parsedUTP = parseUTP(*utp);
-    auto &placeable = newPlaceable(parsedUTP.Tag);
-    auto placeablesRaw = _resourceSvc.twoDas.get("placeables");
-    if (!placeablesRaw) {
-        throw ResourceNotFoundException("placeables 2DA not found");
-    }
-    auto placeables = parsePlaceablesTwoDA(*placeablesRaw);
-    placeable.load(parsedUTP, placeables);
-    return placeable;
-}
-
-Sound &Game::loadSound(const resource::ResRef &tmplt) {
-    auto uts = _resourceSvc.gffs.get(tmplt.value(), ResType::Uts);
-    if (!uts) {
-        throw ResourceNotFoundException("Sound UTS not found: " + tmplt.value());
-    }
-    auto parsedUTS = parseUTS(*uts);
-    auto &sound = newSound(parsedUTS.Tag);
-    return sound;
-}
-
-Store &Game::loadStore(const resource::ResRef &tmplt) {
-    auto utm = _resourceSvc.gffs.get(tmplt.value(), ResType::Utm);
-    if (!utm) {
-        throw ResourceNotFoundException("Store UTM not found: " + tmplt.value());
-    }
-    auto parsedUTM = parseUTM(*utm);
-    auto &store = newStore(parsedUTM.Tag);
-    return store;
-}
-
-Trigger &Game::loadTrigger(const resource::ResRef &tmplt) {
-    auto utt = _resourceSvc.gffs.get(tmplt.value(), ResType::Utt);
-    if (!utt) {
-        throw ResourceNotFoundException("Trigger UTT not found: " + tmplt.value());
-    }
-    auto parsedUTT = parseUTT(*utt);
-    auto &trigger = newTrigger(parsedUTT.Tag);
-    return trigger;
-}
-
-Waypoint &Game::loadWaypoint(const resource::ResRef &tmplt) {
-    auto utw = _resourceSvc.gffs.get(tmplt.value(), ResType::Utw);
-    if (!utw) {
-        throw ResourceNotFoundException("Waypoint UTW not found: " + tmplt.value());
-    }
-    auto parsedUTW = parseUTW(*utw);
-    auto &waypoint = newWaypoint(parsedUTW.Tag);
-    return waypoint;
+    _module = _objectLoader->loadModule(name);
 }
 
 Area &Game::newArea(ObjectTag tag) {
     return newObject<Area>(
         std::move(tag),
-        *this,
+        *_objectLoader,
         *_actionExecutor,
         *this);
 }
@@ -571,7 +390,7 @@ Item &Game::newItem(ObjectTag tag) {
 Module &Game::newModule(ObjectTag tag) {
     return newObject<Module>(
         std::move(tag),
-        *this,
+        *_objectLoader,
         *_actionExecutor,
         *this);
 }

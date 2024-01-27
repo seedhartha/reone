@@ -62,15 +62,6 @@ private:
     AudioOptions _audio;
 };
 
-class MockModule : public Module {
-public:
-    MockModule(MockGame &game) :
-        Module(0, "", game, game, game) {
-    }
-
-    MOCK_METHOD(void, update, (float), (override));
-};
-
 class GameFixture : public Test {
 protected:
     void SetUp() override {
@@ -104,113 +95,6 @@ TEST_F(GameFixture, should_return_nullopt_for_current_module) {
 
     // then
     EXPECT_FALSE(module.has_value());
-}
-
-TEST_F(GameFixture, should_start_module) {
-    // given
-    auto ifo = Gff::Builder().build();
-
-    // when
-    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(ifo));
-    _game->startModule("end_m01aa");
-
-    // then
-    auto currentModule = _game->module();
-    EXPECT_TRUE(currentModule.has_value());
-}
-
-TEST_F(GameFixture, should_load_camera) {
-    // when
-    auto &camera = _game->loadCamera();
-}
-
-TEST_F(GameFixture, should_load_creature) {
-    // given
-    auto utc = Gff::Builder().build();
-    std::shared_ptr<TwoDA> appearance = TwoDA::Builder()
-                                            .columns({"modeltype", "race", "racetex"})
-                                            .row({"F", "n_mandalorian", ""})
-                                            .build();
-    std::shared_ptr<TwoDA> heads = TwoDA::Builder().build();
-
-    // expect
-    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utc));
-    EXPECT_CALL(_resourceModule.twoDas(), get("appearance")).WillOnce(Return(appearance));
-    EXPECT_CALL(_resourceModule.twoDas(), get("heads")).WillOnce(Return(heads));
-    auto &creature = _game->loadCreature({"tmplt"});
-}
-
-TEST_F(GameFixture, should_load_door) {
-    // given
-    auto utd = Gff::Builder().build();
-    std::shared_ptr<TwoDA> genericDoors = TwoDA::Builder()
-                                              .columns({"modelname"})
-                                              .row({"dor_lhr01"})
-                                              .build();
-
-    // expect
-    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utd));
-    EXPECT_CALL(_resourceModule.twoDas(), get("genericdoors")).WillOnce(Return(genericDoors));
-    auto &door = _game->loadDoor({"tmplt"});
-}
-
-TEST_F(GameFixture, should_load_encounter) {
-    // given
-    auto ute = Gff::Builder().build();
-
-    // expect
-    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(ute));
-    auto &encounter = _game->loadEncounter({"tmplt"});
-}
-
-TEST_F(GameFixture, should_load_placeable) {
-    // given
-    auto utp = Gff::Builder().build();
-
-    // expect
-    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utp));
-    std::shared_ptr<TwoDA> placeables = TwoDA::Builder()
-                                            .columns({"modelname"})
-                                            .row({"plc_footlker"})
-                                            .build();
-    EXPECT_CALL(_resourceModule.twoDas(), get("placeables")).WillOnce(Return(placeables));
-    auto &placeable = _game->loadPlaceable({"tmplt"});
-}
-
-TEST_F(GameFixture, should_load_sound) {
-    // given
-    auto uts = Gff::Builder().build();
-
-    // expect
-    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(uts));
-    auto &sound = _game->loadSound({"tmplt"});
-}
-
-TEST_F(GameFixture, should_load_store) {
-    // given
-    auto utm = Gff::Builder().build();
-
-    // expect
-    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utm));
-    auto &store = _game->loadStore({"tmplt"});
-}
-
-TEST_F(GameFixture, should_load_trigger) {
-    // given
-    auto utt = Gff::Builder().build();
-
-    // expect
-    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utt));
-    auto &trigger = _game->loadTrigger({"tmplt"});
-}
-
-TEST_F(GameFixture, should_load_waypoint) {
-    // given
-    auto utw = Gff::Builder().build();
-
-    // expect
-    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utw));
-    auto &waypoint = _game->loadWaypoint({"tmplt"});
 }
 
 TEST_F(GameFixture, should_instantiate_objects_with_incrementing_id) {
