@@ -45,7 +45,7 @@ using AnimationStack = std::stack<std::string>;
 
 class Object : boost::noncopyable {
 public:
-    virtual void update(float dt);
+    virtual void update(IActionExecutor &actionExecutor, float dt);
 
     ObjectId id() const {
         return _id;
@@ -107,7 +107,6 @@ protected:
     ObjectId _id;
     ObjectTag _tag;
     ObjectType _type;
-    IActionExecutor &_actionExecutor;
     IEventCollector &_eventCollector;
 
     ObjectState _state {ObjectState::Created};
@@ -119,12 +118,10 @@ protected:
     Object(ObjectId id,
            ObjectTag tag,
            ObjectType type,
-           IActionExecutor &actionExecutor,
            IEventCollector &eventCollector) :
         _id(id),
         _tag(std::move(tag)),
         _type(type),
-        _actionExecutor(actionExecutor),
         _eventCollector(eventCollector) {
 
         Event event;
@@ -214,13 +211,11 @@ protected:
     SpatialObject(ObjectId id,
                   ObjectTag tag,
                   ObjectType type,
-                  IActionExecutor &actionExecutor,
                   IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
             type,
-            actionExecutor,
             eventCollector) {
     }
 };

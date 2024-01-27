@@ -90,27 +90,24 @@ class Area : public Object {
 public:
     Area(ObjectId id,
          ObjectTag tag,
-         IAreaObjectLoader &areaObjectLoader,
-         IActionExecutor &actionExecutor,
          IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
             ObjectType::Area,
-            actionExecutor,
-            eventCollector),
-        _areaObjectLoader(areaObjectLoader) {
+            eventCollector) {
     }
 
-    void load(const resource::generated::ARE &are,
+    void load(IAreaObjectLoader &objectLoader,
+              const resource::generated::ARE &are,
               const resource::generated::GIT &git,
               const resource::Layout &lyt,
               std::optional<std::reference_wrapper<const resource::Visibility>> vis,
               std::optional<std::reference_wrapper<const resource::Path>> pth);
 
-    void update(float dt) override {
+    void update(IActionExecutor &actionExecutor, float dt) override {
         for (auto &object : _objects) {
-            object.get().update(dt);
+            object.get().update(actionExecutor, dt);
         }
     }
 
@@ -173,8 +170,6 @@ public:
     // END Objects
 
 private:
-    IAreaObjectLoader &_areaObjectLoader;
-
     RoomList _rooms;
     CameraList _cameras;
     CreatureList _creatures;

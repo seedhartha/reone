@@ -96,31 +96,3 @@ TEST_F(GameFixture, should_return_nullopt_for_current_module) {
     // then
     EXPECT_FALSE(module.has_value());
 }
-
-TEST_F(GameFixture, should_instantiate_objects_with_incrementing_id) {
-    // when
-    auto &area = _game->newArea("");
-    auto &camera = _game->newCamera("");
-    auto &creature = _game->newCreature("");
-    auto &door = _game->newDoor("");
-    auto &encounter = _game->newEncounter("");
-    auto &item = _game->newItem("");
-    auto &placeable = _game->newPlaceable("");
-    auto &sound = _game->newSound("");
-    auto &store = _game->newStore("");
-    auto &trigger = _game->newTrigger("");
-    auto &waypoint = _game->newWaypoint("");
-
-    // then
-    EXPECT_EQ(area.id(), 2);
-    EXPECT_EQ(camera.id(), 3);
-    EXPECT_EQ(creature.id(), 4);
-    EXPECT_EQ(door.id(), 5);
-    EXPECT_EQ(encounter.id(), 6);
-    EXPECT_EQ(item.id(), 7);
-    EXPECT_EQ(placeable.id(), 8);
-    EXPECT_EQ(sound.id(), 9);
-    EXPECT_EQ(store.id(), 10);
-    EXPECT_EQ(trigger.id(), 11);
-    EXPECT_EQ(waypoint.id(), 12);
-}

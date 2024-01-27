@@ -31,9 +31,8 @@ using namespace reone::resource::generated;
 
 TEST(placeable, should_load_utp) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Placeable placeable {0, "", actionExecutor, eventCollector};
+    Placeable placeable {0, "", eventCollector};
     UTP utp;
     utp.Appearance = 0;
     PlaceablesTwoDARow placeablesRow;

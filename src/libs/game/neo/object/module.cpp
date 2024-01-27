@@ -28,9 +28,9 @@ namespace game {
 
 namespace neo {
 
-void Module::load(const IFO &ifo) {
+void Module::load(IAreaLoader &areaLoader, const IFO &ifo) {
     for (const auto &ifoArea : ifo.Mod_Area_list) {
-        auto &area = _areaLoader.loadArea(ifoArea.Area_Name);
+        auto &area = areaLoader.loadArea(ifoArea.Area_Name);
         _areas.push_back(area);
         if (ifoArea.Area_Name == ifo.Mod_Entry_Area) {
             _area = area;
@@ -45,11 +45,11 @@ void Module::load(const IFO &ifo) {
     setState(ObjectState::Loaded);
 }
 
-void Module::update(float dt) {
+void Module::update(IActionExecutor &actionExecutor, float dt) {
     if (!_area) {
         return;
     }
-    _area->get().update(dt);
+    _area->get().update(actionExecutor, dt);
 }
 
 } // namespace neo

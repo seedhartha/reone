@@ -29,13 +29,11 @@ class Store : public Object {
 public:
     Store(ObjectId id,
           ObjectTag tag,
-          IActionExecutor &actionExecutor,
           IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
             ObjectType::Store,
-            actionExecutor,
             eventCollector) {
     }
 };

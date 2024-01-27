@@ -64,13 +64,11 @@ public:
 
     Creature(ObjectId id,
              ObjectTag tag,
-             IActionExecutor &actionExecutor,
              IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
             ObjectType::Creature,
-            actionExecutor,
             eventCollector) {
     }
 

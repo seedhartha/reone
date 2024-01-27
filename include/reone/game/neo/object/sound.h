@@ -29,13 +29,11 @@ class Sound : public SpatialObject {
 public:
     Sound(ObjectId id,
           ObjectTag tag,
-          IActionExecutor &actionExecutor,
           IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
             ObjectType::Sound,
-            actionExecutor,
             eventCollector) {
     }
 };

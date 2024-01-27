@@ -25,10 +25,10 @@ namespace game {
 
 namespace neo {
 
-void Object::update(float dt) {
+void Object::update(IActionExecutor &actionExecutor, float dt) {
     if (!_actions.empty()) {
         const auto &action = _actions.front();
-        bool completed = _actionExecutor.executeAction(*this, action, dt);
+        bool completed = actionExecutor.executeAction(*this, action, dt);
         if (completed) {
             _actions.pop();
         }

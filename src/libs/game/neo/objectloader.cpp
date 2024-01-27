@@ -29,7 +29,7 @@
 #include "reone/game/neo/object/store.h"
 #include "reone/game/neo/object/trigger.h"
 #include "reone/game/neo/object/waypoint.h"
-#include "reone/game/neo/objectfactory.h"
+#include "reone/game/neo/objectrepository.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/parser/2da/appearance.h"
@@ -69,8 +69,8 @@ Module &ObjectLoader::loadModule(const std::string &name) {
         throw ResourceNotFoundException("Module IFO not found: " + name);
     }
     auto parsedIFO = parseIFO(*ifo);
-    auto &module = _objectFactory.newModule(parsedIFO.Mod_Tag);
-    module.load(parsedIFO);
+    auto &module = _objectRepository.newModule(parsedIFO.Mod_Tag);
+    module.load(*this, parsedIFO);
     return module;
 }
 
@@ -95,13 +95,13 @@ Area &ObjectLoader::loadArea(const std::string &name) {
     auto pth = _resourceSvc.paths.get(name);
     if (!pth) {
     }
-    auto &area = _objectFactory.newArea(parsedARE.Tag);
-    area.load(parsedARE, parsedGIT, *lyt, *vis, *pth);
+    auto &area = _objectRepository.newArea(parsedARE.Tag);
+    area.load(*this, parsedARE, parsedGIT, *lyt, *vis, *pth);
     return area;
 }
 
 Camera &ObjectLoader::loadCamera() {
-    auto &camera = _objectFactory.newCamera("");
+    auto &camera = _objectRepository.newCamera("");
     return camera;
 }
 
@@ -111,7 +111,7 @@ Creature &ObjectLoader::loadCreature(const resource::ResRef &tmplt) {
         throw ResourceNotFoundException("Creature UTC not found: " + tmplt.value());
     }
     auto parsedUTC = parseUTC(*utc);
-    auto &creature = _objectFactory.newCreature(parsedUTC.Tag);
+    auto &creature = _objectRepository.newCreature(parsedUTC.Tag);
     auto appearanceRaw = _resourceSvc.twoDas.get("appearance");
     if (!appearanceRaw) {
         throw ResourceNotFoundException("appearance 2DA not found");
@@ -127,7 +127,7 @@ Creature &ObjectLoader::loadCreature(const resource::ResRef &tmplt) {
 }
 
 Creature &ObjectLoader::loadCreature(ObjectTag tag, PortraitId portraitId) {
-    auto &creature = _objectFactory.newCreature(std::move(tag));
+    auto &creature = _objectRepository.newCreature(std::move(tag));
     auto portraits = _resourceSvc.twoDas.get("portraits");
     if (!portraits) {
         throw ResourceNotFoundException("portraits 2DA not found");
@@ -153,7 +153,7 @@ Door &ObjectLoader::loadDoor(const resource::ResRef &tmplt) {
         throw ResourceNotFoundException("Door UTD not found: " + tmplt.value());
     }
     auto parsedUTD = parseUTD(*utd);
-    auto &door = _objectFactory.newDoor(parsedUTD.Tag);
+    auto &door = _objectRepository.newDoor(parsedUTD.Tag);
     auto genericDoorsRaw = _resourceSvc.twoDas.get("genericdoors");
     if (!genericDoorsRaw) {
         throw ResourceNotFoundException("genericdoors 2DA not found");
@@ -169,7 +169,7 @@ Encounter &ObjectLoader::loadEncounter(const resource::ResRef &tmplt) {
         throw ResourceNotFoundException("Encounter UTE not found: " + tmplt.value());
     }
     auto parsedUTE = parseUTE(*ute);
-    auto &encounter = _objectFactory.newEncounter(parsedUTE.Tag);
+    auto &encounter = _objectRepository.newEncounter(parsedUTE.Tag);
     return encounter;
 }
 
@@ -179,7 +179,7 @@ Placeable &ObjectLoader::loadPlaceable(const resource::ResRef &tmplt) {
         throw ResourceNotFoundException("Placeable UTP not found: " + tmplt.value());
     }
     auto parsedUTP = parseUTP(*utp);
-    auto &placeable = _objectFactory.newPlaceable(parsedUTP.Tag);
+    auto &placeable = _objectRepository.newPlaceable(parsedUTP.Tag);
     auto placeablesRaw = _resourceSvc.twoDas.get("placeables");
     if (!placeablesRaw) {
         throw ResourceNotFoundException("placeables 2DA not found");
@@ -195,7 +195,7 @@ Sound &ObjectLoader::loadSound(const resource::ResRef &tmplt) {
         throw ResourceNotFoundException("Sound UTS not found: " + tmplt.value());
     }
     auto parsedUTS = parseUTS(*uts);
-    auto &sound = _objectFactory.newSound(parsedUTS.Tag);
+    auto &sound = _objectRepository.newSound(parsedUTS.Tag);
     return sound;
 }
 
@@ -205,7 +205,7 @@ Store &ObjectLoader::loadStore(const resource::ResRef &tmplt) {
         throw ResourceNotFoundException("Store UTM not found: " + tmplt.value());
     }
     auto parsedUTM = parseUTM(*utm);
-    auto &store = _objectFactory.newStore(parsedUTM.Tag);
+    auto &store = _objectRepository.newStore(parsedUTM.Tag);
     return store;
 }
 
@@ -215,7 +215,7 @@ Trigger &ObjectLoader::loadTrigger(const resource::ResRef &tmplt) {
         throw ResourceNotFoundException("Trigger UTT not found: " + tmplt.value());
     }
     auto parsedUTT = parseUTT(*utt);
-    auto &trigger = _objectFactory.newTrigger(parsedUTT.Tag);
+    auto &trigger = _objectRepository.newTrigger(parsedUTT.Tag);
     return trigger;
 }
 
@@ -225,7 +225,7 @@ Waypoint &ObjectLoader::loadWaypoint(const resource::ResRef &tmplt) {
         throw ResourceNotFoundException("Waypoint UTW not found: " + tmplt.value());
     }
     auto parsedUTW = parseUTW(*utw);
-    auto &waypoint = _objectFactory.newWaypoint(parsedUTW.Tag);
+    auto &waypoint = _objectRepository.newWaypoint(parsedUTW.Tag);
     return waypoint;
 }
 

@@ -32,13 +32,13 @@ namespace game {
 
 namespace neo {
 
-class IObjectFactory;
+class IObjectRepository;
 
 class ObjectLoader : public IAreaLoader, public IAreaObjectLoader, boost::noncopyable {
 public:
-    ObjectLoader(IObjectFactory &objectFactory,
+    ObjectLoader(IObjectRepository &objectRepository,
                  resource::ResourceServices &resourceSvc) :
-        _objectFactory(objectFactory),
+        _objectRepository(objectRepository),
         _resourceSvc(resourceSvc) {
     }
 
@@ -66,7 +66,7 @@ public:
     // END IAreaObjectLoader
 
 private:
-    IObjectFactory &_objectFactory;
+    IObjectRepository &_objectRepository;
     resource::ResourceServices &_resourceSvc;
 };
 

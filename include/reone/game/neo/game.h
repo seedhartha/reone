@@ -29,7 +29,6 @@
 #include "eventhandler.h"
 #include "object/area.h"
 #include "object/module.h"
-#include "objectfactory.h"
 #include "objectloader.h"
 #include "objectrepository.h"
 
@@ -79,9 +78,7 @@ class Store;
 class Trigger;
 class Waypoint;
 
-class Game : public IObjectFactory,
-             public IObjectRepository,
-             public IEventCollector,
+class Game : public IEventCollector,
              boost::noncopyable {
 public:
     Game(OptionsView &options,
@@ -124,22 +121,6 @@ public:
 
     // END Module
 
-    // IObjectRepository
-
-    Object &get(ObjectId objectId) override {
-        return find(objectId).value();
-    }
-
-    std::optional<std::reference_wrapper<Object>> find(ObjectId objectId) override {
-        auto it = _idToObject.find(objectId);
-        if (it == _idToObject.end()) {
-            return std::nullopt;
-        }
-        return it->second;
-    }
-
-    // END IObjectRepository
-
     // IEventCollector
 
     void collectEvent(Event event) override {
@@ -147,23 +128,6 @@ public:
     }
 
     // END IEventCollector
-
-    // IObjectFactory
-
-    Area &newArea(ObjectTag tag) override;
-    Camera &newCamera(ObjectTag tag) override;
-    Creature &newCreature(ObjectTag tag) override;
-    Door &newDoor(ObjectTag tag) override;
-    Encounter &newEncounter(ObjectTag tag) override;
-    Item &newItem(ObjectTag tag) override;
-    Module &newModule(ObjectTag tag) override;
-    Placeable &newPlaceable(ObjectTag tag) override;
-    Sound &newSound(ObjectTag tag) override;
-    Store &newStore(ObjectTag tag) override;
-    Trigger &newTrigger(ObjectTag tag) override;
-    Waypoint &newWaypoint(ObjectTag tag) override;
-
-    // END IObjectFactory
 
 private:
     OptionsView &_options;
@@ -176,9 +140,6 @@ private:
 
     bool _inited {false};
 
-    ObjectId _nextObjectId {2};
-    std::list<std::unique_ptr<Object>> _objects;
-    std::map<ObjectId, std::reference_wrapper<Object>> _idToObject;
     std::optional<std::reference_wrapper<Module>> _module;
     std::optional<std::reference_wrapper<Creature>> _pc;
 
@@ -187,6 +148,7 @@ private:
     // Services
 
     std::unique_ptr<ObjectLoader> _objectLoader;
+    std::unique_ptr<ObjectRepository> _objectRepository;
     std::unique_ptr<ActionExecutor> _actionExecutor;
     std::unique_ptr<EventHandler> _eventHandler;
 
@@ -211,18 +173,6 @@ private:
     std::list<Event> _eventsBackBuf;
     std::list<Event> _eventsFrontBuf;
     std::mutex _eventsMutex;
-
-    template <class O, class... Args>
-    inline O &newObject(ObjectTag tag, Args &&...args) {
-        auto object = std::make_unique<O>(
-            _nextObjectId++,
-            std::move(tag),
-            std::forward<Args>(args)...);
-        _objects.push_back(std::move(object));
-        auto &inserted = *_objects.back();
-        _idToObject.insert({inserted.id(), inserted});
-        return static_cast<O &>(inserted);
-    }
 
     // END Logic thread
 

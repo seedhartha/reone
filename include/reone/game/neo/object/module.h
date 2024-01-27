@@ -48,21 +48,17 @@ class Module : public Object {
 public:
     Module(ObjectId id,
            ObjectTag tag,
-           IAreaLoader &areaLoader,
-           IActionExecutor &actionExecutor,
            IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
             ObjectType::Module,
-            actionExecutor,
-            eventCollector),
-        _areaLoader(areaLoader) {
+            eventCollector) {
     }
 
-    void load(const resource::generated::IFO &ifo);
+    void load(IAreaLoader &areaLoader, const resource::generated::IFO &ifo);
 
-    void update(float dt) override;
+    void update(IActionExecutor &actionExecutor, float dt) override;
 
     Area &area() {
         if (!_area) {
@@ -84,8 +80,6 @@ public:
     // END Entry
 
 private:
-    IAreaLoader &_areaLoader;
-
     glm::vec3 _entryPosition {0.0f};
     float _entryFacing {0.0f};
 

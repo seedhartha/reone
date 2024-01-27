@@ -108,10 +108,11 @@ void Game::init() {
         }
     }
 
-    _objectLoader = std::make_unique<ObjectLoader>(*this, _resourceSvc);
-    _eventHandler = std::make_unique<EventHandler>(*this, _options.graphics, _resourceSvc, _sceneSvc);
+    _objectRepository = std::make_unique<ObjectRepository>(*this);
+    _objectLoader = std::make_unique<ObjectLoader>(*_objectRepository, _resourceSvc);
+    _eventHandler = std::make_unique<EventHandler>(*_objectRepository, _options.graphics, _resourceSvc, _sceneSvc);
 
-    _actionExecutor = std::make_unique<ActionExecutor>(*this, _resourceSvc);
+    _actionExecutor = std::make_unique<ActionExecutor>(*_objectRepository, _resourceSvc);
     _actionExecutor->setWalkSurfaceMaterials(walkSurfaceMaterials);
     _actionExecutor->setWalkcheckSurfaceMaterials(walkcheckSurfaceMaterials);
 
@@ -310,7 +311,7 @@ void Game::logicThreadFunc() {
         _ticks = ticks;
         _profiler.measure(kLogicThreadName, 0, [this, &dt]() {
             if (_module) {
-                _module->get().update(dt);
+                _module->get().update(*_actionExecutor, dt);
                 flushEvents();
             }
             std::queue<AsyncTask> tasks;
@@ -342,92 +343,6 @@ void Game::runOnLogicThread(AsyncTask task) {
 
 void Game::startModule(const std::string &name) {
     _module = _objectLoader->loadModule(name);
-}
-
-Area &Game::newArea(ObjectTag tag) {
-    return newObject<Area>(
-        std::move(tag),
-        *_objectLoader,
-        *_actionExecutor,
-        *this);
-}
-
-Camera &Game::newCamera(ObjectTag tag) {
-    return newObject<Camera>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
-}
-
-Creature &Game::newCreature(ObjectTag tag) {
-    return newObject<Creature>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
-}
-
-Door &Game::newDoor(ObjectTag tag) {
-    return newObject<Door>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
-}
-
-Encounter &Game::newEncounter(ObjectTag tag) {
-    return newObject<Encounter>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
-}
-
-Item &Game::newItem(ObjectTag tag) {
-    return newObject<Item>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
-}
-
-Module &Game::newModule(ObjectTag tag) {
-    return newObject<Module>(
-        std::move(tag),
-        *_objectLoader,
-        *_actionExecutor,
-        *this);
-}
-
-Placeable &Game::newPlaceable(ObjectTag tag) {
-    return newObject<Placeable>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
-}
-
-Sound &Game::newSound(ObjectTag tag) {
-    return newObject<Sound>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
-}
-
-Store &Game::newStore(ObjectTag tag) {
-    return newObject<Store>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
-}
-
-Trigger &Game::newTrigger(ObjectTag tag) {
-    return newObject<Trigger>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
-}
-
-Waypoint &Game::newWaypoint(ObjectTag tag) {
-    return newObject<Waypoint>(
-        std::move(tag),
-        *_actionExecutor,
-        *this);
 }
 
 } // namespace neo

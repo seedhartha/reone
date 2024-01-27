@@ -43,13 +43,11 @@ class Placeable : public SpatialObject {
 public:
     Placeable(ObjectId id,
               ObjectTag tag,
-              IActionExecutor &actionExecutor,
               IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
             ObjectType::Placeable,
-            actionExecutor,
             eventCollector) {
     }
 

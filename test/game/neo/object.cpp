@@ -30,13 +30,11 @@ class TestObject : public Object {
 public:
     TestObject(ObjectId objectId,
                ObjectTag tag,
-               IActionExecutor &actionExecutor,
                IEventCollector &eventCollector) :
         Object(
             objectId,
             std::move(tag),
             ObjectType::Invalid,
-            actionExecutor,
             eventCollector) {
     }
 };
@@ -45,22 +43,19 @@ class TestSpatialObject : public SpatialObject {
 public:
     TestSpatialObject(ObjectId objectId,
                       ObjectTag tag,
-                      IActionExecutor &actionExecutor,
                       IEventCollector &eventCollector) :
         SpatialObject(
             objectId,
             std::move(tag),
             ObjectType::Invalid,
-            actionExecutor,
             eventCollector) {
     }
 };
 
 TEST(object, should_be_constructed_in_created_state) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    TestObject object {0, "", actionExecutor, eventCollector};
+    TestObject object {0, "", eventCollector};
 
     // expect
     EXPECT_TRUE(object.is(ObjectState::Created));
@@ -68,9 +63,8 @@ TEST(object, should_be_constructed_in_created_state) {
 
 TEST(object, should_return_nullopt_for_current_action) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    TestObject object {0, "", actionExecutor, eventCollector};
+    TestObject object {0, "", eventCollector};
 
     // when
     auto action = object.currentAction();
@@ -81,9 +75,8 @@ TEST(object, should_return_nullopt_for_current_action) {
 
 TEST(object, should_add_action_to_action_queue) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    TestObject object {0, "", actionExecutor, eventCollector};
+    TestObject object {0, "", eventCollector};
 
     // when
     object.add(Action());
@@ -95,9 +88,8 @@ TEST(object, should_add_action_to_action_queue) {
 
 TEST(object, should_apply_effect) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    TestObject object {0, "", actionExecutor, eventCollector};
+    TestObject object {0, "", eventCollector};
 
     // when
     object.apply(Effect());
@@ -107,9 +99,8 @@ TEST(object, should_apply_effect) {
 
 TEST(spatial_object, should_be_created_at_world_zero_facing_east) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    TestSpatialObject object {0, "", actionExecutor, eventCollector};
+    TestSpatialObject object {0, "", eventCollector};
 
     // expect
     EXPECT_EQ(object.position(), (glm::vec3 {0.0f}));
@@ -118,13 +109,12 @@ TEST(spatial_object, should_be_created_at_world_zero_facing_east) {
 
 TEST(spatial_object, should_set_position) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
     std::vector<Event> events;
     ON_CALL(eventCollector, collectEvent(_)).WillByDefault([&events](auto event) {
         events.push_back(std::move(event));
     });
-    TestSpatialObject object {0, "", actionExecutor, eventCollector};
+    TestSpatialObject object {0, "", eventCollector};
 
     // when
     object.setPosition({1.0f, 1.0f, 1.0f});
@@ -140,13 +130,12 @@ TEST(spatial_object, should_set_position) {
 
 TEST(spatial_object, should_set_facing) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
     std::vector<Event> events;
     ON_CALL(eventCollector, collectEvent(_)).WillByDefault([&events](auto event) {
         events.push_back(std::move(event));
     });
-    TestSpatialObject object {0, "", actionExecutor, eventCollector};
+    TestSpatialObject object {0, "", eventCollector};
 
     // when
     object.setFacing(glm::radians(270.0f));
@@ -168,7 +157,7 @@ TEST(spatial_object, should_set_facing_point) {
     ON_CALL(eventCollector, collectEvent(_)).WillByDefault([&events](auto event) {
         events.push_back(std::move(event));
     });
-    TestSpatialObject object {0, "", actionExecutor, eventCollector};
+    TestSpatialObject object {0, "", eventCollector};
     object.setPosition({1.0f, 1.0f, 1.0f});
 
     // when

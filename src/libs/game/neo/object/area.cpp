@@ -41,7 +41,8 @@ namespace game {
 
 namespace neo {
 
-void Area::load(const ARE &are,
+void Area::load(IAreaObjectLoader &objectLoader,
+                const ARE &are,
                 const GIT &git,
                 const Layout &lyt,
                 std::optional<std::reference_wrapper<const resource::Visibility>> vis,
@@ -63,45 +64,45 @@ void Area::load(const ARE &are,
         _rooms.push_back(std::move(room));
     }
     for (auto &gitCamera : git.CameraList) {
-        auto &camera = _areaObjectLoader.loadCamera();
+        auto &camera = objectLoader.loadCamera();
         add(camera);
     }
     for (auto &gitCreature : git.Creature_List) {
-        auto &creature = _areaObjectLoader.loadCreature(gitCreature.TemplateResRef);
+        auto &creature = objectLoader.loadCreature(gitCreature.TemplateResRef);
         creature.setPosition({gitCreature.XPosition, gitCreature.YPosition, gitCreature.ZPosition});
         creature.setFacing(-glm::atan(gitCreature.XOrientation, gitCreature.YOrientation));
         add(creature);
     }
     for (auto &gitDoor : git.Door_List) {
-        auto &door = _areaObjectLoader.loadDoor(gitDoor.TemplateResRef);
+        auto &door = objectLoader.loadDoor(gitDoor.TemplateResRef);
         door.setPosition({gitDoor.X, gitDoor.Y, gitDoor.Z});
         door.setFacing(gitDoor.Bearing);
         add(door);
     }
     for (auto &gitEncounter : git.Encounter_List) {
-        auto &encounter = _areaObjectLoader.loadEncounter(gitEncounter.TemplateResRef);
+        auto &encounter = objectLoader.loadEncounter(gitEncounter.TemplateResRef);
         add(encounter);
     }
     for (auto &gitPlaceable : git.Placeable_List) {
-        auto &placeable = _areaObjectLoader.loadPlaceable(gitPlaceable.TemplateResRef);
+        auto &placeable = objectLoader.loadPlaceable(gitPlaceable.TemplateResRef);
         placeable.setPosition({gitPlaceable.X, gitPlaceable.Y, gitPlaceable.Z});
         placeable.setFacing(gitPlaceable.Bearing);
         add(placeable);
     }
     for (auto &gitTrigger : git.TriggerList) {
-        auto &trigger = _areaObjectLoader.loadTrigger(gitTrigger.TemplateResRef);
+        auto &trigger = objectLoader.loadTrigger(gitTrigger.TemplateResRef);
         add(trigger);
     }
     for (auto &gitSound : git.SoundList) {
-        auto &sound = _areaObjectLoader.loadSound(gitSound.TemplateResRef);
+        auto &sound = objectLoader.loadSound(gitSound.TemplateResRef);
         add(sound);
     }
     for (auto &gitStore : git.StoreList) {
-        auto &store = _areaObjectLoader.loadStore(gitStore.ResRef);
+        auto &store = objectLoader.loadStore(gitStore.ResRef);
         add(store);
     }
     for (auto &gitWaypoint : git.WaypointList) {
-        auto &waypoint = _areaObjectLoader.loadWaypoint(gitWaypoint.TemplateResRef);
+        auto &waypoint = objectLoader.loadWaypoint(gitWaypoint.TemplateResRef);
         add(waypoint);
     }
     setState(ObjectState::Loaded);

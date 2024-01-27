@@ -29,13 +29,11 @@ class Item : public Object {
 public:
     Item(ObjectId id,
          ObjectTag tag,
-         IActionExecutor &actionExecutor,
          IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
             ObjectType::Item,
-            actionExecutor,
             eventCollector) {
     }
 };

@@ -36,9 +36,8 @@ using testing::ReturnRef;
 TEST(area, should_load_are_and_git) {
     // given
     MockObjectLoader objectLoader;
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Area area {0, "", objectLoader, actionExecutor, eventCollector};
+    Area area {0, "", eventCollector};
     ARE_Rooms room;
     room.RoomName = "m01aa_01a";
     ARE_Rooms room2;
@@ -72,15 +71,15 @@ TEST(area, should_load_are_and_git) {
     vis.insert({"m01aa_01a", "m01aa_02a"});
     vis.insert({"m01aa_02a", "m01aa_01a"});
     Path pth;
-    Camera camera {1, "", actionExecutor, eventCollector};
-    Creature creature {2, "", actionExecutor, eventCollector};
-    Door door {3, "", actionExecutor, eventCollector};
-    Encounter encounter {4, "", actionExecutor, eventCollector};
-    Placeable placeable {5, "", actionExecutor, eventCollector};
-    Sound sound {6, "", actionExecutor, eventCollector};
-    Store store {7, "", actionExecutor, eventCollector};
-    Trigger trigger {8, "", actionExecutor, eventCollector};
-    Waypoint waypoint {9, "", actionExecutor, eventCollector};
+    Camera camera {1, "", eventCollector};
+    Creature creature {2, "", eventCollector};
+    Door door {3, "", eventCollector};
+    Encounter encounter {4, "", eventCollector};
+    Placeable placeable {5, "", eventCollector};
+    Sound sound {6, "", eventCollector};
+    Store store {7, "", eventCollector};
+    Trigger trigger {8, "", eventCollector};
+    Waypoint waypoint {9, "", eventCollector};
 
     // expect
     EXPECT_CALL(objectLoader, loadCamera()).WillOnce(ReturnRef(camera));
@@ -92,7 +91,7 @@ TEST(area, should_load_are_and_git) {
     EXPECT_CALL(objectLoader, loadStore(_)).WillOnce(ReturnRef(store));
     EXPECT_CALL(objectLoader, loadTrigger(_)).WillOnce(ReturnRef(trigger));
     EXPECT_CALL(objectLoader, loadWaypoint(_)).WillOnce(ReturnRef(waypoint));
-    area.load(are, git, lyt, vis, pth);
+    area.load(objectLoader, are, git, lyt, vis, pth);
     EXPECT_TRUE(area.is(ObjectState::Loaded));
     EXPECT_EQ(area.rooms().size(), 2);
     EXPECT_EQ(area.rooms().at(0).model, "m01aa_01a");
@@ -105,19 +104,17 @@ TEST(area, should_load_are_and_git) {
 
 TEST(area, should_add_objects) {
     // given
-    MockObjectLoader objectLoader;
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Area area {0, "", objectLoader, actionExecutor, eventCollector};
-    Camera camera {1, "", actionExecutor, eventCollector};
-    Creature creature {2, "", actionExecutor, eventCollector};
-    Door door {3, "", actionExecutor, eventCollector};
-    Encounter encounter {4, "", actionExecutor, eventCollector};
-    Placeable placeable {5, "", actionExecutor, eventCollector};
-    Sound sound {6, "", actionExecutor, eventCollector};
-    Store store {7, "", actionExecutor, eventCollector};
-    Trigger trigger {8, "", actionExecutor, eventCollector};
-    Waypoint waypoint {9, "", actionExecutor, eventCollector};
+    Area area {0, "", eventCollector};
+    Camera camera {1, "", eventCollector};
+    Creature creature {2, "", eventCollector};
+    Door door {3, "", eventCollector};
+    Encounter encounter {4, "", eventCollector};
+    Placeable placeable {5, "", eventCollector};
+    Sound sound {6, "", eventCollector};
+    Store store {7, "", eventCollector};
+    Trigger trigger {8, "", eventCollector};
+    Waypoint waypoint {9, "", eventCollector};
 
     // when
     area.add(camera);
@@ -166,28 +163,25 @@ class MockCreature : public Creature {
 public:
     MockCreature(ObjectId objectId,
                  ObjectTag tag,
-                 MockActionExecutor &actionExecutor,
                  MockEventCollector &eventCollector) :
         Creature(
             objectId,
             std::move(tag),
-            actionExecutor,
             eventCollector) {
     }
 
-    MOCK_METHOD(void, update, (float), (override));
+    MOCK_METHOD(void, update, (IActionExecutor &, float), (override));
 };
 
 TEST(area, should_update_objects_on_update) {
     // given
-    MockObjectLoader objectLoader;
     MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Area area {0, "", objectLoader, actionExecutor, eventCollector};
-    MockCreature creature {1, "", actionExecutor, eventCollector};
+    Area area {0, "", eventCollector};
+    MockCreature creature {1, "", eventCollector};
     area.add(creature);
 
     // expect
-    EXPECT_CALL(creature, update(_));
-    area.update(1.0f);
+    EXPECT_CALL(creature, update(_, _));
+    area.update(actionExecutor, 1.0f);
 }

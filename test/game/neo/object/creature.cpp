@@ -33,9 +33,8 @@ using namespace reone::resource::generated;
 
 TEST(creature, should_load_utc) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Creature creature {0, "", actionExecutor, eventCollector};
+    Creature creature {0, "", eventCollector};
     UTC utc;
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
@@ -59,9 +58,8 @@ TEST(creature, should_load_utc) {
 
 TEST(creature, should_load_utc_with_body_and_head_appearance) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Creature creature {0, "", actionExecutor, eventCollector};
+    Creature creature {0, "", eventCollector};
     UTC utc;
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
@@ -88,10 +86,9 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
 
 TEST(creature, should_equip_item) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Creature creature {0, "", actionExecutor, eventCollector};
-    Item item {1, "", actionExecutor, eventCollector};
+    Creature creature {0, "", eventCollector};
+    Item item {1, "", eventCollector};
 
     // when
     creature.equip(item, InventorySlots::rightWeapon);
@@ -104,11 +101,10 @@ TEST(creature, should_equip_item) {
 
 TEST(creature, should_unequip_previously_equipped_item_on_equip) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Creature creature {0, "", actionExecutor, eventCollector};
-    Item item {1, "", actionExecutor, eventCollector};
-    Item item2 {2, "", actionExecutor, eventCollector};
+    Creature creature {0, "", eventCollector};
+    Item item {1, "", eventCollector};
+    Item item2 {2, "", eventCollector};
     creature.equip(item, InventorySlots::rightWeapon);
 
     // when
@@ -125,10 +121,9 @@ TEST(creature, should_unequip_previously_equipped_item_on_equip) {
 
 TEST(creature, should_unequip_item) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Creature creature {0, "", actionExecutor, eventCollector};
-    Item item {1, "", actionExecutor, eventCollector};
+    Creature creature {0, "", eventCollector};
+    Item item {1, "", eventCollector};
     creature.equip(item, InventorySlots::rightWeapon);
 
     // when
@@ -144,10 +139,9 @@ TEST(creature, should_unequip_item) {
 
 TEST(creature, should_give_item) {
     // given
-    MockActionExecutor actionExecutor;
     MockEventCollector eventCollector;
-    Creature creature {0, "", actionExecutor, eventCollector};
-    Item item {1, "", actionExecutor, eventCollector};
+    Creature creature {0, "", eventCollector};
+    Item item {1, "", eventCollector};
 
     // when
     creature.give(item);

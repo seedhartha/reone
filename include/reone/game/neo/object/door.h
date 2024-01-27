@@ -43,13 +43,11 @@ class Door : public SpatialObject {
 public:
     Door(ObjectId id,
          ObjectTag tag,
-         IActionExecutor &actionExecutor,
          IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
             ObjectType::Door,
-            actionExecutor,
             eventCollector) {
     }
 
