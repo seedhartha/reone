@@ -526,161 +526,89 @@ Waypoint &Game::loadWaypoint(const resource::ResRef &tmplt) {
 }
 
 Area &Game::newArea(ObjectTag tag) {
-    auto object = std::make_unique<Area>(
-        _nextObjectId++,
+    return newObject<Area>(
         std::move(tag),
         *this,
         *_actionExecutor,
         *this);
-    auto &area = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return area;
 }
 
 Camera &Game::newCamera(ObjectTag tag) {
-    auto object = std::make_unique<Camera>(
-        _nextObjectId++,
+    return newObject<Camera>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &camera = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return camera;
 }
 
 Creature &Game::newCreature(ObjectTag tag) {
-    auto object = std::make_unique<Creature>(
-        _nextObjectId++,
+    return newObject<Creature>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &creature = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return creature;
 }
 
 Door &Game::newDoor(ObjectTag tag) {
-    auto object = std::make_unique<Door>(
-        _nextObjectId++,
+    return newObject<Door>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &door = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return door;
 }
 
 Encounter &Game::newEncounter(ObjectTag tag) {
-    auto object = std::make_unique<Encounter>(
-        _nextObjectId++,
+    return newObject<Encounter>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &encounter = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return encounter;
 }
 
 Item &Game::newItem(ObjectTag tag) {
-    auto object = std::make_unique<Item>(
-        _nextObjectId++,
+    return newObject<Item>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &item = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return item;
 }
 
 Module &Game::newModule(ObjectTag tag) {
-    auto object = std::make_unique<Module>(
-        _nextObjectId++,
+    return newObject<Module>(
         std::move(tag),
         *this,
         *_actionExecutor,
         *this);
-    auto &module = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return module;
 }
 
 Placeable &Game::newPlaceable(ObjectTag tag) {
-    auto object = std::make_unique<Placeable>(
-        _nextObjectId++,
+    return newObject<Placeable>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &placeable = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return placeable;
 }
 
 Sound &Game::newSound(ObjectTag tag) {
-    auto object = std::make_unique<Sound>(
-        _nextObjectId++,
+    return newObject<Sound>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &sound = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return sound;
 }
 
 Store &Game::newStore(ObjectTag tag) {
-    auto object = std::make_unique<Store>(
-        _nextObjectId++,
+    return newObject<Store>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &store = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return store;
 }
 
 Trigger &Game::newTrigger(ObjectTag tag) {
-    auto object = std::make_unique<Trigger>(
-        _nextObjectId++,
+    return newObject<Trigger>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &trigger = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return trigger;
 }
 
 Waypoint &Game::newWaypoint(ObjectTag tag) {
-    auto object = std::make_unique<Waypoint>(
-        _nextObjectId++,
+    return newObject<Waypoint>(
         std::move(tag),
         *_actionExecutor,
         *this);
-    auto &waypoint = *object;
-    _objects.push_back(std::move(object));
-    auto &inserted = *_objects.back();
-    _idToObject.insert({inserted.id(), inserted});
-    return waypoint;
 }
 
 } // namespace neo

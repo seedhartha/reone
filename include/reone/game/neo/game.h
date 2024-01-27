@@ -250,6 +250,22 @@ private:
     void runOnLogicThread(AsyncTask task);
 
     // END Logic thread
+
+    // Object factory methods
+
+    template <class O, class... Args>
+    inline O &newObject(ObjectTag tag, Args &&...args) {
+        auto object = std::make_unique<O>(
+            _nextObjectId++,
+            std::move(tag),
+            std::forward<Args>(args)...);
+        _objects.push_back(std::move(object));
+        auto &inserted = *_objects.back();
+        _idToObject.insert({inserted.id(), inserted});
+        return static_cast<O &>(inserted);
+    }
+
+    // END Object factory methods
 };
 
 } // namespace neo
