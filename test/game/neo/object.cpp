@@ -17,28 +17,33 @@
 
 #include <gtest/gtest.h>
 
+#include "../../fixtures/neogame.h"
+
 #include "reone/game/neo/object.h"
 
 using namespace reone::game;
 using namespace reone::game::neo;
 
+using testing::_;
+
 class TestObject : public Object {
 public:
-    TestObject() :
-        Object(0, "", ObjectType::Invalid) {
+    TestObject(MockGame &game) :
+        Object(0, "", ObjectType::Invalid, game, game) {
     }
 };
 
 class TestSpatialObject : public SpatialObject {
 public:
-    TestSpatialObject() :
-        SpatialObject(0, "", ObjectType::Invalid) {
+    TestSpatialObject(MockGame &game) :
+        SpatialObject(0, "", ObjectType::Invalid, game, game) {
     }
 };
 
 TEST(object, should_be_constructed_in_created_state) {
     // given
-    TestObject object;
+    MockGame game;
+    TestObject object {game};
 
     // expect
     EXPECT_TRUE(object.is(ObjectState::Created));
@@ -46,7 +51,8 @@ TEST(object, should_be_constructed_in_created_state) {
 
 TEST(object, should_return_nullopt_for_current_action) {
     // given
-    TestObject object;
+    MockGame game;
+    TestObject object {game};
 
     // when
     auto action = object.currentAction();
@@ -57,7 +63,8 @@ TEST(object, should_return_nullopt_for_current_action) {
 
 TEST(object, should_add_action_to_action_queue) {
     // given
-    TestObject object;
+    MockGame game;
+    TestObject object {game};
 
     // when
     object.add(Action());
@@ -69,7 +76,8 @@ TEST(object, should_add_action_to_action_queue) {
 
 TEST(object, should_apply_effect) {
     // given
-    TestObject object;
+    MockGame game;
+    TestObject object {game};
 
     // when
     object.apply(Effect());
@@ -79,7 +87,8 @@ TEST(object, should_apply_effect) {
 
 TEST(spatial_object, should_be_created_at_world_zero_facing_east) {
     // given
-    TestSpatialObject object;
+    MockGame game;
+    TestSpatialObject object {game};
 
     // expect
     EXPECT_EQ(object.position(), (glm::vec3 {0.0f}));
@@ -88,7 +97,12 @@ TEST(spatial_object, should_be_created_at_world_zero_facing_east) {
 
 TEST(spatial_object, should_set_position) {
     // given
-    TestSpatialObject object;
+    MockGame game;
+    std::vector<Event> events;
+    ON_CALL(game, collectEvent(_)).WillByDefault([&events](auto event) {
+        events.push_back(std::move(event));
+    });
+    TestSpatialObject object {game};
 
     // when
     object.setPosition({1.0f, 1.0f, 1.0f});
@@ -96,10 +110,6 @@ TEST(spatial_object, should_set_position) {
     // then
     auto position = object.position();
     EXPECT_EQ(position, (glm::vec3 {1.0f, 1.0f, 1.0f}));
-    std::vector<Event> events;
-    for (const auto &event : object.events()) {
-        events.push_back(event);
-    }
     EXPECT_EQ(events.size(), 2);
     EXPECT_EQ(events.at(0).type, EventType::ObjectCreated);
     EXPECT_EQ(events.at(1).type, EventType::ObjectLocationChanged);
@@ -108,7 +118,12 @@ TEST(spatial_object, should_set_position) {
 
 TEST(spatial_object, should_set_facing) {
     // given
-    TestSpatialObject object;
+    MockGame game;
+    std::vector<Event> events;
+    ON_CALL(game, collectEvent(_)).WillByDefault([&events](auto event) {
+        events.push_back(std::move(event));
+    });
+    TestSpatialObject object {game};
 
     // when
     object.setFacing(glm::radians(270.0f));
@@ -116,10 +131,6 @@ TEST(spatial_object, should_set_facing) {
     // then
     auto facing = object.facing();
     EXPECT_EQ(facing, glm::radians(270.0f));
-    std::vector<Event> events;
-    for (const auto &event : object.events()) {
-        events.push_back(event);
-    }
     EXPECT_EQ(events.size(), 2);
     EXPECT_EQ(events.at(0).type, EventType::ObjectCreated);
     EXPECT_EQ(events.at(1).type, EventType::ObjectLocationChanged);
@@ -128,7 +139,12 @@ TEST(spatial_object, should_set_facing) {
 
 TEST(spatial_object, should_set_facing_point) {
     // given
-    TestSpatialObject object;
+    MockGame game;
+    std::vector<Event> events;
+    ON_CALL(game, collectEvent(_)).WillByDefault([&events](auto event) {
+        events.push_back(std::move(event));
+    });
+    TestSpatialObject object {game};
     object.setPosition({1.0f, 1.0f, 1.0f});
 
     // when
@@ -137,10 +153,6 @@ TEST(spatial_object, should_set_facing_point) {
     // then
     auto facing = object.facing();
     EXPECT_EQ(facing, glm::radians(135.0f));
-    std::vector<Event> events;
-    for (const auto &event : object.events()) {
-        events.push_back(event);
-    }
     EXPECT_EQ(events.size(), 3);
     EXPECT_EQ(events.at(0).type, EventType::ObjectCreated);
     EXPECT_EQ(events.at(1).type, EventType::ObjectLocationChanged);

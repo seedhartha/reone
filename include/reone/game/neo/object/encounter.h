@@ -27,11 +27,16 @@ namespace neo {
 
 class Encounter : public Object {
 public:
-    Encounter(ObjectId id, ObjectTag tag) :
+    Encounter(ObjectId id,
+              ObjectTag tag,
+              IActionExecutor &actionExecutor,
+              IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
-            ObjectType::Encounter) {
+            ObjectType::Encounter,
+            actionExecutor,
+            eventCollector) {
     }
 };
 

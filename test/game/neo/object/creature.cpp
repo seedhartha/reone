@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include "../../../fixtures/neogame.h"
+
 #include "reone/game/neo/object/creature.h"
 #include "reone/game/neo/object/item.h"
 #include "reone/resource/2da.h"
@@ -31,7 +33,8 @@ using namespace reone::resource::generated;
 
 TEST(creature, should_load_utc) {
     // given
-    Creature creature {0, ""};
+    MockGame game;
+    Creature creature {0, "", game, game};
     UTC utc;
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
@@ -55,7 +58,8 @@ TEST(creature, should_load_utc) {
 
 TEST(creature, should_load_utc_with_body_and_head_appearance) {
     // given
-    Creature creature {0, ""};
+    MockGame game;
+    Creature creature {0, "", game, game};
     UTC utc;
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
@@ -82,8 +86,9 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
 
 TEST(creature, should_equip_item) {
     // given
-    Creature creature {0, ""};
-    Item item {1, ""};
+    MockGame game;
+    Creature creature {0, "", game, game};
+    Item item {1, "", game, game};
 
     // when
     creature.equip(item, InventorySlots::rightWeapon);
@@ -96,9 +101,10 @@ TEST(creature, should_equip_item) {
 
 TEST(creature, should_unequip_previously_equipped_item_on_equip) {
     // given
-    Creature creature {0, ""};
-    Item item {1, ""};
-    Item item2 {2, ""};
+    MockGame game;
+    Creature creature {0, "", game, game};
+    Item item {1, "", game, game};
+    Item item2 {2, "", game, game};
     creature.equip(item, InventorySlots::rightWeapon);
 
     // when
@@ -115,8 +121,9 @@ TEST(creature, should_unequip_previously_equipped_item_on_equip) {
 
 TEST(creature, should_unequip_item) {
     // given
-    Creature creature {0, ""};
-    Item item {1, ""};
+    MockGame game;
+    Creature creature {0, "", game, game};
+    Item item {1, "", game, game};
     creature.equip(item, InventorySlots::rightWeapon);
 
     // when
@@ -132,8 +139,9 @@ TEST(creature, should_unequip_item) {
 
 TEST(creature, should_give_item) {
     // given
-    Creature creature {0, ""};
-    Item item {1, ""};
+    MockGame game;
+    Creature creature {0, "", game, game};
+    Item item {1, "", game, game};
 
     // when
     creature.give(item);

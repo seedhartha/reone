@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include "../../../fixtures/neogame.h"
+
 #include "reone/game/neo/object/placeable.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/parser/2da/placeables.h"
@@ -29,7 +31,8 @@ using namespace reone::resource::generated;
 
 TEST(placeable, should_load_utp) {
     // given
-    Placeable placeable {0, ""};
+    MockGame game;
+    Placeable placeable {0, "", game, game};
     UTP utp;
     utp.Appearance = 0;
     PlaceablesTwoDARow placeablesRow;

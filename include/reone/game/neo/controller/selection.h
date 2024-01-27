@@ -59,6 +59,11 @@ public:
         _camera = camera;
     }
 
+    void clear() {
+        _hoveredObject.reset();
+        _selectedObject.reset();
+    }
+
     std::optional<std::reference_wrapper<SpatialObject>> hoveredObject() const {
         return _hoveredObject;
     }

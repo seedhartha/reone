@@ -27,11 +27,16 @@ namespace neo {
 
 class Sound : public SpatialObject {
 public:
-    Sound(ObjectId id, ObjectTag tag) :
+    Sound(ObjectId id,
+          ObjectTag tag,
+          IActionExecutor &actionExecutor,
+          IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Sound) {
+            ObjectType::Sound,
+            actionExecutor,
+            eventCollector) {
     }
 };
 

@@ -41,13 +41,13 @@ namespace game {
 
 namespace neo {
 
-class MockAreaLoader : public IAreaLoader {
+class MockGame : public IAreaLoader,
+                 public IAreaObjectLoader,
+                 public IActionExecutor,
+                 public IEventCollector {
 public:
     MOCK_METHOD(Area &, loadArea, (const std::string &), (override));
-};
 
-class MockAreaObjectLoader : public IAreaObjectLoader {
-public:
     MOCK_METHOD(Camera &, loadCamera, (), (override));
     MOCK_METHOD(Creature &, loadCreature, (const ResRef &), (override));
     MOCK_METHOD(Door &, loadDoor, (const ResRef &), (override));
@@ -57,6 +57,10 @@ public:
     MOCK_METHOD(Store &, loadStore, (const ResRef &), (override));
     MOCK_METHOD(Trigger &, loadTrigger, (const ResRef &), (override));
     MOCK_METHOD(Waypoint &, loadWaypoint, (const ResRef &), (override));
+
+    MOCK_METHOD(bool, executeAction, (Object &, const Action &, float), (override));
+
+    MOCK_METHOD(void, collectEvent, (Event), (override));
 };
 
 class MockConsole : public IConsole, boost::noncopyable {

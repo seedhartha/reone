@@ -29,7 +29,9 @@ enum class EventType {
     ObjectCreated,
     ObjectStateChanged,
     ObjectLocationChanged,
-    ObjectAnimationChanged
+    ObjectAnimationReset,
+    ObjectFireForgetAnimationFired,
+    DoorStateChanged
 };
 
 struct ObjectEventData {
@@ -42,11 +44,17 @@ struct ObjectAnimationEventData {
     const char *name;
 };
 
+struct DoorEventData {
+    ObjectId objectId;
+    DoorState state;
+};
+
 struct Event {
     EventType type;
     union {
         ObjectEventData object;
         ObjectAnimationEventData animation;
+        DoorEventData door;
     };
 };
 

@@ -39,8 +39,16 @@ public:
     virtual bool executeAction(Object &subject, const Action &action, float dt) = 0;
 };
 
+class IEventCollector {
+public:
+    virtual ~IEventCollector() = default;
+
+    virtual void collectEvent(Event event) = 0;
+};
+
 using ActionQueue = std::queue<Action>;
 using EffectList = std::vector<Effect>;
+using AnimationStack = std::stack<std::string>;
 
 class Object : boost::noncopyable {
 public:
@@ -92,10 +100,6 @@ public:
         return _actions.front();
     }
 
-    void setActionExecutor(IActionExecutor &actionExecutor) {
-        _actionExecutor = actionExecutor;
-    }
-
     // END Actions
 
     // Effects
@@ -106,42 +110,34 @@ public:
 
     // END Effects
 
-    // Events
-
-    void clearEvents() {
-        _events.clear();
-    }
-
-    const EventList &events() const {
-        return _events;
-    }
-
-    // END Events
-
 protected:
     ObjectId _id;
     ObjectTag _tag;
     ObjectType _type;
-
-    std::optional<std::reference_wrapper<IActionExecutor>> _actionExecutor;
+    IActionExecutor &_actionExecutor;
+    IEventCollector &_eventCollector;
 
     ObjectState _state {ObjectState::Created};
 
     ActionQueue _actions;
     EffectList _effects;
-    EventList _events;
+    AnimationStack _animations;
 
     Object(ObjectId id,
            ObjectTag tag,
-           ObjectType type) :
+           ObjectType type,
+           IActionExecutor &actionExecutor,
+           IEventCollector &eventCollector) :
         _id(id),
         _tag(std::move(tag)),
-        _type(type) {
+        _type(type),
+        _actionExecutor(actionExecutor),
+        _eventCollector(eventCollector) {
 
         Event event;
         event.type = EventType::ObjectCreated;
         event.object.objectId = _id;
-        _events.push_back(std::move(event));
+        _eventCollector.collectEvent(std::move(event));
     }
 
     void setState(ObjectState state) {
@@ -154,7 +150,31 @@ protected:
         event.type = EventType::ObjectStateChanged;
         event.object.objectId = _id;
         event.object.state = _state;
-        _events.push_back(std::move(event));
+        _eventCollector.collectEvent(std::move(event));
+    }
+
+    void resetAnimation(std::string name) {
+        AnimationStack animations;
+        animations.push(std::move(name));
+        std::swap(_animations, animations);
+
+        Event event;
+        event.type = EventType::ObjectAnimationReset;
+        event.animation.objectId = _id;
+        event.animation.name = _animations.top().c_str();
+        _eventCollector.collectEvent(std::move(event));
+    }
+
+    void playFireForgetAnimation(const std::string &name) {
+        AnimationStack animations;
+        animations.push(std::move(name));
+        std::swap(_animations, animations);
+
+        Event event;
+        event.type = EventType::ObjectFireForgetAnimationFired;
+        event.animation.objectId = _id;
+        event.animation.name = _animations.top().c_str();
+        _eventCollector.collectEvent(std::move(event));
     }
 };
 
@@ -173,7 +193,7 @@ public:
         Event event;
         event.type = EventType::ObjectLocationChanged;
         event.object.objectId = _id;
-        _events.push_back(std::move(event));
+        _eventCollector.collectEvent(std::move(event));
     }
 
     float facing() const {
@@ -189,7 +209,7 @@ public:
         Event event;
         event.type = EventType::ObjectLocationChanged;
         event.object.objectId = _id;
-        _events.push_back(std::move(event));
+        _eventCollector.collectEvent(std::move(event));
     }
 
     void setFacingPoint(const glm::vec3 &target);
@@ -200,8 +220,15 @@ protected:
 
     SpatialObject(ObjectId id,
                   ObjectTag tag,
-                  ObjectType type) :
-        Object(id, std::move(tag), type) {
+                  ObjectType type,
+                  IActionExecutor &actionExecutor,
+                  IEventCollector &eventCollector) :
+        Object(
+            id,
+            std::move(tag),
+            type,
+            actionExecutor,
+            eventCollector) {
     }
 };
 

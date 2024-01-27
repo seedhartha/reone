@@ -90,11 +90,15 @@ class Area : public Object {
 public:
     Area(ObjectId id,
          ObjectTag tag,
-         IAreaObjectLoader &areaObjectLoader) :
+         IAreaObjectLoader &areaObjectLoader,
+         IActionExecutor &actionExecutor,
+         IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
-            ObjectType::Area),
+            ObjectType::Area,
+            actionExecutor,
+            eventCollector),
         _areaObjectLoader(areaObjectLoader) {
     }
 

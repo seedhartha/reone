@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include "../../../fixtures/neogame.h"
+
 #include "reone/game/neo/object/door.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/parser/2da/genericdoors.h"
@@ -29,7 +31,8 @@ using namespace reone::resource::generated;
 
 TEST(door, should_load_utd) {
     // given
-    Door door {0, ""};
+    MockGame game;
+    Door door {0, "", game, game};
     UTD utd;
     utd.GenericType = 0;
     GenericdoorsTwoDARow genericDoorsRow;

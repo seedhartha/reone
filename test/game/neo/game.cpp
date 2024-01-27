@@ -64,8 +64,8 @@ private:
 
 class MockModule : public Module {
 public:
-    MockModule(IAreaLoader &areaLoader) :
-        Module(0, "", areaLoader) {
+    MockModule(MockGame &game) :
+        Module(0, "", game, game, game) {
     }
 
     MOCK_METHOD(void, update, (float), (override));

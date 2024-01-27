@@ -35,8 +35,8 @@ using testing::ReturnRef;
 
 class MockCreature : public Creature {
 public:
-    MockCreature() :
-        Creature(1, "") {
+    MockCreature(MockGame &game) :
+        Creature(1, "", game, game) {
     }
 
     MOCK_METHOD(void, update, (float), (override));
@@ -44,8 +44,8 @@ public:
 
 TEST(area, should_load_are_and_git) {
     // given
-    MockAreaObjectLoader areaObjectLoader;
-    Area area {0, "", areaObjectLoader};
+    MockGame game;
+    Area area {0, "", game, game, game};
     ARE_Rooms room;
     room.RoomName = "m01aa_01a";
     ARE_Rooms room2;
@@ -79,26 +79,26 @@ TEST(area, should_load_are_and_git) {
     vis.insert({"m01aa_01a", "m01aa_02a"});
     vis.insert({"m01aa_02a", "m01aa_01a"});
     Path pth;
-    Camera camera {0, ""};
-    Creature creature {1, ""};
-    Door door {2, ""};
-    Encounter encounter {3, ""};
-    Placeable placeable {4, ""};
-    Sound sound {5, ""};
-    Store store {6, ""};
-    Trigger trigger {7, ""};
-    Waypoint waypoint {8, ""};
+    Camera camera {0, "", game, game};
+    Creature creature {1, "", game, game};
+    Door door {2, "", game, game};
+    Encounter encounter {3, "", game, game};
+    Placeable placeable {4, "", game, game};
+    Sound sound {5, "", game, game};
+    Store store {6, "", game, game};
+    Trigger trigger {7, "", game, game};
+    Waypoint waypoint {8, "", game, game};
 
     // expect
-    EXPECT_CALL(areaObjectLoader, loadCamera()).WillOnce(ReturnRef(camera));
-    EXPECT_CALL(areaObjectLoader, loadCreature(_)).WillOnce(ReturnRef(creature));
-    EXPECT_CALL(areaObjectLoader, loadDoor(_)).WillOnce(ReturnRef(door));
-    EXPECT_CALL(areaObjectLoader, loadEncounter(_)).WillOnce(ReturnRef(encounter));
-    EXPECT_CALL(areaObjectLoader, loadPlaceable(_)).WillOnce(ReturnRef(placeable));
-    EXPECT_CALL(areaObjectLoader, loadSound(_)).WillOnce(ReturnRef(sound));
-    EXPECT_CALL(areaObjectLoader, loadStore(_)).WillOnce(ReturnRef(store));
-    EXPECT_CALL(areaObjectLoader, loadTrigger(_)).WillOnce(ReturnRef(trigger));
-    EXPECT_CALL(areaObjectLoader, loadWaypoint(_)).WillOnce(ReturnRef(waypoint));
+    EXPECT_CALL(game, loadCamera()).WillOnce(ReturnRef(camera));
+    EXPECT_CALL(game, loadCreature(_)).WillOnce(ReturnRef(creature));
+    EXPECT_CALL(game, loadDoor(_)).WillOnce(ReturnRef(door));
+    EXPECT_CALL(game, loadEncounter(_)).WillOnce(ReturnRef(encounter));
+    EXPECT_CALL(game, loadPlaceable(_)).WillOnce(ReturnRef(placeable));
+    EXPECT_CALL(game, loadSound(_)).WillOnce(ReturnRef(sound));
+    EXPECT_CALL(game, loadStore(_)).WillOnce(ReturnRef(store));
+    EXPECT_CALL(game, loadTrigger(_)).WillOnce(ReturnRef(trigger));
+    EXPECT_CALL(game, loadWaypoint(_)).WillOnce(ReturnRef(waypoint));
     area.load(are, git, lyt, vis, pth);
     EXPECT_TRUE(area.is(ObjectState::Loaded));
     EXPECT_EQ(area.rooms().size(), 2);
@@ -112,17 +112,17 @@ TEST(area, should_load_are_and_git) {
 
 TEST(area, should_add_objects) {
     // given
-    MockAreaObjectLoader areaObjectLoader;
-    Area area {0, "", areaObjectLoader};
-    Camera camera {1, ""};
-    Creature creature {2, ""};
-    Door door {3, ""};
-    Encounter encounter {4, ""};
-    Placeable placeable {5, ""};
-    Sound sound {6, ""};
-    Store store {7, ""};
-    Trigger trigger {8, ""};
-    Waypoint waypoint {9, ""};
+    MockGame game;
+    Area area {0, "", game, game, game};
+    Camera camera {1, "", game, game};
+    Creature creature {2, "", game, game};
+    Door door {3, "", game, game};
+    Encounter encounter {4, "", game, game};
+    Placeable placeable {5, "", game, game};
+    Sound sound {6, "", game, game};
+    Store store {7, "", game, game};
+    Trigger trigger {8, "", game, game};
+    Waypoint waypoint {9, "", game, game};
 
     // when
     area.add(camera);
@@ -169,9 +169,9 @@ TEST(area, should_add_objects) {
 
 TEST(area, should_update_objects_on_update) {
     // given
-    MockAreaObjectLoader areaObjectLoader;
-    Area area {0, "", areaObjectLoader};
-    MockCreature creature;
+    MockGame game;
+    Area area {0, "", game, game, game};
+    MockCreature creature {game};
     area.add(creature);
 
     // expect

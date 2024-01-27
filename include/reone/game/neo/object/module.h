@@ -48,11 +48,15 @@ class Module : public Object {
 public:
     Module(ObjectId id,
            ObjectTag tag,
-           IAreaLoader &areaLoader) :
+           IAreaLoader &areaLoader,
+           IActionExecutor &actionExecutor,
+           IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
-            ObjectType::Module),
+            ObjectType::Module,
+            actionExecutor,
+            eventCollector),
         _areaLoader(areaLoader) {
     }
 

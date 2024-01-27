@@ -27,11 +27,16 @@ namespace neo {
 
 class Waypoint : public SpatialObject {
 public:
-    Waypoint(ObjectId id, ObjectTag tag) :
+    Waypoint(ObjectId id,
+             ObjectTag tag,
+             IActionExecutor &actionExecutor,
+             IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Waypoint) {
+            ObjectType::Waypoint,
+            actionExecutor,
+            eventCollector) {
     }
 };
 

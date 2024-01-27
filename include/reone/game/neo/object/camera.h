@@ -27,11 +27,16 @@ namespace neo {
 
 class Camera : public SpatialObject {
 public:
-    Camera(ObjectId id, ObjectTag tag) :
+    Camera(ObjectId id,
+           ObjectTag tag,
+           IActionExecutor &actionExecutor,
+           IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Camera) {
+            ObjectType::Camera,
+            actionExecutor,
+            eventCollector) {
     }
 };
 

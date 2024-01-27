@@ -17,6 +17,7 @@
 
 #include "reone/game/neo/controller/selection.h"
 
+#include "reone/game/neo/object/door.h"
 #include "reone/graphics/options.h"
 #include "reone/input/event.h"
 #include "reone/scene/graph.h"
@@ -65,7 +66,14 @@ std::optional<std::reference_wrapper<SpatialObject>> SelectionController::findOb
     if (!ref) {
         return std::nullopt;
     }
-    return *reinterpret_cast<SpatialObject *>(ref);
+    auto &object = *reinterpret_cast<SpatialObject *>(ref);
+    if (object.type() == ObjectType::Door) {
+        auto &door = static_cast<Door &>(object);
+        if (door.doorState() != DoorState::Closed) {
+            return std::nullopt;
+        }
+    }
+    return object;
 }
 
 } // namespace neo

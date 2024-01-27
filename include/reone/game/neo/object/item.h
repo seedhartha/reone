@@ -27,11 +27,16 @@ namespace neo {
 
 class Item : public Object {
 public:
-    Item(ObjectId id, ObjectTag tag) :
+    Item(ObjectId id,
+         ObjectTag tag,
+         IActionExecutor &actionExecutor,
+         IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
-            ObjectType::Item) {
+            ObjectType::Item,
+            actionExecutor,
+            eventCollector) {
     }
 };
 

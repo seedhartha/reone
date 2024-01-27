@@ -27,11 +27,16 @@ namespace neo {
 
 class Trigger : public SpatialObject {
 public:
-    Trigger(ObjectId id, ObjectTag tag) :
+    Trigger(ObjectId id,
+            ObjectTag tag,
+            IActionExecutor &actionExecutor,
+            IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Trigger) {
+            ObjectType::Trigger,
+            actionExecutor,
+            eventCollector) {
     }
 };
 

@@ -29,6 +29,11 @@ enum class ObjectState {
     Destroyed
 };
 
+enum class DoorState {
+    Closed,
+    Open
+};
+
 using ObjectId = uint32_t;
 using ObjectTag = std::string;
 using PortraitId = uint32_t;

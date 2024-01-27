@@ -33,8 +33,8 @@ using testing::ReturnRef;
 
 class MockArea : public Area {
 public:
-    MockArea(IAreaObjectLoader &areaObjectLoader) :
-        Area(1, "", areaObjectLoader) {
+    MockArea(MockGame &game) :
+        Area(1, "", game, game, game) {
     }
 
     MOCK_METHOD(void, update, (float), (override));
@@ -42,8 +42,8 @@ public:
 
 TEST(module, should_load_ifo) {
     // given
-    MockAreaLoader areaLoader;
-    Module module {0, "", areaLoader};
+    MockGame game;
+    Module module {0, "", game, game, game};
     IFO ifo;
     ifo.Mod_Entry_Area = "m01aa";
     ifo.Mod_Entry_X = 1.0f;
@@ -52,11 +52,10 @@ TEST(module, should_load_ifo) {
     ifo.Mod_Entry_Dir_X = 0.70710677f;
     ifo.Mod_Entry_Dir_Y = -0.70710677f;
     ifo.Mod_Area_list.push_back({"m01aa"});
-    MockAreaObjectLoader areaObjectLoader;
-    MockArea area {areaObjectLoader};
+    MockArea area {game};
 
     // expect
-    EXPECT_CALL(areaLoader, loadArea(_)).WillOnce(ReturnRef(area));
+    EXPECT_CALL(game, loadArea(_)).WillOnce(ReturnRef(area));
     module.load(ifo);
     EXPECT_TRUE(module.is(ObjectState::Loaded));
     EXPECT_EQ(module.area(), area);
@@ -66,8 +65,8 @@ TEST(module, should_load_ifo) {
 
 TEST(module, should_throw_for_area_when_has_no_areas) {
     // given
-    MockAreaLoader areaLoader;
-    Module module {0, "", areaLoader};
+    MockGame game;
+    Module module {0, "", game, game, game};
 
     // expect
     EXPECT_THROW(module.area(), std::logic_error);
@@ -75,11 +74,10 @@ TEST(module, should_throw_for_area_when_has_no_areas) {
 
 TEST(module, should_update_current_area_on_update) {
     // given
-    MockAreaObjectLoader areaObjectLoader;
-    MockArea area {areaObjectLoader};
-    MockAreaLoader areaLoader;
-    EXPECT_CALL(areaLoader, loadArea(_)).WillOnce(ReturnRef(area));
-    Module module {0, "", areaLoader};
+    MockGame game;
+    MockArea area {game};
+    EXPECT_CALL(game, loadArea(_)).WillOnce(ReturnRef(area));
+    Module module {0, "", game, game, game};
     IFO ifo;
     ifo.Mod_Area_list.push_back({"m01aa"});
     ifo.Mod_Entry_Area = "m01aa";

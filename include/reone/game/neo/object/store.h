@@ -27,11 +27,16 @@ namespace neo {
 
 class Store : public Object {
 public:
-    Store(ObjectId id, ObjectTag tag) :
+    Store(ObjectId id,
+          ObjectTag tag,
+          IActionExecutor &actionExecutor,
+          IEventCollector &eventCollector) :
         Object(
             id,
             std::move(tag),
-            ObjectType::Store) {
+            ObjectType::Store,
+            actionExecutor,
+            eventCollector) {
     }
 };
 

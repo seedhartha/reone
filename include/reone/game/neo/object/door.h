@@ -41,22 +41,58 @@ namespace neo {
 
 class Door : public SpatialObject {
 public:
-    Door(ObjectId id, ObjectTag tag) :
+    Door(ObjectId id,
+         ObjectTag tag,
+         IActionExecutor &actionExecutor,
+         IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Door) {
+            ObjectType::Door,
+            actionExecutor,
+            eventCollector) {
     }
 
     void load(const resource::generated::UTD &utd,
               const resource::generated::GenericdoorsTwoDA &genericDoors);
+
+    void open() {
+        setDoorState(DoorState::Open);
+        // resetAnimation("opened1");
+        playFireForgetAnimation("opening1");
+    }
+
+    void close() {
+        setDoorState(DoorState::Closed);
+        // resetAnimation("closed");
+        playFireForgetAnimation("closing1");
+    }
+
+    DoorState doorState() const {
+        return _doorState;
+    }
 
     const resource::ResRef &modelName() const {
         return _modelName;
     }
 
 private:
+    DoorState _doorState {DoorState::Closed};
+
     resource::ResRef _modelName;
+
+    void setDoorState(DoorState state) {
+        if (_doorState == state) {
+            return;
+        }
+        _doorState = state;
+
+        Event event;
+        event.type = EventType::DoorStateChanged;
+        event.door.objectId = _id;
+        event.door.state = _doorState;
+        _eventCollector.collectEvent(std::move(event));
+    }
 };
 
 } // namespace neo

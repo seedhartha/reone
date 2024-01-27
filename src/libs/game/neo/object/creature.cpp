@@ -221,23 +221,19 @@ void Creature::setMoveType(MoveType type) {
     }
     _moveType = type;
 
-    Event event;
-    event.type = EventType::ObjectAnimationChanged;
-    event.animation.objectId = _id;
     switch (_moveType) {
     case MoveType::None:
-        event.animation.name = "pause1";
+        resetAnimation("pause1");
         break;
     case MoveType::Walk:
-        event.animation.name = "walk";
+        resetAnimation("walk");
         break;
     case MoveType::Run:
-        event.animation.name = "run";
+        resetAnimation("run");
         break;
     default:
         throw std::invalid_argument("Unsupported move type: " + std::to_string(static_cast<int>(type)));
     }
-    _events.push_back(std::move(event));
 }
 
 void Creature::equip(Item &item, InventorySlot slot) {

@@ -172,7 +172,16 @@ bool Game::handle(const input::Event &event) {
     if (_playerCameraController->handle(event)) {
         return true;
     }
+    auto oldSelected = _selectionController->selectedObject();
     if (_selectionController->handle(event)) {
+        auto newSelected = _selectionController->selectedObject();
+        if (newSelected && (!oldSelected || newSelected->get() != oldSelected->get())) {
+            if (newSelected->get().type() == ObjectType::Door) {
+                auto &door = static_cast<Door &>(newSelected->get());
+                door.open();
+                _selectionController->clear();
+            }
+        }
         return true;
     }
     switch (event.type) {
@@ -193,7 +202,7 @@ void Game::handleEvents() {
     EventList events;
     {
         std::lock_guard<std::mutex> lock {_eventsMutex};
-        std::swap(events, _events);
+        std::swap(events, _eventsFrontBuf);
     }
     for (auto &event : events) {
         if (event.type == EventType::ObjectStateChanged && event.object.state == ObjectState::Loaded) {
@@ -215,9 +224,16 @@ void Game::handleEvents() {
             auto &object = _idToObject.at(event.object.objectId).get();
             auto &spatial = static_cast<SpatialObject &>(object);
             onObjectLocationChanged(spatial);
-        } else if (event.type == EventType::ObjectAnimationChanged) {
+        } else if (event.type == EventType::ObjectAnimationReset) {
             auto &object = _idToObject.at(event.animation.objectId).get();
-            onObjectAnimationChanged(object, event.animation.name);
+            onObjectAnimationReset(object, event.animation.name);
+        } else if (event.type == EventType::ObjectFireForgetAnimationFired) {
+            auto &object = _idToObject.at(event.animation.objectId).get();
+            onObjectFireForgetAnimationFired(object, event.animation.name);
+        } else if (event.type == EventType::DoorStateChanged) {
+            auto &object = _idToObject.at(event.object.objectId).get();
+            auto &door = static_cast<Door &>(object);
+            onDoorStateChanged(door, event.door.state);
         }
     }
 }
@@ -234,9 +250,7 @@ void Game::onAreaLoaded(Area &area) {
         scene.addRoot(std::move(sceneNode));
         auto walkmesh = _resourceSvc.walkmeshes.get(room.model, ResType::Wok);
         if (walkmesh) {
-            ObjectWalkmesh ow;
-            ow.objectId = area.id();
-            ow.walkmesh = walkmesh.get();
+            ObjectWalkmesh ow {area.id(), *walkmesh};
             _objectWalkmeshes.push_back(std::move(ow));
             auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
             scene.addRoot(std::move(walkmeshSceneNode));
@@ -301,12 +315,18 @@ void Game::onDoorLoaded(Door &door) {
     for (int i = 0; i < 3; ++i) {
         auto walkmesh = _resourceSvc.walkmeshes.get(modelName + std::to_string(i), ResType::Dwk);
         if (walkmesh) {
-            ObjectWalkmesh ow;
-            ow.objectId = door.id();
-            ow.walkmesh = walkmesh.get();
+            ObjectWalkmesh ow {door.id(),
+                               *walkmesh,
+                               static_cast<DoorWalkmeshType>(i)};
             _objectWalkmeshes.push_back(std::move(ow));
             auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
             walkmeshSceneNode->setLocalTransform(transform);
+            if (door.doorState() == DoorState::Closed) {
+                walkmeshSceneNode->setEnabled(i == 0);
+            } else {
+                walkmeshSceneNode->setEnabled(i == 1);
+            }
+            _doorIdToWalkmesh[door.id()].push_back(*walkmeshSceneNode);
             scene.addRoot(std::move(walkmeshSceneNode));
         } else {
             warn("Door walkmesh not found: " + modelName);
@@ -331,9 +351,7 @@ void Game::onPlaceableLoaded(Placeable &placeable) {
     scene.addRoot(std::move(sceneNode));
     auto walkmesh = _resourceSvc.walkmeshes.get(modelName, ResType::Pwk);
     if (walkmesh) {
-        ObjectWalkmesh ow;
-        ow.objectId = placeable.id();
-        ow.walkmesh = walkmesh.get();
+        ObjectWalkmesh ow {placeable.id(), *walkmesh};
         _objectWalkmeshes.push_back(std::move(ow));
         auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
         walkmeshSceneNode->setLocalTransform(transform);
@@ -356,14 +374,39 @@ void Game::onObjectLocationChanged(SpatialObject &object) {
     sceneNode->get().setLocalTransform(std::move(transform));
 }
 
-void Game::onObjectAnimationChanged(Object &object, const std::string &animName) {
+void Game::onObjectAnimationReset(Object &object, const std::string &animName) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     auto sceneNode = scene.modelByExternalRef(&object);
     if (!sceneNode) {
         return;
     }
-    auto props = AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate);
+    int flags = AnimationFlags::loop |
+                AnimationFlags::propagate;
+    auto props = AnimationProperties::fromFlags(flags);
     sceneNode->get().playAnimation(animName, nullptr, std::move(props));
+}
+
+void Game::onObjectFireForgetAnimationFired(Object &object, const std::string &animName) {
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    auto sceneNode = scene.modelByExternalRef(&object);
+    if (!sceneNode) {
+        return;
+    }
+    int flags = AnimationFlags::fireForget |
+                AnimationFlags::propagate;
+    auto props = AnimationProperties::fromFlags(flags);
+    sceneNode->get().playAnimation(animName, nullptr, std::move(props));
+}
+
+void Game::onDoorStateChanged(Door &door, DoorState state) {
+    auto &walkmeshes = _doorIdToWalkmesh.at(door.id());
+    for (size_t i = 0; i < walkmeshes.size(); ++i) {
+        if (state == DoorState::Closed) {
+            walkmeshes[i].get().setEnabled(i == 0);
+        } else {
+            walkmeshes[i].get().setEnabled(i == 1);
+        }
+    }
 }
 
 void Game::render() {
@@ -464,7 +507,7 @@ void Game::logicThreadFunc() {
         _profiler.measure(kLogicThreadName, 0, [this, &dt]() {
             if (_module) {
                 _module->get().update(dt);
-                collectEvents();
+                flushEvents();
             }
             std::queue<AsyncTask> tasks;
             {
@@ -509,7 +552,7 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
     std::optional<float> zCoord;
     for (const auto &ow : _objectWalkmeshes) {
         const auto &object = _idToObject.at(ow.objectId);
-        const auto &walkmesh = *ow.walkmesh;
+        const auto &walkmesh = ow.walkmesh;
         glm::mat4 toLocal {1.0f};
         if (object.get().type() == ObjectType::Area) {
             if (!walkmesh.contains(oldPos2D) &&
@@ -517,6 +560,20 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
                 continue;
             }
         } else {
+            if (object.get().type() == ObjectType::Door) {
+                const auto &door = static_cast<Door &>(object.get());
+                if (!ow.doorType) {
+                    continue;
+                }
+                if (door.doorState() == DoorState::Closed &&
+                    *ow.doorType != DoorWalkmeshType::Closed) {
+                    continue;
+                }
+                if (door.doorState() == DoorState::Open &&
+                    *ow.doorType != DoorWalkmeshType::Open1) {
+                    continue;
+                }
+            }
             const auto &spatial = static_cast<SpatialObject &>(object.get());
             float distance = glm::distance(subject.position(), spatial.position());
             if (distance > 4.0f) {
@@ -551,7 +608,7 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
     // Second pass: wall obstructions
     for (const auto &ow : _objectWalkmeshes) {
         const auto &object = _idToObject.at(ow.objectId);
-        const auto &walkmesh = *ow.walkmesh;
+        const auto &walkmesh = ow.walkmesh;
         glm::mat4 toLocal {1.0f};
         if (object.get().type() == ObjectType::Area) {
             if (!walkmesh.contains(oldPos2D) &&
@@ -559,6 +616,20 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
                 continue;
             }
         } else {
+            if (object.get().type() == ObjectType::Door) {
+                const auto &door = static_cast<Door &>(object.get());
+                if (!ow.doorType) {
+                    continue;
+                }
+                if (door.doorState() == DoorState::Closed &&
+                    *ow.doorType != DoorWalkmeshType::Closed) {
+                    continue;
+                }
+                if (door.doorState() == DoorState::Open &&
+                    *ow.doorType != DoorWalkmeshType::Open1) {
+                    continue;
+                }
+            }
             const auto &spatial = static_cast<SpatialObject &>(object.get());
             float distance = glm::distance(subject.position(), spatial.position());
             if (distance > 4.0f) {
@@ -588,27 +659,12 @@ bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt)
     return false;
 }
 
-void Game::collectEvents() {
+void Game::flushEvents() {
     std::lock_guard<std::mutex> lock {_eventsMutex};
-
-    auto &module = _module->get();
-    for (auto &event : module.events()) {
-        _events.push_back(std::move(event));
+    for (auto &event : _eventsBackBuf) {
+        _eventsFrontBuf.push_back(std::move(event));
     }
-    module.clearEvents();
-
-    auto &area = module.area();
-    for (auto &event : area.events()) {
-        _events.push_back(std::move(event));
-    }
-    area.clearEvents();
-
-    for (auto &object : area.objects()) {
-        for (auto &event : object.get().events()) {
-            _events.push_back(std::move(event));
-        }
-        object.get().clearEvents();
-    }
+    _eventsBackBuf.clear();
 }
 
 void Game::runOnLogicThread(AsyncTask task) {
@@ -787,7 +843,12 @@ Waypoint &Game::loadWaypoint(const resource::ResRef &tmplt) {
 }
 
 Area &Game::newArea(ObjectTag tag) {
-    auto object = std::make_unique<Area>(_nextObjectId++, std::move(tag), *this);
+    auto object = std::make_unique<Area>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this,
+        *this);
     auto &area = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -796,7 +857,11 @@ Area &Game::newArea(ObjectTag tag) {
 }
 
 Camera &Game::newCamera(ObjectTag tag) {
-    auto object = std::make_unique<Camera>(_nextObjectId++, std::move(tag));
+    auto object = std::make_unique<Camera>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &camera = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -805,8 +870,11 @@ Camera &Game::newCamera(ObjectTag tag) {
 }
 
 Creature &Game::newCreature(ObjectTag tag) {
-    auto object = std::make_unique<Creature>(_nextObjectId++, std::move(tag));
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Creature>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &creature = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -815,8 +883,11 @@ Creature &Game::newCreature(ObjectTag tag) {
 }
 
 Door &Game::newDoor(ObjectTag tag) {
-    auto object = std::make_unique<Door>(_nextObjectId++, std::move(tag));
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Door>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &door = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -825,8 +896,11 @@ Door &Game::newDoor(ObjectTag tag) {
 }
 
 Encounter &Game::newEncounter(ObjectTag tag) {
-    auto object = std::make_unique<Encounter>(_nextObjectId++, std::move(tag));
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Encounter>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &encounter = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -835,8 +909,11 @@ Encounter &Game::newEncounter(ObjectTag tag) {
 }
 
 Item &Game::newItem(ObjectTag tag) {
-    auto object = std::make_unique<Item>(_nextObjectId++, std::move(tag));
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Item>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &item = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -845,8 +922,12 @@ Item &Game::newItem(ObjectTag tag) {
 }
 
 Module &Game::newModule(ObjectTag tag) {
-    auto object = std::make_unique<Module>(_nextObjectId++, std::move(tag), *this);
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Module>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this,
+        *this);
     auto &module = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -855,8 +936,11 @@ Module &Game::newModule(ObjectTag tag) {
 }
 
 Placeable &Game::newPlaceable(ObjectTag tag) {
-    auto object = std::make_unique<Placeable>(_nextObjectId++, std::move(tag));
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Placeable>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &placeable = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -865,8 +949,11 @@ Placeable &Game::newPlaceable(ObjectTag tag) {
 }
 
 Sound &Game::newSound(ObjectTag tag) {
-    auto object = std::make_unique<Sound>(_nextObjectId++, std::move(tag));
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Sound>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &sound = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -875,8 +962,11 @@ Sound &Game::newSound(ObjectTag tag) {
 }
 
 Store &Game::newStore(ObjectTag tag) {
-    auto object = std::make_unique<Store>(_nextObjectId++, std::move(tag));
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Store>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &store = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -885,8 +975,11 @@ Store &Game::newStore(ObjectTag tag) {
 }
 
 Trigger &Game::newTrigger(ObjectTag tag) {
-    auto object = std::make_unique<Trigger>(_nextObjectId++, std::move(tag));
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Trigger>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &trigger = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();
@@ -895,8 +988,11 @@ Trigger &Game::newTrigger(ObjectTag tag) {
 }
 
 Waypoint &Game::newWaypoint(ObjectTag tag) {
-    auto object = std::make_unique<Waypoint>(_nextObjectId++, std::move(tag));
-    object->setActionExecutor(*this);
+    auto object = std::make_unique<Waypoint>(
+        _nextObjectId++,
+        std::move(tag),
+        *this,
+        *this);
     auto &waypoint = *object;
     _objects.push_back(std::move(object));
     auto &inserted = *_objects.back();

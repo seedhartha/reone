@@ -62,11 +62,16 @@ public:
         Run
     };
 
-    Creature(ObjectId id, ObjectTag tag) :
+    Creature(ObjectId id,
+             ObjectTag tag,
+             IActionExecutor &actionExecutor,
+             IEventCollector &eventCollector) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Creature) {
+            ObjectType::Creature,
+            actionExecutor,
+            eventCollector) {
     }
 
     void load(const resource::generated::UTC &utc,

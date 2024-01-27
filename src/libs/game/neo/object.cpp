@@ -24,9 +24,9 @@ namespace game {
 namespace neo {
 
 void Object::update(float dt) {
-    if (!_actions.empty() && _actionExecutor) {
+    if (!_actions.empty()) {
         const auto &action = _actions.front();
-        bool completed = _actionExecutor->get().executeAction(*this, action, dt);
+        bool completed = _actionExecutor.executeAction(*this, action, dt);
         if (completed) {
             _actions.pop();
         }

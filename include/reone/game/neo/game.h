@@ -52,6 +52,7 @@ struct SceneServices;
 
 class CameraSceneNode;
 class ModelSceneNode;
+class WalkmeshSceneNode;
 
 } // namespace scene
 
@@ -76,6 +77,7 @@ class Waypoint;
 class Game : public IAreaLoader,
              public IAreaObjectLoader,
              public IActionExecutor,
+             public IEventCollector,
              boost::noncopyable {
 public:
     Game(OptionsView &options,
@@ -152,6 +154,14 @@ public:
 
     // END IActionExecutor
 
+    // IEventCollector
+
+    void collectEvent(Event event) override {
+        _eventsBackBuf.push_back(std::move(event));
+    }
+
+    // END IEventCollector
+
     // Object factory methods
 
     Area &newArea(ObjectTag tag);
@@ -170,9 +180,24 @@ public:
     // END Object factory methods
 
 private:
+    enum class DoorWalkmeshType {
+        Closed,
+        Open1,
+        Open2
+    };
+
     struct ObjectWalkmesh {
-        ObjectId objectId {0};
-        graphics::Walkmesh *walkmesh {nullptr};
+        ObjectId objectId;
+        graphics::Walkmesh &walkmesh;
+        std::optional<DoorWalkmeshType> doorType;
+
+        ObjectWalkmesh(ObjectId objectId,
+                       graphics::Walkmesh &walkmesh,
+                       std::optional<DoorWalkmeshType> doorType = std::nullopt) :
+            objectId(objectId),
+            walkmesh(walkmesh),
+            doorType(std::move(doorType)) {
+        }
     };
 
     OptionsView &_options;
@@ -192,13 +217,15 @@ private:
     std::queue<AsyncTask> _logicTasks;
     std::mutex _logicTasksMutex;
 
-    std::list<Event> _events;
+    std::list<Event> _eventsBackBuf;
+    std::list<Event> _eventsFrontBuf;
     std::mutex _eventsMutex;
 
     ObjectId _nextObjectId {2};
     std::list<std::unique_ptr<Object>> _objects;
     std::map<ObjectId, std::reference_wrapper<Object>> _idToObject;
     std::list<ObjectWalkmesh> _objectWalkmeshes;
+    std::map<ObjectId, std::vector<std::reference_wrapper<scene::WalkmeshSceneNode>>> _doorIdToWalkmesh;
     std::optional<std::reference_wrapper<Module>> _module;
     std::optional<std::reference_wrapper<Creature>> _pc;
 
@@ -218,7 +245,7 @@ private:
     // Logic thread
 
     void logicThreadFunc();
-    void collectEvents();
+    void flushEvents();
 
     void runOnLogicThread(AsyncTask task);
 
@@ -239,7 +266,9 @@ private:
     void onDoorLoaded(Door &door);
     void onPlaceableLoaded(Placeable &placeable);
     void onObjectLocationChanged(SpatialObject &object);
-    void onObjectAnimationChanged(Object &object, const std::string &animName);
+    void onObjectAnimationReset(Object &object, const std::string &animName);
+    void onObjectFireForgetAnimationFired(Object &object, const std::string &animName);
+    void onDoorStateChanged(Door &door, DoorState state);
 
     // END Event handling
 };
