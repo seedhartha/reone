@@ -123,6 +123,9 @@ void Game::init() {
     _playerCameraController = std::make_unique<PlayerCameraController>(scene);
     _selectionController = std::make_unique<SelectionController>(_options.graphics, scene);
 
+    _selectionOverlay = std::make_unique<SelectionOverlay>(scene, _graphicsSvc, _resourceSvc);
+    _selectionOverlay->init();
+
     startModule("end_m01aa");
 
     if (_module) {
@@ -145,6 +148,7 @@ void Game::init() {
         _playerCameraController->setCameraFacing(module.entryFacing());
         _playerCameraController->setCameraPitch(glm::radians(kCameraPitch));
         _playerCameraController->refreshCamera();
+        _selectionOverlay->setCamera(*camera);
         _cameraSceneNode = *camera;
         scene.setActiveCamera(camera.get());
     }
@@ -161,6 +165,13 @@ void Game::deinit() {
     if (_logicThread.joinable()) {
         _logicThread.join();
     }
+    _selectionOverlay.reset();
+    _selectionController.reset();
+    _playerCameraController.reset();
+    _actionExecutor.reset();
+    _eventHandler.reset();
+    _objectLoader.reset();
+    _objectRepository.reset();
     _inited = false;
 }
 
@@ -192,6 +203,8 @@ void Game::update(float dt) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
     scene.update(dt);
     _playerCameraController->update(dt);
+    _selectionOverlay->setHoveredObject(_selectionController->hoveredObject());
+    _selectionOverlay->setSelectedObject(_selectionController->selectedObject());
 }
 
 void Game::handleEvents() {
@@ -225,67 +238,8 @@ void Game::render() {
     _graphicsSvc.context.bindTexture(output);
     _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw();
 
-    // Reticles
-    auto hoveredObject = _selectionController->hoveredObject();
-    auto selectedObject = _selectionController->selectedObject();
-    if ((hoveredObject || selectedObject) && _cameraSceneNode) {
-        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
-        _graphicsSvc.uniforms.setGlobals([&screenSize](auto &globals) {
-            globals.reset();
-            globals.projection = glm::ortho(0.0f, static_cast<float>(screenSize.x),
-                                            static_cast<float>(screenSize.y), 0.0f,
-                                            0.0f, 1.0f);
-        });
-        _graphicsSvc.context.withBlendMode(BlendMode::Additive, [this, &screenSize, &scene, &hoveredObject, &selectedObject]() {
-            const auto &camera = *_cameraSceneNode->get().camera();
-            if (hoveredObject) {
-                auto model = scene.modelByExternalRef(&hoveredObject->get());
-                if (model) {
-                    auto reticle = _resourceSvc.textures.get("friendlyreticle", TextureUsage::GUI);
-                    auto objectWorld = model->get().getWorldCenterOfAABB();
-                    auto objectNDC = camera.projection() * camera.view() * glm::vec4 {objectWorld, 1.0f};
-                    if (objectNDC.w > 0.0f) {
-                        objectNDC /= objectNDC.w;
-                        glm::vec3 objectScreen {screenSize.x * 0.5f * (objectNDC.x + 1.0f),
-                                                screenSize.y * (1.0f - 0.5f * (objectNDC.y + 1.0f)),
-                                                0.0f};
-                        auto transform = glm::scale(
-                            glm::translate(objectScreen - 0.5f * glm::vec3 {reticle->width(), reticle->height(), 0.0f}),
-                            glm::vec3 {reticle->width(), reticle->height(), 1.0f});
-                        _graphicsSvc.context.bindTexture(*reticle);
-                        _graphicsSvc.uniforms.setLocals([&transform](auto &locals) {
-                            locals.reset();
-                            locals.model = std::move(transform);
-                        });
-                        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
-                    }
-                }
-            }
-            if (selectedObject) {
-                auto model = scene.modelByExternalRef(&selectedObject->get());
-                if (model) {
-                    auto reticle2 = _resourceSvc.textures.get("friendlyreticle2", TextureUsage::GUI);
-                    auto objectWorld = model->get().getWorldCenterOfAABB();
-                    auto objectNDC = camera.projection() * camera.view() * glm::vec4 {objectWorld, 1.0f};
-                    if (objectNDC.w > 0.0f) {
-                        objectNDC /= objectNDC.w;
-                        glm::vec3 objectScreen {screenSize.x * 0.5f * (objectNDC.x + 1.0f),
-                                                screenSize.y * (1.0f - 0.5f * (objectNDC.y + 1.0f)),
-                                                0.0f};
-                        auto transform = glm::scale(
-                            glm::translate(objectScreen - 0.5f * glm::vec3 {reticle2->width(), reticle2->height(), 0.0f}),
-                            glm::vec3 {reticle2->width(), reticle2->height(), 1.0f});
-                        _graphicsSvc.context.bindTexture(*reticle2);
-                        _graphicsSvc.uniforms.setLocals([&transform](auto &locals) {
-                            locals.reset();
-                            locals.model = std::move(transform);
-                        });
-                        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
-                    }
-                }
-            }
-        });
-    }
+    // Overlays
+    _selectionOverlay->render(screenSize);
 }
 
 void Game::pause(bool pause) {

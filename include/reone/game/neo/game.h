@@ -31,6 +31,7 @@
 #include "object/module.h"
 #include "objectloader.h"
 #include "objectrepository.h"
+#include "selectionoverlay.h"
 
 namespace reone {
 
@@ -160,6 +161,12 @@ private:
     std::unique_ptr<SelectionController> _selectionController;
 
     // END Controllers
+
+    // Overlays
+
+    std::unique_ptr<SelectionOverlay> _selectionOverlay;
+
+    // END Overlays
 
     // Logic thread
 
