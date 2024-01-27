@@ -17,6 +17,8 @@
 
 #include "reone/game/neo/object.h"
 
+#include "reone/game/neo/actionexecutor.h"
+
 namespace reone {
 
 namespace game {

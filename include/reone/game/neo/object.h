@@ -30,14 +30,7 @@ namespace game {
 
 namespace neo {
 
-class Object;
-
-class IActionExecutor {
-public:
-    virtual ~IActionExecutor() = default;
-
-    virtual bool executeAction(Object &subject, const Action &action, float dt) = 0;
-};
+class IActionExecutor;
 
 class IEventCollector {
 public:

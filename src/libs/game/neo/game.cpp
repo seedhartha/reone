@@ -85,7 +85,6 @@ namespace game {
 namespace neo {
 
 static constexpr float kCameraPitch = 84.0f;
-static constexpr float kPlayerMoveRate = 4.0f;
 
 static const std::string kPickedModelFormat {R"END(
 Picked model:
@@ -104,6 +103,9 @@ static const std::string kLogicThreadName {"game"};
 void Game::init() {
     checkThat(!_inited, "Must not be initialized");
 
+    std::set<uint32_t> walkSurfaceMaterials;
+    std::set<uint32_t> walkcheckSurfaceMaterials;
+    std::set<uint32_t> lineOfSightSurfaceMaterials;
     auto surfacematRaw = _resourceSvc.twoDas.get("surfacemat");
     if (!surfacematRaw) {
         throw ResourceNotFoundException("surfacemat 2DA not found");
@@ -112,22 +114,25 @@ void Game::init() {
     for (size_t i = 0; i < surfacemat.rows.size(); ++i) {
         const auto &row = surfacemat.rows[i];
         if (row.walk) {
-            _walkSurfaceMaterials.insert(i);
+            walkSurfaceMaterials.insert(i);
         }
         if (row.walkcheck) {
-            _walkcheckSurfaceMaterials.insert(i);
+            walkcheckSurfaceMaterials.insert(i);
         }
         if (row.lineofsight) {
-            _lineOfSightSurfaceMaterials.insert(i);
+            lineOfSightSurfaceMaterials.insert(i);
         }
     }
 
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    scene.setLineOfSightSurfaces(_lineOfSightSurfaceMaterials);
-    scene.setUpdateRoots(true);
+    _actionExecutor = std::make_unique<ActionExecutor>(*this, _resourceSvc);
+    _actionExecutor->setWalkSurfaceMaterials(walkSurfaceMaterials);
+    _actionExecutor->setWalkcheckSurfaceMaterials(walkcheckSurfaceMaterials);
 
-    _actionExecutor = std::make_unique<ActionExecutor>();
     _eventHandler = std::make_unique<EventHandler>(*this, _options.graphics, _resourceSvc, _sceneSvc);
+
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    scene.setLineOfSightSurfaces(lineOfSightSurfaceMaterials);
+    scene.setUpdateRoots(true);
 
     _playerCameraController = std::make_unique<PlayerCameraController>(scene);
     _selectionController = std::make_unique<SelectionController>(_options.graphics, scene);
@@ -136,6 +141,8 @@ void Game::init() {
 
     if (_module) {
         auto &module = _module->get();
+        _actionExecutor->setModule(module);
+
         auto &pc = loadCreature("", 23);
         _pc = pc;
         pc.setPosition(module.entryPosition());
@@ -335,145 +342,6 @@ void Game::logicThreadFunc() {
     }
 }
 
-bool Game::executeAction(Object &subject, const Action &action, float dt) {
-    if (subject.type() == ObjectType::Creature) {
-        auto &creature = static_cast<Creature &>(subject);
-        if (action.type == ActionType::MoveToPoint) {
-            return executeMoveToPoint(creature, action, dt);
-        }
-    }
-    return false;
-}
-
-bool Game::executeMoveToPoint(Creature &subject, const Action &action, float dt) {
-    glm::vec3 delta = action.location.position - subject.position();
-    glm::vec2 delta2D = delta;
-    auto distance2D = glm::length(delta2D);
-    if (distance2D < 1.0f) {
-        subject.setMoveType(Creature::MoveType::None);
-        return true;
-    }
-    glm::vec3 dir = glm::normalize(delta);
-    glm::vec2 dir2D = delta2D / distance2D;
-    glm::vec2 oldPos2D = subject.position();
-    glm::vec2 newPos2D = oldPos2D + kPlayerMoveRate * dir2D * dt;
-    subject.setFacingPoint(action.location.position);
-
-    std::vector<ObjectWalkmesh> walkmeshes;
-    auto &area = _module->get().area();
-    for (const auto &room : area.rooms()) {
-        auto walkmesh = _resourceSvc.walkmeshes.get(room.model, ResType::Wok);
-        if (walkmesh) {
-            walkmeshes.emplace_back(area.id(), *walkmesh);
-        }
-    }
-    for (const auto &door : area.doors()) {
-        auto walkmeshResRef = door.get().modelName().value();
-        DoorWalkmeshType walkmeshType;
-        if (door.get().isClosed()) {
-            walkmeshResRef += "0";
-            walkmeshType = DoorWalkmeshType::Closed;
-        } else {
-            walkmeshResRef += "1";
-            walkmeshType = DoorWalkmeshType::Open1;
-        }
-        auto walkmesh = _resourceSvc.walkmeshes.get(walkmeshResRef, ResType::Dwk);
-        if (walkmesh) {
-            walkmeshes.emplace_back(door.get().id(), *walkmesh, walkmeshType);
-        }
-    }
-    for (const auto &placeable : area.placeables()) {
-        auto walkmeshResRef = placeable.get().modelName().value();
-        auto walkmesh = _resourceSvc.walkmeshes.get(walkmeshResRef, ResType::Pwk);
-        if (walkmesh) {
-            walkmeshes.emplace_back(placeable.get().id(), *walkmesh);
-        }
-    }
-
-    // TODO: extract method
-    // First pass: Z coord and floor obstructions
-    std::optional<float> zCoord;
-    for (const auto &ow : walkmeshes) {
-        const auto &object = _idToObject.at(ow.objectId);
-        const auto &walkmesh = ow.walkmesh;
-        glm::mat4 toLocal {1.0f};
-        if (object.get().type() == ObjectType::Area) {
-            if (!walkmesh.contains(oldPos2D) &&
-                !walkmesh.contains(newPos2D)) {
-                continue;
-            }
-        } else {
-            const auto &spatial = static_cast<SpatialObject &>(object.get());
-            float distance = glm::distance(subject.position(), spatial.position());
-            if (distance > 4.0f) {
-                continue;
-            }
-            toLocal = glm::inverse(glm::rotate(
-                glm::translate(spatial.position()),
-                spatial.facing(),
-                glm::vec3 {0.0f, 0.0f, 1.0f}));
-        }
-        glm::vec3 originLocal = toLocal * glm::vec4 {newPos2D, 1000.0f, 1.0f};
-        glm::vec3 dirLocal = toLocal * glm::vec4 {0.0f, 0.0f, -1.0f, 0.0f};
-        float distance;
-        auto face = walkmesh.raycast(
-            _walkcheckSurfaceMaterials,
-            originLocal,
-            dirLocal,
-            std::numeric_limits<float>::max(),
-            distance);
-        if (face) {
-            bool walkable = _walkSurfaceMaterials.count(face->material);
-            if (!walkable) {
-                subject.setMoveType(Creature::MoveType::None);
-                return false;
-            }
-            zCoord = 1000.0f - distance;
-        }
-    }
-    if (!zCoord) {
-        return false;
-    }
-    // Second pass: wall obstructions
-    for (const auto &ow : walkmeshes) {
-        const auto &object = _idToObject.at(ow.objectId);
-        const auto &walkmesh = ow.walkmesh;
-        glm::mat4 toLocal {1.0f};
-        if (object.get().type() == ObjectType::Area) {
-            if (!walkmesh.contains(oldPos2D) &&
-                !walkmesh.contains(newPos2D)) {
-                continue;
-            }
-        } else {
-            const auto &spatial = static_cast<SpatialObject &>(object.get());
-            float distance = glm::distance(subject.position(), spatial.position());
-            if (distance > 4.0f) {
-                continue;
-            }
-            toLocal = glm::inverse(glm::rotate(
-                glm::translate(spatial.position()),
-                spatial.facing(),
-                glm::vec3 {0.0f, 0.0f, 1.0f}));
-        }
-        glm::vec3 originLocal = toLocal * glm::vec4 {subject.position(), 1.0f};
-        glm::vec3 dirLocal = toLocal * glm::vec4 {dir, 0.0f};
-        float distance;
-        auto face = walkmesh.raycast(
-            _walkcheckSurfaceMaterials,
-            originLocal + glm::vec3 {0.0f, 0.0f, 0.5f},
-            dirLocal,
-            kPlayerMoveRate * dt,
-            distance);
-        if (face && _walkSurfaceMaterials.count(face->material) == 0) {
-            subject.setMoveType(Creature::MoveType::None);
-            return false;
-        }
-    }
-    subject.setMoveType(Creature::MoveType::Run);
-    subject.setPosition(glm::vec3 {newPos2D, *zCoord});
-    return false;
-}
-
 void Game::flushEvents() {
     std::lock_guard<std::mutex> lock {_eventsMutex};
     for (auto &event : _eventsBackBuf) {
@@ -662,7 +530,7 @@ Area &Game::newArea(ObjectTag tag) {
         _nextObjectId++,
         std::move(tag),
         *this,
-        *this,
+        *_actionExecutor,
         *this);
     auto &area = *object;
     _objects.push_back(std::move(object));
@@ -675,7 +543,7 @@ Camera &Game::newCamera(ObjectTag tag) {
     auto object = std::make_unique<Camera>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &camera = *object;
     _objects.push_back(std::move(object));
@@ -688,7 +556,7 @@ Creature &Game::newCreature(ObjectTag tag) {
     auto object = std::make_unique<Creature>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &creature = *object;
     _objects.push_back(std::move(object));
@@ -701,7 +569,7 @@ Door &Game::newDoor(ObjectTag tag) {
     auto object = std::make_unique<Door>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &door = *object;
     _objects.push_back(std::move(object));
@@ -714,7 +582,7 @@ Encounter &Game::newEncounter(ObjectTag tag) {
     auto object = std::make_unique<Encounter>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &encounter = *object;
     _objects.push_back(std::move(object));
@@ -727,7 +595,7 @@ Item &Game::newItem(ObjectTag tag) {
     auto object = std::make_unique<Item>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &item = *object;
     _objects.push_back(std::move(object));
@@ -741,7 +609,7 @@ Module &Game::newModule(ObjectTag tag) {
         _nextObjectId++,
         std::move(tag),
         *this,
-        *this,
+        *_actionExecutor,
         *this);
     auto &module = *object;
     _objects.push_back(std::move(object));
@@ -754,7 +622,7 @@ Placeable &Game::newPlaceable(ObjectTag tag) {
     auto object = std::make_unique<Placeable>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &placeable = *object;
     _objects.push_back(std::move(object));
@@ -767,7 +635,7 @@ Sound &Game::newSound(ObjectTag tag) {
     auto object = std::make_unique<Sound>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &sound = *object;
     _objects.push_back(std::move(object));
@@ -780,7 +648,7 @@ Store &Game::newStore(ObjectTag tag) {
     auto object = std::make_unique<Store>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &store = *object;
     _objects.push_back(std::move(object));
@@ -793,7 +661,7 @@ Trigger &Game::newTrigger(ObjectTag tag) {
     auto object = std::make_unique<Trigger>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &trigger = *object;
     _objects.push_back(std::move(object));
@@ -806,7 +674,7 @@ Waypoint &Game::newWaypoint(ObjectTag tag) {
     auto object = std::make_unique<Waypoint>(
         _nextObjectId++,
         std::move(tag),
-        *this,
+        *_actionExecutor,
         *this);
     auto &waypoint = *object;
     _objects.push_back(std::move(object));

@@ -80,7 +80,6 @@ class Waypoint;
 class Game : public IObjectRepository,
              public IAreaLoader,
              public IAreaObjectLoader,
-             public IActionExecutor,
              public IEventCollector,
              boost::noncopyable {
 public:
@@ -168,12 +167,6 @@ public:
 
     // END IAreaObjectLoader
 
-    // IActionExecutor
-
-    bool executeAction(Object &subject, const Action &action, float dt) override;
-
-    // END IActionExecutor
-
     // IEventCollector
 
     void collectEvent(Event event) override {
@@ -200,26 +193,6 @@ public:
     // END Object factory methods
 
 private:
-    enum class DoorWalkmeshType {
-        Closed,
-        Open1,
-        Open2
-    };
-
-    struct ObjectWalkmesh {
-        ObjectId objectId;
-        graphics::Walkmesh &walkmesh;
-        std::optional<DoorWalkmeshType> doorType;
-
-        ObjectWalkmesh(ObjectId objectId,
-                       graphics::Walkmesh &walkmesh,
-                       std::optional<DoorWalkmeshType> doorType = std::nullopt) :
-            objectId(objectId),
-            walkmesh(walkmesh),
-            doorType(std::move(doorType)) {
-        }
-    };
-
     OptionsView &_options;
     SystemServices &_systemSvc;
     graphics::GraphicsServices &_graphicsSvc;
@@ -237,10 +210,6 @@ private:
     std::optional<std::reference_wrapper<Creature>> _pc;
 
     std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
-
-    std::set<uint32_t> _walkSurfaceMaterials;
-    std::set<uint32_t> _walkcheckSurfaceMaterials;
-    std::set<uint32_t> _lineOfSightSurfaceMaterials;
 
     // Services
 
@@ -281,12 +250,6 @@ private:
     void runOnLogicThread(AsyncTask task);
 
     // END Logic thread
-
-    // Action execution
-
-    bool executeMoveToPoint(Creature &subject, const Action &action, float dt);
-
-    // END Action execution
 };
 
 } // namespace neo

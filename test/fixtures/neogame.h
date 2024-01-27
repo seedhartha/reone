@@ -20,6 +20,7 @@
 #include <gmock/gmock.h>
 
 #include "reone/game/console.h"
+#include "reone/game/neo/actionexecutor.h"
 #include "reone/game/neo/object/area.h"
 #include "reone/game/neo/object/camera.h"
 #include "reone/game/neo/object/creature.h"

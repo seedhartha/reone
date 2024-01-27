@@ -17,13 +17,92 @@
 
 #pragma once
 
+#include "types.h"
+
 namespace reone {
+
+namespace graphics {
+
+class Walkmesh;
+
+}
+
+namespace resource {
+
+struct ResourceServices;
+
+}
 
 namespace game {
 
 namespace neo {
 
-class ActionExecutor : boost::noncopyable {
+struct Action;
+
+class IObjectRepository;
+
+class Creature;
+class Module;
+class Object;
+
+class IActionExecutor {
+public:
+    virtual ~IActionExecutor() = default;
+
+    virtual bool executeAction(Object &subject, const Action &action, float dt) = 0;
+};
+
+class ActionExecutor : public IActionExecutor, boost::noncopyable {
+public:
+    ActionExecutor(IObjectRepository &objectRepository,
+                   resource::ResourceServices &resourceSvc) :
+        _objectRepository(objectRepository),
+        _resourceSvc(resourceSvc) {
+    }
+
+    bool executeAction(Object &subject, const Action &action, float dt) override;
+
+    void setModule(Module &module) {
+        _module = module;
+    }
+
+    void setWalkSurfaceMaterials(std::set<uint32_t> materials) {
+        _walkSurfaceMaterials = std::move(materials);
+    }
+
+    void setWalkcheckSurfaceMaterials(std::set<uint32_t> materials) {
+        _walkcheckSurfaceMaterials = std::move(materials);
+    }
+
+private:
+    enum class DoorWalkmeshType {
+        Closed,
+        Open1,
+        Open2
+    };
+
+    struct ObjectWalkmesh {
+        ObjectId objectId;
+        graphics::Walkmesh &walkmesh;
+        std::optional<DoorWalkmeshType> doorType;
+
+        ObjectWalkmesh(ObjectId objectId,
+                       graphics::Walkmesh &walkmesh,
+                       std::optional<DoorWalkmeshType> doorType = std::nullopt) :
+            objectId(objectId),
+            walkmesh(walkmesh),
+            doorType(std::move(doorType)) {
+        }
+    };
+
+    IObjectRepository &_objectRepository;
+    resource::ResourceServices &_resourceSvc;
+
+    std::optional<std::reference_wrapper<Module>> _module;
+    std::set<uint32_t> _walkSurfaceMaterials;
+    std::set<uint32_t> _walkcheckSurfaceMaterials;
+
+    bool executeMoveToPoint(Creature &subject, const Action &action, float dt);
 };
 
 } // namespace neo
