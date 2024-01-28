@@ -132,6 +132,7 @@ void Game::init() {
         auto &module = _module->get();
         _actionExecutor->setModule(module);
         _eventHandler->setModule(module);
+        _selectionController->setModule(module);
 
         auto &pc = _objectLoader->loadCreature("", 23);
         _pc = pc;
@@ -220,7 +221,7 @@ void Game::handleEvents() {
         if (event.type == EventType::ObjectStateChanged &&
             event.object.state == ObjectState::Loaded &&
             (_pc && event.object.objectId == _pc->get().id())) {
-            auto sceneNode = scene.modelByExternalRef(&_pc->get());
+            auto sceneNode = scene.modelByExternalId(reinterpret_cast<void *>(_pc->get().id()));
             if (sceneNode) {
                 _playerCameraController->setPlayerSceneNode(sceneNode->get());
             }

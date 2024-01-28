@@ -99,7 +99,6 @@ std::optional<std::string> TwoDA::getStringOpt(int row, const std::string &colum
 
     int columnIdx = getColumnIndex(column);
     if (columnIdx == -1) {
-        warn("2DA: column not found: " + column);
         return std::nullopt;
     }
 

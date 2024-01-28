@@ -72,7 +72,7 @@ static const std::vector<float> g_shadowCascadeDivisors {
     0.135f};
 
 void SceneGraph::clear() {
-    _externalRefToNode.clear();
+    _externalIdToNode.clear();
     _modelRoots.clear();
     _walkmeshRoots.clear();
     _soundRoots.clear();
@@ -82,17 +82,17 @@ void SceneGraph::clear() {
 
 void SceneGraph::addRoot(std::shared_ptr<ModelSceneNode> node) {
     _modelRoots.push_back(node);
-    auto externalRef = node->externalRef();
-    if (externalRef) {
-        _externalRefToNode.insert({externalRef, *_modelRoots.back()});
+    auto externalId = node->externalId();
+    if (externalId) {
+        _externalIdToNode.insert({externalId, *_modelRoots.back()});
     }
 }
 
 void SceneGraph::addRoot(std::shared_ptr<WalkmeshSceneNode> node) {
-    if (node->walkmesh().isAreaWalkmesh()) {
-        _walkmeshRoots.push_back(node);
-    } else {
-        _walkmeshRoots.push_front(node);
+    _walkmeshRoots.push_back(node);
+    auto externalId = node->externalId();
+    if (externalId) {
+        _externalIdToNode.insert({externalId, *_walkmeshRoots.back()});
     }
 }
 
@@ -116,9 +116,9 @@ void SceneGraph::removeRoot(ModelSceneNode &node) {
             ++it;
         }
     }
-    auto externalRef = node.externalRef();
+    auto externalRef = node.externalId();
     if (externalRef) {
-        _externalRefToNode.erase(externalRef);
+        _externalIdToNode.erase(externalRef);
     }
     auto it = std::remove_if(
         _modelRoots.begin(),
@@ -159,15 +159,30 @@ void SceneGraph::removeRoot(SoundSceneNode &node) {
     _soundRoots.erase(it, _soundRoots.end());
 }
 
-std::optional<std::reference_wrapper<ModelSceneNode>> SceneGraph::modelByExternalRef(void *externalRef) {
-    if (_externalRefToNode.count(externalRef) == 0) {
+std::optional<std::reference_wrapper<ModelSceneNode>> SceneGraph::modelByExternalId(void *externalId) {
+    if (_externalIdToNode.count(externalId) == 0) {
         return std::nullopt;
     }
-    auto &node = _externalRefToNode.at(externalRef);
-    if (node.get().type() != SceneNodeType::Model) {
+    auto it = _externalIdToNode.find(externalId);
+    if (it->second.get().type() != SceneNodeType::Model) {
         return std::nullopt;
     }
-    return static_cast<ModelSceneNode &>(node.get());
+    return static_cast<ModelSceneNode &>(it->second.get());
+}
+
+std::vector<std::reference_wrapper<WalkmeshSceneNode>> SceneGraph::walkmeshesByExternalId(void *externalId) {
+    std::vector<std::reference_wrapper<WalkmeshSceneNode>> walkmeshes;
+    if (_externalIdToNode.count(externalId) == 0) {
+        return walkmeshes;
+    }
+    auto range = _externalIdToNode.equal_range(externalId);
+    for (auto it = range.first; it != range.second; ++it) {
+        if (it->second.get().type() != SceneNodeType::Walkmesh) {
+            continue;
+        }
+        walkmeshes.push_back(static_cast<WalkmeshSceneNode &>(it->second.get()));
+    }
+    return walkmeshes;
 }
 
 void SceneGraph::update(float dt) {

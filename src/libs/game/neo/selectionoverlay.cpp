@@ -17,6 +17,7 @@
 
 #include "reone/game/neo/selectionoverlay.h"
 
+#include "reone/game/neo/object.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/meshregistry.h"
@@ -67,7 +68,7 @@ void SelectionOverlay::render(const glm::ivec2 &screenSize) {
         _graphicsSvc.context.withBlendMode(BlendMode::Additive, [this, &screenSize]() {
             const auto &camera = *_camera->get().camera();
             if (_hoveredObject) {
-                auto model = _scene.modelByExternalRef(&_hoveredObject->get());
+                auto model = _scene.modelByExternalId(reinterpret_cast<void *>(_hoveredObject->get().id()));
                 if (model) {
                     auto objectWorld = model->get().getWorldCenterOfAABB();
                     auto objectNDC = camera.projection() * camera.view() * glm::vec4 {objectWorld, 1.0f};
@@ -89,7 +90,7 @@ void SelectionOverlay::render(const glm::ivec2 &screenSize) {
                 }
             }
             if (_selectedObject) {
-                auto model = _scene.modelByExternalRef(&_selectedObject->get());
+                auto model = _scene.modelByExternalId(reinterpret_cast<void *>(_selectedObject->get().id()));
                 if (model) {
                     auto objectWorld = model->get().getWorldCenterOfAABB();
                     auto objectNDC = camera.projection() * camera.view() * glm::vec4 {objectWorld, 1.0f};

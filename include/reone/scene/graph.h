@@ -110,7 +110,8 @@ public:
     virtual void removeRoot(GrassSceneNode &node) = 0;
     virtual void removeRoot(SoundSceneNode &node) = 0;
 
-    virtual std::optional<std::reference_wrapper<ModelSceneNode>> modelByExternalRef(void *externalRef) = 0;
+    virtual std::optional<std::reference_wrapper<ModelSceneNode>> modelByExternalId(void *externalId) = 0;
+    virtual std::vector<std::reference_wrapper<WalkmeshSceneNode>> walkmeshesByExternalId(void *externalId) = 0;
 
     // END Roots
 
@@ -191,7 +192,8 @@ public:
     void removeRoot(GrassSceneNode &node) override;
     void removeRoot(SoundSceneNode &node) override;
 
-    std::optional<std::reference_wrapper<ModelSceneNode>> modelByExternalRef(void *externalRef) override;
+    std::optional<std::reference_wrapper<ModelSceneNode>> modelByExternalId(void *externalId) override;
+    std::vector<std::reference_wrapper<WalkmeshSceneNode>> walkmeshesByExternalId(void *externalId) override;
 
     // END Roots
 
@@ -302,7 +304,7 @@ private:
     std::list<std::shared_ptr<GrassSceneNode>> _grassRoots;
     std::list<std::shared_ptr<SoundSceneNode>> _soundRoots;
 
-    std::map<void *, std::reference_wrapper<SceneNode>> _externalRefToNode;
+    std::multimap<void *, std::reference_wrapper<SceneNode>> _externalIdToNode;
 
     // END Roots
 

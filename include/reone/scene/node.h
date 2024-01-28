@@ -19,6 +19,7 @@
 
 #include "reone/graphics/aabb.h"
 
+#include "attributebag.h"
 #include "types.h"
 
 namespace reone {
@@ -80,14 +81,15 @@ public:
     const graphics::AABB &aabb() const { return _aabb; }
     IUser *user() { return _user; }
     const IUser *user() const { return _user; }
-    void *externalRef() const { return _externalRef; }
+    void *externalId() const { return _externalId; }
+    AttributeBag &attributes() { return _attributes; }
 
     void setUser(IUser &user) {
         _user = &user;
     }
 
-    void setExternalRef(void *externalRef) {
-        _externalRef = externalRef;
+    void setExternalId(void *externalId) {
+        _externalId = externalId;
     }
 
     // Flags
@@ -120,7 +122,8 @@ protected:
     graphics::AABB _aabb;
 
     IUser *_user {nullptr};
-    void *_externalRef {nullptr};
+    void *_externalId {nullptr};
+    AttributeBag _attributes;
 
     // Flags
 

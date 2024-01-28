@@ -89,6 +89,7 @@ void EventHandler::onAreaLoaded(Area &area) {
         auto walkmesh = _resourceSvc.walkmeshes.get(room.model, ResType::Wok);
         if (walkmesh) {
             auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
+            walkmeshSceneNode->setExternalId(reinterpret_cast<void *>(area.id()));
             scene.addRoot(std::move(walkmeshSceneNode));
         } else {
             warn("Room walkmesh not found: " + room.model);
@@ -126,7 +127,7 @@ void EventHandler::onCreatureLoaded(Creature &creature) {
     sceneNode->setLocalTransform(std::move(transform));
     sceneNode->setDrawDistance(_graphicsOpt.drawDistance);
     sceneNode->setPickable(true);
-    sceneNode->setExternalRef(&creature);
+    sceneNode->setExternalId(reinterpret_cast<void *>(creature.id()));
     scene.addRoot(std::move(sceneNode));
 }
 
@@ -143,13 +144,15 @@ void EventHandler::onDoorLoaded(Door &door) {
     sceneNode->setLocalTransform(transform);
     // sceneNode->setDrawDistance(_graphicsOpt.drawDistance);
     sceneNode->setPickable(true);
-    sceneNode->setExternalRef(&door);
+    sceneNode->setExternalId(reinterpret_cast<void *>(door.id()));
     scene.addRoot(std::move(sceneNode));
     for (int i = 0; i < 3; ++i) {
         auto walkmesh = _resourceSvc.walkmeshes.get(modelName + std::to_string(i), ResType::Dwk);
         if (walkmesh) {
             auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
             walkmeshSceneNode->setLocalTransform(transform);
+            walkmeshSceneNode->setExternalId(reinterpret_cast<void *>(door.id()));
+            walkmeshSceneNode->attributes().add("doorState", i);
             scene.addRoot(std::move(walkmeshSceneNode));
         } else {
             warn("Door walkmesh not found: " + modelName);
@@ -170,21 +173,22 @@ void EventHandler::onPlaceableLoaded(Placeable &placeable) {
     sceneNode->setLocalTransform(transform);
     sceneNode->setDrawDistance(_graphicsOpt.drawDistance);
     sceneNode->setPickable(true);
-    sceneNode->setExternalRef(&placeable);
+    sceneNode->setExternalId(reinterpret_cast<void *>(placeable.id()));
     scene.addRoot(std::move(sceneNode));
     auto walkmesh = _resourceSvc.walkmeshes.get(modelName, ResType::Pwk);
     if (walkmesh) {
         auto walkmeshSceneNode = scene.newWalkmesh(*walkmesh);
         walkmeshSceneNode->setLocalTransform(transform);
+        walkmeshSceneNode->setExternalId(reinterpret_cast<void *>(placeable.id()));
         scene.addRoot(std::move(walkmeshSceneNode));
     } else {
-        warn("Placeable walkmesh not found: " + modelName);
+        debug("Placeable walkmesh not found: " + modelName, LogChannel::Graphics);
     }
 }
 
 void EventHandler::onObjectLocationChanged(SpatialObject &object) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    auto sceneNode = scene.modelByExternalRef(&object);
+    auto sceneNode = scene.modelByExternalId(reinterpret_cast<void *>(object.id()));
     if (!sceneNode) {
         return;
     }
@@ -197,7 +201,7 @@ void EventHandler::onObjectLocationChanged(SpatialObject &object) {
 
 void EventHandler::onObjectAnimationReset(Object &object, const std::string &animName) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    auto sceneNode = scene.modelByExternalRef(&object);
+    auto sceneNode = scene.modelByExternalId(reinterpret_cast<void *>(object.id()));
     if (!sceneNode) {
         return;
     }
@@ -209,7 +213,7 @@ void EventHandler::onObjectAnimationReset(Object &object, const std::string &ani
 
 void EventHandler::onObjectFireForgetAnimationFired(Object &object, const std::string &animName) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    auto sceneNode = scene.modelByExternalRef(&object);
+    auto sceneNode = scene.modelByExternalId(reinterpret_cast<void *>(object.id()));
     if (!sceneNode) {
         return;
     }
@@ -220,14 +224,14 @@ void EventHandler::onObjectFireForgetAnimationFired(Object &object, const std::s
 }
 
 void EventHandler::onDoorStateChanged(Door &door, DoorState state) {
-    // auto &walkmeshes = _doorIdToWalkmesh.at(door.id());
-    // for (size_t i = 0; i < walkmeshes.size(); ++i) {
-    //     if (state == DoorState::Closed) {
-    //         walkmeshes[i].get().setEnabled(i == 0);
-    //     } else {
-    //         walkmeshes[i].get().setEnabled(i == 1);
-    //     }
-    // }
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    auto walkmeshes = scene.walkmeshesByExternalId(reinterpret_cast<void *>(door.id()));
+    for (const auto &walkmesh : walkmeshes) {
+        bool enabled = walkmesh.get()
+                           .attributes()
+                           .getInt("doorState") == static_cast<int>(state);
+        walkmesh.get().setEnabled(enabled);
+    }
 }
 
 } // namespace neo

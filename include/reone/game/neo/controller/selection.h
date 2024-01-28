@@ -44,6 +44,7 @@ namespace game {
 namespace neo {
 
 class SpatialObject;
+class Module;
 
 class SelectionController : boost::noncopyable {
 public:
@@ -57,6 +58,10 @@ public:
 
     void setCamera(scene::CameraSceneNode &camera) {
         _camera = camera;
+    }
+
+    void setModule(Module &module) {
+        _module = module;
     }
 
     void clear() {
@@ -76,6 +81,7 @@ private:
     graphics::GraphicsOptions &_graphicsOpt;
     scene::ISceneGraph &_scene;
 
+    std::optional<std::reference_wrapper<Module>> _module;
     std::optional<std::reference_wrapper<scene::CameraSceneNode>> _camera;
 
     std::optional<std::reference_wrapper<SpatialObject>> _hoveredObject;

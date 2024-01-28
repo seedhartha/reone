@@ -19,6 +19,7 @@ set(SCENE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/scene)
 set(SCENE_HEADERS
     ${SCENE_INCLUDE_DIR}/animeventlistener.h
     ${SCENE_INCLUDE_DIR}/animproperties.h
+    ${SCENE_INCLUDE_DIR}/attributebag.h
     ${SCENE_INCLUDE_DIR}/collision.h
     ${SCENE_INCLUDE_DIR}/di/module.h
     ${SCENE_INCLUDE_DIR}/di/services.h
