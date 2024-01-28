@@ -37,8 +37,7 @@ using namespace reone::game::neo;
 
 TEST(object_factory, should_instantiate_objects_with_incrementing_id) {
     // given
-    MockEventCollector eventCollector;
-    ObjectFactory subject {eventCollector};
+    ObjectFactory subject;
 
     // when
     auto &area = subject.newArea("");

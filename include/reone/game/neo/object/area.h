@@ -89,13 +89,11 @@ public:
 class Area : public Object {
 public:
     Area(ObjectId id,
-         ObjectTag tag,
-         IEventCollector &eventCollector) :
+         ObjectTag tag) :
         Object(
             id,
             std::move(tag),
-            ObjectType::Area,
-            eventCollector) {
+            ObjectType::Area) {
     }
 
     void load(IAreaObjectLoader &objectLoader,
@@ -108,6 +106,13 @@ public:
     void update(IActionExecutor &actionExecutor, float dt) override {
         for (auto &object : _objects) {
             object.get().update(actionExecutor, dt);
+        }
+    }
+
+    void collectEvents(IEventCollector &collector) override {
+        Object::collectEvents(collector);
+        for (auto &object : _objects) {
+            object.get().collectEvents(collector);
         }
     }
 

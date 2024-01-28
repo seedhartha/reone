@@ -36,8 +36,7 @@ using testing::ReturnRef;
 TEST(area, should_load_are_and_git) {
     // given
     MockObjectLoader objectLoader;
-    MockEventCollector eventCollector;
-    Area area {0, "", eventCollector};
+    Area area {0, ""};
     ARE_Rooms room;
     room.RoomName = "m01aa_01a";
     ARE_Rooms room2;
@@ -71,15 +70,15 @@ TEST(area, should_load_are_and_git) {
     vis.insert({"m01aa_01a", "m01aa_02a"});
     vis.insert({"m01aa_02a", "m01aa_01a"});
     Path pth;
-    Camera camera {1, "", eventCollector};
-    Creature creature {2, "", eventCollector};
-    Door door {3, "", eventCollector};
-    Encounter encounter {4, "", eventCollector};
-    Placeable placeable {5, "", eventCollector};
-    Sound sound {6, "", eventCollector};
-    Store store {7, "", eventCollector};
-    Trigger trigger {8, "", eventCollector};
-    Waypoint waypoint {9, "", eventCollector};
+    Camera camera {1, ""};
+    Creature creature {2, ""};
+    Door door {3, ""};
+    Encounter encounter {4, ""};
+    Placeable placeable {5, ""};
+    Sound sound {6, ""};
+    Store store {7, ""};
+    Trigger trigger {8, ""};
+    Waypoint waypoint {9, ""};
 
     // expect
     EXPECT_CALL(objectLoader, loadCamera()).WillOnce(ReturnRef(camera));
@@ -104,17 +103,16 @@ TEST(area, should_load_are_and_git) {
 
 TEST(area, should_add_objects) {
     // given
-    MockEventCollector eventCollector;
-    Area area {0, "", eventCollector};
-    Camera camera {1, "", eventCollector};
-    Creature creature {2, "", eventCollector};
-    Door door {3, "", eventCollector};
-    Encounter encounter {4, "", eventCollector};
-    Placeable placeable {5, "", eventCollector};
-    Sound sound {6, "", eventCollector};
-    Store store {7, "", eventCollector};
-    Trigger trigger {8, "", eventCollector};
-    Waypoint waypoint {9, "", eventCollector};
+    Area area {0, ""};
+    Camera camera {1, ""};
+    Creature creature {2, ""};
+    Door door {3, ""};
+    Encounter encounter {4, ""};
+    Placeable placeable {5, ""};
+    Sound sound {6, ""};
+    Store store {7, ""};
+    Trigger trigger {8, ""};
+    Waypoint waypoint {9, ""};
 
     // when
     area.add(camera);
@@ -162,12 +160,10 @@ TEST(area, should_add_objects) {
 class MockCreature : public Creature {
 public:
     MockCreature(ObjectId objectId,
-                 ObjectTag tag,
-                 MockEventCollector &eventCollector) :
+                 ObjectTag tag) :
         Creature(
             objectId,
-            std::move(tag),
-            eventCollector) {
+            std::move(tag)) {
     }
 
     MOCK_METHOD(void, update, (IActionExecutor &, float), (override));
@@ -176,9 +172,8 @@ public:
 TEST(area, should_update_objects_on_update) {
     // given
     MockActionExecutor actionExecutor;
-    MockEventCollector eventCollector;
-    Area area {0, "", eventCollector};
-    MockCreature creature {1, "", eventCollector};
+    Area area {0, ""};
+    MockCreature creature {1, ""};
     area.add(creature);
 
     // expect

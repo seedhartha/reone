@@ -33,8 +33,7 @@ using namespace reone::resource::generated;
 
 TEST(creature, should_load_utc) {
     // given
-    MockEventCollector eventCollector;
-    Creature creature {0, "", eventCollector};
+    Creature creature {0, ""};
     UTC utc;
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
@@ -58,8 +57,7 @@ TEST(creature, should_load_utc) {
 
 TEST(creature, should_load_utc_with_body_and_head_appearance) {
     // given
-    MockEventCollector eventCollector;
-    Creature creature {0, "", eventCollector};
+    Creature creature {0, ""};
     UTC utc;
     utc.Appearance_Type = 0;
     utc.BodyVariation = 1;
@@ -86,9 +84,8 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
 
 TEST(creature, should_equip_item) {
     // given
-    MockEventCollector eventCollector;
-    Creature creature {0, "", eventCollector};
-    Item item {1, "", eventCollector};
+    Creature creature {0, ""};
+    Item item {1, ""};
 
     // when
     creature.equip(item, InventorySlots::rightWeapon);
@@ -101,10 +98,9 @@ TEST(creature, should_equip_item) {
 
 TEST(creature, should_unequip_previously_equipped_item_on_equip) {
     // given
-    MockEventCollector eventCollector;
-    Creature creature {0, "", eventCollector};
-    Item item {1, "", eventCollector};
-    Item item2 {2, "", eventCollector};
+    Creature creature {0, ""};
+    Item item {1, ""};
+    Item item2 {2, ""};
     creature.equip(item, InventorySlots::rightWeapon);
 
     // when
@@ -121,9 +117,8 @@ TEST(creature, should_unequip_previously_equipped_item_on_equip) {
 
 TEST(creature, should_unequip_item) {
     // given
-    MockEventCollector eventCollector;
-    Creature creature {0, "", eventCollector};
-    Item item {1, "", eventCollector};
+    Creature creature {0, ""};
+    Item item {1, ""};
     creature.equip(item, InventorySlots::rightWeapon);
 
     // when
@@ -139,9 +134,8 @@ TEST(creature, should_unequip_item) {
 
 TEST(creature, should_give_item) {
     // given
-    MockEventCollector eventCollector;
-    Creature creature {0, "", eventCollector};
-    Item item {1, "", eventCollector};
+    Creature creature {0, ""};
+    Item item {1, ""};
 
     // when
     creature.give(item);

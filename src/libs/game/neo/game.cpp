@@ -114,7 +114,7 @@ void Game::init() {
     scene.setWalkcheckSurfaces(walkcheckSurfaceMaterials);
     scene.setLineOfSightSurfaces(lineOfSightSurfaceMaterials);
 
-    _objectFactory = std::make_unique<ObjectFactory>(*this);
+    _objectFactory = std::make_unique<ObjectFactory>();
     _objectLoader = std::make_unique<ObjectLoader>(*_objectFactory, _resourceSvc);
     _actionExecutor = std::make_unique<ActionExecutor>(_sceneLock, _resourceSvc, _sceneSvc);
     _eventHandler = std::make_unique<EventHandler>(_sceneLock, _options.graphics, _resourceSvc, _sceneSvc);
@@ -267,6 +267,7 @@ void Game::logicThreadFunc() {
         _profiler.measure(kLogicThreadName, 0, [this, &dt]() {
             if (_module) {
                 _module->get().update(*_actionExecutor, dt);
+                _module->get().collectEvents(*this);
                 flushEvents();
             }
             std::queue<AsyncTask> tasks;

@@ -61,13 +61,11 @@ public:
     };
 
     Creature(ObjectId id,
-             ObjectTag tag,
-             IEventCollector &eventCollector) :
+             ObjectTag tag) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Creature,
-            eventCollector) {
+            ObjectType::Creature) {
     }
 
     void load(const resource::generated::UTC &utc,

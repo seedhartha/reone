@@ -39,75 +39,51 @@ namespace game {
 namespace neo {
 
 Area &ObjectFactory::newArea(ObjectTag tag) {
-    return newObject<Area>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Area>(std::move(tag));
 }
 
 Camera &ObjectFactory::newCamera(ObjectTag tag) {
-    return newObject<Camera>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Camera>(std::move(tag));
 }
 
 Creature &ObjectFactory::newCreature(ObjectTag tag) {
-    return newObject<Creature>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Creature>(std::move(tag));
 }
 
 Door &ObjectFactory::newDoor(ObjectTag tag) {
-    return newObject<Door>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Door>(std::move(tag));
 }
 
 Encounter &ObjectFactory::newEncounter(ObjectTag tag) {
-    return newObject<Encounter>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Encounter>(std::move(tag));
 }
 
 Item &ObjectFactory::newItem(ObjectTag tag) {
-    return newObject<Item>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Item>(std::move(tag));
 }
 
 Module &ObjectFactory::newModule(ObjectTag tag) {
-    return newObject<Module>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Module>(std::move(tag));
 }
 
 Placeable &ObjectFactory::newPlaceable(ObjectTag tag) {
-    return newObject<Placeable>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Placeable>(std::move(tag));
 }
 
 Sound &ObjectFactory::newSound(ObjectTag tag) {
-    return newObject<Sound>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Sound>(std::move(tag));
 }
 
 Store &ObjectFactory::newStore(ObjectTag tag) {
-    return newObject<Store>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Store>(std::move(tag));
 }
 
 Trigger &ObjectFactory::newTrigger(ObjectTag tag) {
-    return newObject<Trigger>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Trigger>(std::move(tag));
 }
 
 Waypoint &ObjectFactory::newWaypoint(ObjectTag tag) {
-    return newObject<Waypoint>(
-        std::move(tag),
-        _eventCollector);
+    return newObject<Waypoint>(std::move(tag));
 }
 
 } // namespace neo

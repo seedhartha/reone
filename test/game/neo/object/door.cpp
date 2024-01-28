@@ -31,8 +31,7 @@ using namespace reone::resource::generated;
 
 TEST(door, should_load_utd) {
     // given
-    MockEventCollector eventCollector;
-    Door door {0, "", eventCollector};
+    Door door {0, ""};
     UTD utd;
     utd.GenericType = 0;
     GenericdoorsTwoDARow genericDoorsRow;

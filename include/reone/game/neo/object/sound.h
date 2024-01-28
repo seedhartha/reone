@@ -28,13 +28,11 @@ namespace neo {
 class Sound : public SpatialObject {
 public:
     Sound(ObjectId id,
-          ObjectTag tag,
-          IEventCollector &eventCollector) :
+          ObjectTag tag) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Sound,
-            eventCollector) {
+            ObjectType::Sound) {
     }
 };
 

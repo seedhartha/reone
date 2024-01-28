@@ -48,7 +48,7 @@ void Door::setDoorState(DoorState state) {
     event.type = EventType::DoorStateChanged;
     event.door.objectId = _id;
     event.door.state = _doorState;
-    _eventCollector.collectEvent(std::move(event));
+    publishEvent(std::move(event));
 }
 
 } // namespace neo

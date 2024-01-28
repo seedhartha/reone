@@ -48,10 +48,17 @@ void Module::load(IAreaLoader &areaLoader, const IFO &ifo) {
 }
 
 void Module::update(IActionExecutor &actionExecutor, float dt) {
-    if (!_area) {
-        return;
+    Object::update(actionExecutor, dt);
+    if (_area) {
+        _area->get().update(actionExecutor, dt);
     }
-    _area->get().update(actionExecutor, dt);
+}
+
+void Module::collectEvents(IEventCollector &collector) {
+    Object::collectEvents(collector);
+    if (_area) {
+        _area->get().collectEvents(collector);
+    }
 }
 
 std::optional<std::reference_wrapper<Object>> Module::objectById(ObjectId objectId) {

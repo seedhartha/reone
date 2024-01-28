@@ -60,10 +60,6 @@ public:
 
 class ObjectFactory : public IObjectFactory, boost::noncopyable {
 public:
-    ObjectFactory(IEventCollector &eventCollector) :
-        _eventCollector(eventCollector) {
-    }
-
     Area &newArea(ObjectTag tag) override;
     Camera &newCamera(ObjectTag tag) override;
     Creature &newCreature(ObjectTag tag) override;
@@ -78,8 +74,6 @@ public:
     Waypoint &newWaypoint(ObjectTag tag) override;
 
 private:
-    IEventCollector &_eventCollector;
-
     ObjectId _nextObjectId {2};
     std::list<std::unique_ptr<Object>> _objects;
 

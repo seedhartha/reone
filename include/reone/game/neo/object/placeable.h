@@ -42,13 +42,11 @@ namespace neo {
 class Placeable : public SpatialObject {
 public:
     Placeable(ObjectId id,
-              ObjectTag tag,
-              IEventCollector &eventCollector) :
+              ObjectTag tag) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Placeable,
-            eventCollector) {
+            ObjectType::Placeable) {
     }
 
     void load(const resource::generated::UTP &utp,

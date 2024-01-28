@@ -55,18 +55,18 @@ protected:
     void SetUp() override {
         _resourceModule.init();
 
-        _area = std::make_unique<Area>(0, "", _eventCollector);
-        _camera = std::make_unique<Camera>(1, "", _eventCollector);
-        _creature = std::make_unique<Creature>(2, "", _eventCollector);
-        _door = std::make_unique<Door>(3, "", _eventCollector);
-        _encounter = std::make_unique<Encounter>(4, "", _eventCollector);
-        _item = std::make_unique<Item>(5, "", _eventCollector);
-        _module = std::make_unique<Module>(6, "", _eventCollector);
-        _placeable = std::make_unique<Placeable>(7, "", _eventCollector);
-        _sound = std::make_unique<Sound>(8, "", _eventCollector);
-        _store = std::make_unique<Store>(9, "", _eventCollector);
-        _trigger = std::make_unique<Trigger>(10, "", _eventCollector);
-        _waypoint = std::make_unique<Waypoint>(11, "", _eventCollector);
+        _area = std::make_unique<Area>(0, "");
+        _camera = std::make_unique<Camera>(1, "");
+        _creature = std::make_unique<Creature>(2, "");
+        _door = std::make_unique<Door>(3, "");
+        _encounter = std::make_unique<Encounter>(4, "");
+        _item = std::make_unique<Item>(5, "");
+        _module = std::make_unique<Module>(6, "");
+        _placeable = std::make_unique<Placeable>(7, "");
+        _sound = std::make_unique<Sound>(8, "");
+        _store = std::make_unique<Store>(9, "");
+        _trigger = std::make_unique<Trigger>(10, "");
+        _waypoint = std::make_unique<Waypoint>(11, "");
 
         ON_CALL(_objectFactory, newArea(_)).WillByDefault(ReturnRef(*_area));
         ON_CALL(_objectFactory, newCamera(_)).WillByDefault(ReturnRef(*_camera));
@@ -90,7 +90,6 @@ protected:
     MockObjectFactory _objectFactory;
     MockObjectLoader _objectLoader;
     MockActionExecutor _actionExecutor;
-    MockEventCollector _eventCollector;
 
     std::unique_ptr<Area> _area;
     std::unique_ptr<Camera> _camera;

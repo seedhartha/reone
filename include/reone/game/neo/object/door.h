@@ -42,13 +42,11 @@ namespace neo {
 class Door : public SpatialObject {
 public:
     Door(ObjectId id,
-         ObjectTag tag,
-         IEventCollector &eventCollector) :
+         ObjectTag tag) :
         SpatialObject(
             id,
             std::move(tag),
-            ObjectType::Door,
-            eventCollector) {
+            ObjectType::Door) {
     }
 
     void load(const resource::generated::UTD &utd,

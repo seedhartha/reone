@@ -28,13 +28,11 @@ namespace neo {
 class Item : public Object {
 public:
     Item(ObjectId id,
-         ObjectTag tag,
-         IEventCollector &eventCollector) :
+         ObjectTag tag) :
         Object(
             id,
             std::move(tag),
-            ObjectType::Item,
-            eventCollector) {
+            ObjectType::Item) {
     }
 };
 

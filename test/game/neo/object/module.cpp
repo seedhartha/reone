@@ -34,8 +34,7 @@ using testing::ReturnRef;
 TEST(module, should_load_ifo) {
     // given
     MockObjectLoader objectLoader;
-    MockEventCollector eventCollector;
-    Module module {0, "", eventCollector};
+    Module module {0, ""};
     IFO ifo;
     ifo.Mod_Entry_Area = "m01aa";
     ifo.Mod_Entry_X = 1.0f;
@@ -44,7 +43,7 @@ TEST(module, should_load_ifo) {
     ifo.Mod_Entry_Dir_X = 0.70710677f;
     ifo.Mod_Entry_Dir_Y = -0.70710677f;
     ifo.Mod_Area_list.push_back({"m01aa"});
-    Area area {1, "", eventCollector};
+    Area area {1, ""};
 
     // expect
     EXPECT_CALL(objectLoader, loadArea(_)).WillOnce(ReturnRef(area));
@@ -57,8 +56,7 @@ TEST(module, should_load_ifo) {
 
 TEST(module, should_throw_for_area_when_has_no_areas) {
     // given
-    MockEventCollector eventCollector;
-    Module module {0, "", eventCollector};
+    Module module {0, ""};
 
     // expect
     EXPECT_THROW(module.area(), std::logic_error);
@@ -67,12 +65,10 @@ TEST(module, should_throw_for_area_when_has_no_areas) {
 class MockArea : public Area {
 public:
     MockArea(ObjectId objectId,
-             ObjectTag tag,
-             MockEventCollector &eventCollector) :
+             ObjectTag tag) :
         Area(
             objectId,
-            std::move(tag),
-            eventCollector) {
+            std::move(tag)) {
     }
 
     MOCK_METHOD(void, update, (IActionExecutor & actionExecutor, float), (override));
@@ -81,9 +77,8 @@ TEST(module, should_update_current_area_on_update) {
     // given
     MockObjectLoader objectLoader;
     MockActionExecutor actionExecutor;
-    MockEventCollector eventCollector;
-    Module module {0, "", eventCollector};
-    MockArea area {1, "", eventCollector};
+    Module module {0, ""};
+    MockArea area {1, ""};
     EXPECT_CALL(objectLoader, loadArea(_)).WillOnce(ReturnRef(area));
     IFO ifo;
     ifo.Mod_Area_list.push_back({"m01aa"});

@@ -47,18 +47,18 @@ public:
 class Module : public Object {
 public:
     Module(ObjectId id,
-           ObjectTag tag,
-           IEventCollector &eventCollector) :
+           ObjectTag tag) :
         Object(
             id,
             std::move(tag),
-            ObjectType::Module,
-            eventCollector) {
+            ObjectType::Module) {
     }
 
     void load(IAreaLoader &areaLoader, const resource::generated::IFO &ifo);
 
     void update(IActionExecutor &actionExecutor, float dt) override;
+
+    void collectEvents(IEventCollector &collector) override;
 
     Area &area() {
         if (!_area) {

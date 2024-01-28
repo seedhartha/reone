@@ -69,6 +69,16 @@ public:
         return this != &that;
     }
 
+    // Events
+
+    virtual void collectEvents(IEventCollector &collector);
+
+    const std::vector<Event> &events() const {
+        return _events;
+    }
+
+    // END Events
+
     // Actions
 
     void clearAllActions() {
@@ -101,9 +111,9 @@ protected:
     ObjectId _id;
     ObjectTag _tag;
     ObjectType _type;
-    IEventCollector &_eventCollector;
 
     ObjectState _state {ObjectState::Created};
+    std::vector<Event> _events;
 
     ActionQueue _actions;
     EffectList _effects;
@@ -111,13 +121,15 @@ protected:
 
     Object(ObjectId id,
            ObjectTag tag,
-           ObjectType type,
-           IEventCollector &eventCollector) :
+           ObjectType type) :
         _id(id),
         _tag(std::move(tag)),
-        _type(type),
-        _eventCollector(eventCollector) {
-        collectObjectCreatedEvent();
+        _type(type) {
+
+        Event event;
+        event.type = EventType::ObjectCreated;
+        event.object.objectId = _id;
+        publishEvent(std::move(event));
     }
 
     void setState(ObjectState state);
@@ -125,8 +137,9 @@ protected:
     void resetAnimation(std::string name);
     void playFireForgetAnimation(const std::string &name);
 
-private:
-    void collectObjectCreatedEvent();
+    void publishEvent(Event event) {
+        _events.push_back(std::move(event));
+    }
 };
 
 class SpatialObject : public Object {
@@ -149,13 +162,11 @@ protected:
 
     SpatialObject(ObjectId id,
                   ObjectTag tag,
-                  ObjectType type,
-                  IEventCollector &eventCollector) :
+                  ObjectType type) :
         Object(
             id,
             std::move(tag),
-            type,
-            eventCollector) {
+            type) {
     }
 };
 

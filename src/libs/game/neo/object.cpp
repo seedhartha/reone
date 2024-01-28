@@ -26,13 +26,6 @@ namespace game {
 
 namespace neo {
 
-void Object::collectObjectCreatedEvent() {
-    Event event;
-    event.type = EventType::ObjectCreated;
-    event.object.objectId = _id;
-    _eventCollector.collectEvent(std::move(event));
-}
-
 void Object::update(IActionExecutor &actionExecutor, float dt) {
     if (!_actions.empty()) {
         const auto &action = _actions.front();
@@ -53,7 +46,7 @@ void Object::setState(ObjectState state) {
     event.type = EventType::ObjectStateChanged;
     event.object.objectId = _id;
     event.object.state = _state;
-    _eventCollector.collectEvent(std::move(event));
+    publishEvent(std::move(event));
 }
 
 void Object::resetAnimation(std::string name) {
@@ -65,7 +58,7 @@ void Object::resetAnimation(std::string name) {
     event.type = EventType::ObjectAnimationReset;
     event.animation.objectId = _id;
     event.animation.name = _animations.top().c_str();
-    _eventCollector.collectEvent(std::move(event));
+    publishEvent(std::move(event));
 }
 
 void Object::playFireForgetAnimation(const std::string &name) {
@@ -77,7 +70,14 @@ void Object::playFireForgetAnimation(const std::string &name) {
     event.type = EventType::ObjectFireForgetAnimationFired;
     event.animation.objectId = _id;
     event.animation.name = _animations.top().c_str();
-    _eventCollector.collectEvent(std::move(event));
+    publishEvent(std::move(event));
+}
+
+void Object::collectEvents(IEventCollector &collector) {
+    for (auto &event : _events) {
+        collector.collectEvent(std::move(event));
+    }
+    _events.clear();
 }
 
 void SpatialObject::setPosition(glm::vec3 position) {
@@ -89,7 +89,7 @@ void SpatialObject::setPosition(glm::vec3 position) {
     Event event;
     event.type = EventType::ObjectLocationChanged;
     event.object.objectId = _id;
-    _eventCollector.collectEvent(std::move(event));
+    publishEvent(std::move(event));
 }
 
 void SpatialObject::setFacing(float facing) {
@@ -101,7 +101,7 @@ void SpatialObject::setFacing(float facing) {
     Event event;
     event.type = EventType::ObjectLocationChanged;
     event.object.objectId = _id;
-    _eventCollector.collectEvent(std::move(event));
+    publishEvent(std::move(event));
 }
 
 void SpatialObject::setFacingPoint(const glm::vec3 &target) {
