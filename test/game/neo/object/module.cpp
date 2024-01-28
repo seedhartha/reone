@@ -89,3 +89,30 @@ TEST(module, should_update_current_area_on_update) {
     EXPECT_CALL(area, update(_, _));
     module.update(actionExecutor, 1.0f);
 }
+
+TEST(module, should_find_object_by_id) {
+    // given
+    Creature creature {2, ""};
+    Area area {1, ""};
+    area.add(creature);
+    Module module {0, ""};
+    module.setArea(area);
+
+    // expect
+    std::optional<std::reference_wrapper<Object>> found;
+
+    found = module.objectById(3);
+    EXPECT_FALSE(found.has_value());
+
+    found = module.objectById(0);
+    EXPECT_TRUE(found.has_value());
+    EXPECT_EQ(found->get(), module);
+
+    found = module.objectById(1);
+    EXPECT_TRUE(found.has_value());
+    EXPECT_EQ(found->get(), area);
+
+    found = module.objectById(2);
+    EXPECT_TRUE(found.has_value());
+    EXPECT_EQ(found->get(), creature);
+}

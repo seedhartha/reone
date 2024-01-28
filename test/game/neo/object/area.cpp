@@ -180,3 +180,48 @@ TEST(area, should_update_objects_on_update) {
     EXPECT_CALL(creature, update(_, _));
     area.update(actionExecutor, 1.0f);
 }
+
+TEST(area, should_find_object_by_id) {
+    // given
+    Creature creature {1, ""};
+    Area area {0, ""};
+    area.add(creature);
+
+    // expect
+    std::optional<std::reference_wrapper<Object>> found;
+
+    found = area.objectById(2);
+    EXPECT_FALSE(found.has_value());
+
+    found = area.objectById(0);
+    EXPECT_FALSE(found.has_value());
+
+    found = area.objectById(1);
+    EXPECT_TRUE(found.has_value());
+    EXPECT_EQ(found->get(), creature);
+}
+
+TEST(area, should_find_object_by_tag) {
+    // given
+    Creature creature1 {1, "tag1"};
+    Creature creature2 {2, "tag2"};
+    Creature creature3 {3, "tag1"};
+    Area area {0, ""};
+    area.add(creature1);
+    area.add(creature2);
+    area.add(creature3);
+
+    // expect
+    std::optional<std::reference_wrapper<Object>> found;
+
+    found = area.objectByTag("tag1", 0);
+    EXPECT_TRUE(found.has_value());
+    EXPECT_EQ(found->get(), creature1);
+
+    found = area.objectByTag("tag1", 1);
+    EXPECT_TRUE(found.has_value());
+    EXPECT_EQ(found->get(), creature3);
+
+    found = area.objectByTag("tag1", 2);
+    EXPECT_FALSE(found.has_value());
+}
