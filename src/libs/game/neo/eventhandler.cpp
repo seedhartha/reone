@@ -78,6 +78,7 @@ void EventHandler::handle(const Event &event) {
 
 void EventHandler::onAreaLoaded(Area &area) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    _sceneLock.lock();
     for (auto &room : area.rooms()) {
         auto model = _resourceSvc.models.get(room.model);
         if (!model) {
@@ -95,6 +96,7 @@ void EventHandler::onAreaLoaded(Area &area) {
             warn("Room walkmesh not found: " + room.model);
         }
     }
+    _sceneLock.unlock();
 }
 
 void EventHandler::onCreatureLoaded(Creature &creature) {
@@ -128,7 +130,9 @@ void EventHandler::onCreatureLoaded(Creature &creature) {
     sceneNode->setDrawDistance(_graphicsOpt.drawDistance);
     sceneNode->setPickable(true);
     sceneNode->setExternalId(reinterpret_cast<void *>(creature.id()));
+    _sceneLock.lock();
     scene.addRoot(std::move(sceneNode));
+    _sceneLock.unlock();
 }
 
 void EventHandler::onDoorLoaded(Door &door) {
@@ -145,6 +149,7 @@ void EventHandler::onDoorLoaded(Door &door) {
     // sceneNode->setDrawDistance(_graphicsOpt.drawDistance);
     sceneNode->setPickable(true);
     sceneNode->setExternalId(reinterpret_cast<void *>(door.id()));
+    _sceneLock.lock();
     scene.addRoot(std::move(sceneNode));
     for (int i = 0; i < 3; ++i) {
         auto walkmesh = _resourceSvc.walkmeshes.get(modelName + std::to_string(i), ResType::Dwk);
@@ -158,6 +163,7 @@ void EventHandler::onDoorLoaded(Door &door) {
             warn("Door walkmesh not found: " + modelName);
         }
     }
+    _sceneLock.unlock();
 }
 
 void EventHandler::onPlaceableLoaded(Placeable &placeable) {
@@ -174,6 +180,7 @@ void EventHandler::onPlaceableLoaded(Placeable &placeable) {
     sceneNode->setDrawDistance(_graphicsOpt.drawDistance);
     sceneNode->setPickable(true);
     sceneNode->setExternalId(reinterpret_cast<void *>(placeable.id()));
+    _sceneLock.lock();
     scene.addRoot(std::move(sceneNode));
     auto walkmesh = _resourceSvc.walkmeshes.get(modelName, ResType::Pwk);
     if (walkmesh) {
@@ -184,6 +191,7 @@ void EventHandler::onPlaceableLoaded(Placeable &placeable) {
     } else {
         debug("Placeable walkmesh not found: " + modelName, LogChannel::Graphics);
     }
+    _sceneLock.unlock();
 }
 
 void EventHandler::onObjectLocationChanged(SpatialObject &object) {

@@ -33,6 +33,12 @@ struct ResourceServices;
 
 }
 
+namespace scene {
+
+struct SceneServices;
+
+}
+
 namespace game {
 
 namespace neo {
@@ -52,8 +58,12 @@ public:
 
 class ActionExecutor : public IActionExecutor, boost::noncopyable {
 public:
-    ActionExecutor(resource::ResourceServices &resourceSvc) :
-        _resourceSvc(resourceSvc) {
+    ActionExecutor(std::unique_lock<std::mutex> &sceneLock,
+                   resource::ResourceServices &resourceSvc,
+                   scene::SceneServices &sceneSvc) :
+        _sceneLock(sceneLock),
+        _resourceSvc(resourceSvc),
+        _sceneSvc(sceneSvc) {
     }
 
     bool executeAction(Object &subject, const Action &action, float dt) override;
@@ -62,40 +72,12 @@ public:
         _module = module;
     }
 
-    void setWalkSurfaceMaterials(std::set<uint32_t> materials) {
-        _walkSurfaceMaterials = std::move(materials);
-    }
-
-    void setWalkcheckSurfaceMaterials(std::set<uint32_t> materials) {
-        _walkcheckSurfaceMaterials = std::move(materials);
-    }
-
 private:
-    enum class DoorWalkmeshType {
-        Closed,
-        Open1,
-        Open2
-    };
-
-    struct ObjectWalkmesh {
-        ObjectId objectId;
-        graphics::Walkmesh &walkmesh;
-        std::optional<DoorWalkmeshType> doorType;
-
-        ObjectWalkmesh(ObjectId objectId,
-                       graphics::Walkmesh &walkmesh,
-                       std::optional<DoorWalkmeshType> doorType = std::nullopt) :
-            objectId(objectId),
-            walkmesh(walkmesh),
-            doorType(std::move(doorType)) {
-        }
-    };
-
+    std::unique_lock<std::mutex> &_sceneLock;
     resource::ResourceServices &_resourceSvc;
+    scene::SceneServices &_sceneSvc;
 
     std::optional<std::reference_wrapper<Module>> _module;
-    std::set<uint32_t> _walkSurfaceMaterials;
-    std::set<uint32_t> _walkcheckSurfaceMaterials;
 
     bool executeMoveToPoint(Creature &subject, const Action &action, float dt);
 };

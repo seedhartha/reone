@@ -87,6 +87,9 @@ static const std::string kLogicThreadName {"game"};
 void Game::init() {
     checkThat(!_inited, "Must not be initialized");
 
+    auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    scene.setUpdateRoots(true);
+
     std::set<uint32_t> walkSurfaceMaterials;
     std::set<uint32_t> walkcheckSurfaceMaterials;
     std::set<uint32_t> lineOfSightSurfaceMaterials;
@@ -107,18 +110,14 @@ void Game::init() {
             lineOfSightSurfaceMaterials.insert(i);
         }
     }
+    scene.setWalkableSurfaces(walkSurfaceMaterials);
+    scene.setWalkcheckSurfaces(walkcheckSurfaceMaterials);
+    scene.setLineOfSightSurfaces(lineOfSightSurfaceMaterials);
 
     _objectFactory = std::make_unique<ObjectFactory>(*this);
     _objectLoader = std::make_unique<ObjectLoader>(*_objectFactory, _resourceSvc);
-    _eventHandler = std::make_unique<EventHandler>(_options.graphics, _resourceSvc, _sceneSvc);
-
-    _actionExecutor = std::make_unique<ActionExecutor>(_resourceSvc);
-    _actionExecutor->setWalkSurfaceMaterials(walkSurfaceMaterials);
-    _actionExecutor->setWalkcheckSurfaceMaterials(walkcheckSurfaceMaterials);
-
-    auto &scene = _sceneSvc.graphs.get(kSceneMain);
-    scene.setLineOfSightSurfaces(lineOfSightSurfaceMaterials);
-    scene.setUpdateRoots(true);
+    _actionExecutor = std::make_unique<ActionExecutor>(_sceneLock, _resourceSvc, _sceneSvc);
+    _eventHandler = std::make_unique<EventHandler>(_sceneLock, _options.graphics, _resourceSvc, _sceneSvc);
 
     _playerCameraController = std::make_unique<PlayerCameraController>(scene);
     _selectionController = std::make_unique<SelectionController>(_options.graphics, scene);

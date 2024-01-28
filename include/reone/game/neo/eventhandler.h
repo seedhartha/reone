@@ -54,9 +54,11 @@ class SpatialObject;
 
 class EventHandler : boost::noncopyable {
 public:
-    EventHandler(graphics::GraphicsOptions &graphicsOpt,
+    EventHandler(std::unique_lock<std::mutex> &sceneLock,
+                 graphics::GraphicsOptions &graphicsOpt,
                  resource::ResourceServices &resourceSvc,
                  scene::SceneServices &sceneSvc) :
+        _sceneLock(sceneLock),
         _graphicsOpt(graphicsOpt),
         _resourceSvc(resourceSvc),
         _sceneSvc(sceneSvc) {
@@ -69,6 +71,7 @@ public:
     }
 
 private:
+    std::unique_lock<std::mutex> &_sceneLock;
     graphics::GraphicsOptions &_graphicsOpt;
     resource::ResourceServices &_resourceSvc;
     scene::SceneServices &_sceneSvc;

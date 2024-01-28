@@ -146,6 +146,9 @@ private:
 
     std::optional<std::reference_wrapper<scene::CameraSceneNode>> _cameraSceneNode;
 
+    std::mutex _sceneMutex;
+    std::unique_lock<std::mutex> _sceneLock {_sceneMutex, std::defer_lock};
+
     // Services
 
     std::unique_ptr<ObjectLoader> _objectLoader;
