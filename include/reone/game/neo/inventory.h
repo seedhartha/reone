@@ -17,13 +17,13 @@
 
 #pragma once
 
+#include "object/item.h"
+
 namespace reone {
 
 namespace game {
 
 namespace neo {
-
-class Item;
 
 using ItemList = std::list<std::reference_wrapper<Item>>;
 

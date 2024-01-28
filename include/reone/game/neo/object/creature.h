@@ -49,8 +49,6 @@ struct Appearance {
     // TODO: evil head textures
 };
 
-class Item;
-
 using EquipmentMap = std::map<InventorySlot, std::reference_wrapper<Item>>;
 
 class Creature : public SpatialObject {
