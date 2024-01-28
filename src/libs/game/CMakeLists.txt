@@ -284,6 +284,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/neo/controller/selection.h
     ${GAME_INCLUDE_DIR}/neo/effect.h
     ${GAME_INCLUDE_DIR}/neo/event.h
+    ${GAME_INCLUDE_DIR}/neo/eventcollector.h
     ${GAME_INCLUDE_DIR}/neo/eventhandler.h
     ${GAME_INCLUDE_DIR}/neo/game.h
     ${GAME_INCLUDE_DIR}/neo/inventory.h

@@ -83,18 +83,7 @@ private:
 
     resource::ResRef _modelName;
 
-    void setDoorState(DoorState state) {
-        if (_doorState == state) {
-            return;
-        }
-        _doorState = state;
-
-        Event event;
-        event.type = EventType::DoorStateChanged;
-        event.door.objectId = _id;
-        event.door.state = _doorState;
-        _eventCollector.collectEvent(std::move(event));
-    }
+    void setDoorState(DoorState state);
 };
 
 } // namespace neo

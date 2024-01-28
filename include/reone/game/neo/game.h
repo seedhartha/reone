@@ -26,6 +26,7 @@
 #include "actionexecutor.h"
 #include "controller/playercamera.h"
 #include "controller/selection.h"
+#include "eventcollector.h"
 #include "eventhandler.h"
 #include "object/area.h"
 #include "object/module.h"

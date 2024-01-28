@@ -31,13 +31,7 @@ namespace game {
 namespace neo {
 
 class IActionExecutor;
-
-class IEventCollector {
-public:
-    virtual ~IEventCollector() = default;
-
-    virtual void collectEvent(Event event) = 0;
-};
+class IEventCollector;
 
 using ActionQueue = std::queue<Action>;
 using EffectList = std::vector<Effect>;
@@ -123,49 +117,16 @@ protected:
         _tag(std::move(tag)),
         _type(type),
         _eventCollector(eventCollector) {
-
-        Event event;
-        event.type = EventType::ObjectCreated;
-        event.object.objectId = _id;
-        _eventCollector.collectEvent(std::move(event));
+        collectObjectCreatedEvent();
     }
 
-    void setState(ObjectState state) {
-        if (_state == state) {
-            return;
-        }
-        _state = state;
+    void setState(ObjectState state);
 
-        Event event;
-        event.type = EventType::ObjectStateChanged;
-        event.object.objectId = _id;
-        event.object.state = _state;
-        _eventCollector.collectEvent(std::move(event));
-    }
+    void resetAnimation(std::string name);
+    void playFireForgetAnimation(const std::string &name);
 
-    void resetAnimation(std::string name) {
-        AnimationStack animations;
-        animations.push(std::move(name));
-        std::swap(_animations, animations);
-
-        Event event;
-        event.type = EventType::ObjectAnimationReset;
-        event.animation.objectId = _id;
-        event.animation.name = _animations.top().c_str();
-        _eventCollector.collectEvent(std::move(event));
-    }
-
-    void playFireForgetAnimation(const std::string &name) {
-        AnimationStack animations;
-        animations.push(std::move(name));
-        std::swap(_animations, animations);
-
-        Event event;
-        event.type = EventType::ObjectFireForgetAnimationFired;
-        event.animation.objectId = _id;
-        event.animation.name = _animations.top().c_str();
-        _eventCollector.collectEvent(std::move(event));
-    }
+private:
+    void collectObjectCreatedEvent();
 };
 
 class SpatialObject : public Object {
@@ -174,34 +135,12 @@ public:
         return _position;
     }
 
-    void setPosition(glm::vec3 position) {
-        if (_position == position) {
-            return;
-        }
-        _position = std::move(position);
-
-        Event event;
-        event.type = EventType::ObjectLocationChanged;
-        event.object.objectId = _id;
-        _eventCollector.collectEvent(std::move(event));
-    }
-
     float facing() const {
         return _facing;
     }
 
-    void setFacing(float facing) {
-        if (_facing == facing) {
-            return;
-        }
-        _facing = facing;
-
-        Event event;
-        event.type = EventType::ObjectLocationChanged;
-        event.object.objectId = _id;
-        _eventCollector.collectEvent(std::move(event));
-    }
-
+    void setPosition(glm::vec3 position);
+    void setFacing(float facing);
     void setFacingPoint(const glm::vec3 &target);
 
 protected:

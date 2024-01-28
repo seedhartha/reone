@@ -17,6 +17,7 @@
 
 #include "reone/game/neo/object/door.h"
 
+#include "reone/game/neo/eventcollector.h"
 #include "reone/resource/parser/2da/genericdoors.h"
 #include "reone/resource/parser/gff/utd.h"
 #include "reone/system/exception/validation.h"
@@ -35,6 +36,19 @@ void Door::load(const UTD &utd,
     const auto &genericDoorsRow = genericDoors.rows[utd.GenericType];
     _modelName = genericDoorsRow.modelname;
     setState(ObjectState::Loaded);
+}
+
+void Door::setDoorState(DoorState state) {
+    if (_doorState == state) {
+        return;
+    }
+    _doorState = state;
+
+    Event event;
+    event.type = EventType::DoorStateChanged;
+    event.door.objectId = _id;
+    event.door.state = _doorState;
+    _eventCollector.collectEvent(std::move(event));
 }
 
 } // namespace neo
