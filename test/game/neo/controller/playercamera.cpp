@@ -28,6 +28,7 @@
 
 using namespace reone;
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::game::neo;
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -65,6 +66,7 @@ protected:
             _audioModule.services(),
             _resourceModule.services());
         _subject.setCamera(*_camera);
+        _subject.setCameraPitch(glm::radians(90.0f));
         _subject.setGameLogicExecutor([](AsyncTask task) {
             task();
         });
@@ -84,16 +86,17 @@ protected:
 
 TEST_F(PlayerCameraControllerFixture, should_move_and_rotate_camera_given_no_player) {
     // expect
-    glm::vec3 scale, translation, skew;
+    glm::vec3 scale, translation, skew, expectedTranslation;
     glm::quat orientation, expectedOrientation;
     glm::vec4 perspective;
 
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, 0.0f, 1e-4f);
-    expectedOrientation = glm::quat_cast(glm::eulerAngleZX(0.0f, 0.0f));
+    expectedTranslation = glm::vec3 {0.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
+    expectedOrientation = glm::quat_cast(glm::eulerAngleZX(0.0f, glm::radians(90.0f)));
     EXPECT_NEAR(orientation.x, expectedOrientation.x, 1e-4f);
     EXPECT_NEAR(orientation.y, expectedOrientation.y, 1e-4f);
     EXPECT_NEAR(orientation.z, expectedOrientation.z, 1e-4f);
@@ -103,9 +106,10 @@ TEST_F(PlayerCameraControllerFixture, should_move_and_rotate_camera_given_no_pla
     EXPECT_TRUE(_subject.handle(wKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 8.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, -8.0f, 1e-4f);
+    expectedTranslation = 8.0f * glm::vec3 {-glm::sin(0.0f), glm::cos(0.0f), 0.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
 
     auto wKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::W, 0, false});
     EXPECT_TRUE(_subject.handle(wKeyUpEvent));
@@ -116,9 +120,10 @@ TEST_F(PlayerCameraControllerFixture, should_move_and_rotate_camera_given_no_pla
     EXPECT_TRUE(_subject.handle(sKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, 0.0f, 1e-4f);
+    expectedTranslation = glm::vec3 {0.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
 
     auto sKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::S, 0, false});
     EXPECT_TRUE(_subject.handle(sKeyUpEvent));
@@ -127,9 +132,10 @@ TEST_F(PlayerCameraControllerFixture, should_move_and_rotate_camera_given_no_pla
     EXPECT_TRUE(_subject.handle(aKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, -8.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, 0.0f, 1e-4f);
+    expectedTranslation = 8.0f * glm::vec3 {-glm::cos(0.0f), -glm::sin(0.0f), 0.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
 
     auto aKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::A, 0, false});
     EXPECT_TRUE(_subject.handle(aKeyUpEvent));
@@ -138,9 +144,10 @@ TEST_F(PlayerCameraControllerFixture, should_move_and_rotate_camera_given_no_pla
     EXPECT_TRUE(_subject.handle(dKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, 0.0f, 1e-4f);
+    expectedTranslation = glm::vec3 {0.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
 
     auto dKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::D, 0, false});
     EXPECT_TRUE(_subject.handle(dKeyUpEvent));
@@ -149,9 +156,10 @@ TEST_F(PlayerCameraControllerFixture, should_move_and_rotate_camera_given_no_pla
     EXPECT_TRUE(_subject.handle(qKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, 8.0f, 1e-4f);
+    expectedTranslation = 8.0f * glm::vec3 {0.0f, 0.0f, 1.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
 
     auto qKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::Q, 0, false});
     EXPECT_TRUE(_subject.handle(qKeyUpEvent));
@@ -160,9 +168,10 @@ TEST_F(PlayerCameraControllerFixture, should_move_and_rotate_camera_given_no_pla
     EXPECT_TRUE(_subject.handle(zKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, 0.0f, 1e-4f);
+    expectedTranslation = glm::vec3 {0.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
 
     auto zKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::Z, 0, false});
     EXPECT_TRUE(_subject.handle(zKeyUpEvent));
@@ -171,7 +180,7 @@ TEST_F(PlayerCameraControllerFixture, should_move_and_rotate_camera_given_no_pla
     EXPECT_TRUE(_subject.handle(xMotionEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    expectedOrientation = glm::quat_cast(glm::eulerAngleZX(-0.001f, 0.0f));
+    expectedOrientation = glm::quat_cast(glm::eulerAngleZX(-0.001f, glm::radians(90.0f)));
     EXPECT_NEAR(orientation.x, expectedOrientation.x, 1e-4f);
     EXPECT_NEAR(orientation.y, expectedOrientation.y, 1e-4f);
     EXPECT_NEAR(orientation.z, expectedOrientation.z, 1e-4f);
@@ -181,7 +190,7 @@ TEST_F(PlayerCameraControllerFixture, should_move_and_rotate_camera_given_no_pla
     EXPECT_TRUE(_subject.handle(yMotionEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    expectedOrientation = glm::quat_cast(glm::eulerAngleZX(-0.001f, 0.001f));
+    expectedOrientation = glm::quat_cast(glm::eulerAngleZX(-0.001f, glm::radians(90.0f) + 0.001f));
     EXPECT_NEAR(orientation.x, expectedOrientation.x, 1e-4f);
     EXPECT_NEAR(orientation.y, expectedOrientation.y, 1e-4f);
     EXPECT_NEAR(orientation.z, expectedOrientation.z, 1e-4f);
@@ -194,17 +203,18 @@ TEST_F(PlayerCameraControllerFixture, should_rotate_camera_around_player_and_mov
     _subject.setPlayerSceneNode(*_playerSceneNode);
 
     // expect
-    glm::vec3 scale, translation, skew;
+    glm::vec3 scale, translation, skew, expectedTranslation;
     glm::quat orientation, expectedOrientation;
     glm::vec4 perspective;
 
     EXPECT_CALL(_sceneGraph, testLineOfSight(_, _, _)).WillRepeatedly(Return(false));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, -1.2f, 1e-4f);
-    expectedOrientation = glm::quat_cast(glm::eulerAngleZX(0.0f, 0.0f));
+    expectedTranslation = glm::vec3 {0.0f, -3.2f, 2.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
+    expectedOrientation = glm::quat_cast(glm::eulerAngleZX(0.0f, glm::radians(90.0f)));
     EXPECT_NEAR(orientation.x, expectedOrientation.x, 1e-4f);
     EXPECT_NEAR(orientation.y, expectedOrientation.y, 1e-4f);
     EXPECT_NEAR(orientation.z, expectedOrientation.z, 1e-4f);
@@ -215,10 +225,13 @@ TEST_F(PlayerCameraControllerFixture, should_rotate_camera_around_player_and_mov
     EXPECT_TRUE(_subject.handle(wKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, -1.2f, 1e-4f);
+    expectedTranslation = glm::vec3 {0.0f, -3.2f, 2.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
     EXPECT_TRUE(_player.currentAction().has_value());
+    EXPECT_EQ(_player.currentAction()->type, ActionType::MoveToPoint);
+    EXPECT_EQ(_player.currentAction()->location.position, (glm::vec3 {0.0f, 1000.0f, 0.0f}));
 
     auto wKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::W, 0, false});
     EXPECT_TRUE(_subject.handle(wKeyUpEvent));
@@ -229,9 +242,13 @@ TEST_F(PlayerCameraControllerFixture, should_rotate_camera_around_player_and_mov
     EXPECT_TRUE(_subject.handle(sKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, -1.2f, 1e-4f);
+    expectedTranslation = glm::vec3 {0.0f, -3.2f, 2.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
+    EXPECT_TRUE(_player.currentAction().has_value());
+    EXPECT_EQ(_player.currentAction()->type, ActionType::MoveToPoint);
+    EXPECT_EQ(_player.currentAction()->location.position, (glm::vec3 {0.0f, -1000.0f, 0.0f}));
 
     auto sKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::S, 0, false});
     EXPECT_TRUE(_subject.handle(sKeyUpEvent));
@@ -240,9 +257,10 @@ TEST_F(PlayerCameraControllerFixture, should_rotate_camera_around_player_and_mov
     EXPECT_TRUE(_subject.handle(aKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, -1.2f, 1e-4f);
+    expectedTranslation = glm::vec3 {-2.42177f, 2.09166f, 2.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
 
     auto aKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::A, 0, false});
     EXPECT_TRUE(_subject.handle(aKeyUpEvent));
@@ -251,9 +269,10 @@ TEST_F(PlayerCameraControllerFixture, should_rotate_camera_around_player_and_mov
     EXPECT_TRUE(_subject.handle(dKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, -1.2f, 1e-4f);
+    expectedTranslation = glm::vec3 {0.0f, -3.2f, 2.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
 
     auto dKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::D, 0, false});
     EXPECT_TRUE(_subject.handle(dKeyUpEvent));
@@ -262,9 +281,13 @@ TEST_F(PlayerCameraControllerFixture, should_rotate_camera_around_player_and_mov
     EXPECT_TRUE(_subject.handle(zKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, -1.2f, 1e-4f);
+    expectedTranslation = glm::vec3 {0.0f, -3.2f, 2.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
+    EXPECT_TRUE(_player.currentAction().has_value());
+    EXPECT_EQ(_player.currentAction()->type, ActionType::MoveToPoint);
+    EXPECT_EQ(_player.currentAction()->location.position, (glm::vec3 {-1000.0f, 0.0f, 0.0f}));
 
     auto zKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::Z, 0, false});
     EXPECT_TRUE(_subject.handle(zKeyUpEvent));
@@ -273,9 +296,13 @@ TEST_F(PlayerCameraControllerFixture, should_rotate_camera_around_player_and_mov
     EXPECT_TRUE(_subject.handle(cKeyDownEvent));
     _subject.update(1.0f);
     glm::decompose(_camera->localTransform(), scale, orientation, translation, skew, perspective);
-    EXPECT_NEAR(translation.x, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.y, 0.0f, 1e-4f);
-    EXPECT_NEAR(translation.z, -1.2f, 1e-4f);
+    expectedTranslation = glm::vec3 {0.0f, -3.2f, 2.0f};
+    EXPECT_NEAR(translation.x, expectedTranslation.x, 1e-4f);
+    EXPECT_NEAR(translation.y, expectedTranslation.y, 1e-4f);
+    EXPECT_NEAR(translation.z, expectedTranslation.z, 1e-4f);
+    EXPECT_TRUE(_player.currentAction().has_value());
+    EXPECT_EQ(_player.currentAction()->type, ActionType::MoveToPoint);
+    EXPECT_EQ(_player.currentAction()->location.position, (glm::vec3 {1000.0f, 0.0f, 0.0f}));
 
     auto cKeyUpEvent = input::Event::newKeyUp({false, input::KeyCode::C, 0, false});
     EXPECT_TRUE(_subject.handle(cKeyUpEvent));
