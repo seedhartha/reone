@@ -144,7 +144,7 @@ void Game::init() {
         auto camera = scene.newCamera();
         float aspect = _options.graphics.width / static_cast<float>(_options.graphics.height);
         camera->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
-        _playerCameraController->setCameraSceneNode(*camera);
+        _playerCameraController->setCamera(*camera);
         _selectionController->setCamera(*camera);
         _playerCameraController->setCameraFacing(module.entryFacing());
         _playerCameraController->setCameraPitch(glm::radians(kCameraPitch));

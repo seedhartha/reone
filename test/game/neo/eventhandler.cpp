@@ -33,6 +33,7 @@
 #include "reone/graphics/model.h"
 #include "reone/graphics/options.h"
 #include "reone/graphics/walkmesh.h"
+#include "reone/scene/collision.h"
 
 using namespace reone::audio;
 using namespace reone::game::neo;

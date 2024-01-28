@@ -235,7 +235,7 @@ void PlayerCameraController::refreshCamera() {
             _cameraPosition = cameraTarget + kCameraDistance * targetCameraDir;
         }
     }
-    auto &camera = _cameraSceneNode->get();
+    auto &camera = _camera->get();
     auto transform = glm::translate(_cameraPosition);
     transform *= glm::eulerAngleZX(_cameraFacing, _cameraPitch);
     camera.setLocalTransform(std::move(transform));
@@ -243,12 +243,14 @@ void PlayerCameraController::refreshCamera() {
 
 void PlayerCameraController::refreshPlayer() {
     (*_gameLogicExecutor)([this]() {
-        auto &player = _player->get();
-        player.clearAllActions();
-        Action action;
-        action.type = ActionType::MoveToPoint;
-        action.location.position = player.position() + _playerMoveDir;
-        player.add(std::move(action));
+        if (glm::length2(_playerMoveDir) > 0.0f) {
+            auto &player = _player->get();
+            player.clearAllActions();
+            Action action;
+            action.type = ActionType::MoveToPoint;
+            action.location.position = player.position() + _playerMoveDir;
+            player.add(std::move(action));
+        }
     });
 }
 

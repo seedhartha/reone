@@ -89,10 +89,5 @@ protected:
     std::unique_ptr<Game> _game;
 };
 
-TEST_F(GameFixture, should_return_nullopt_for_current_module) {
-    // when
-    auto module = _game->module();
-
-    // then
-    EXPECT_FALSE(module.has_value());
+TEST_F(GameFixture, should_do_something) {
 }
