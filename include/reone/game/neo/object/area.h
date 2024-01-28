@@ -116,6 +116,18 @@ public:
         }
     }
 
+    // Rooms
+
+    const RoomList &rooms() const {
+        return _rooms;
+    }
+
+    void add(AreaRoom room) {
+        _rooms.push_back(std::move(room));
+    }
+
+    // END Rooms
+
     // Objects
 
     void add(Camera &camera);
@@ -145,10 +157,6 @@ public:
             }
         }
         return std::nullopt;
-    }
-
-    const RoomList &rooms() const {
-        return _rooms;
     }
 
     const CameraList &cameras() const {
@@ -209,7 +217,7 @@ private:
     std::unordered_map<ObjectId, std::reference_wrapper<Object>> _idToObject;
     std::multimap<ObjectTag, std::reference_wrapper<Object>> _tagToObject;
 
-    void addInternal(Object &object) {
+    void persist(Object &object) {
         _objects.push_back(object);
         _idToObject.insert({object.id(), object});
         _tagToObject.insert({object.tag(), object});

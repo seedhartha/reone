@@ -57,14 +57,19 @@ public:
     void load(IAreaLoader &areaLoader, const resource::generated::IFO &ifo);
 
     void update(IActionExecutor &actionExecutor, float dt) override;
-
     void collectEvents(IEventCollector &collector) override;
+
+    virtual std::optional<std::reference_wrapper<Object>> objectById(ObjectId objectId);
 
     Area &area() {
         if (!_area) {
             throw std::logic_error("Module has no current area");
         }
         return *_area;
+    }
+
+    void setArea(Area &area) {
+        _area = area;
     }
 
     // Entry location
@@ -78,12 +83,6 @@ public:
     }
 
     // END Entry location
-
-    // Objects
-
-    std::optional<std::reference_wrapper<Object>> objectById(ObjectId objectId);
-
-    // END Objects
 
 private:
     glm::vec3 _entryPosition {0.0f};

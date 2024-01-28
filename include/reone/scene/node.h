@@ -45,8 +45,8 @@ struct ResourceServices;
 namespace scene {
 
 class IRenderPass;
+class ISceneGraph;
 class IUser;
-class SceneGraph;
 
 class SceneNode : boost::noncopyable {
 public:
@@ -111,7 +111,7 @@ public:
 
 protected:
     SceneNodeType _type;
-    SceneGraph &_sceneGraph;
+    ISceneGraph &_sceneGraph;
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
     resource::ResourceServices &_resourceSvc;
@@ -143,7 +143,7 @@ protected:
 
     SceneNode(
         SceneNodeType type,
-        SceneGraph &sceneGraph,
+        ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :

@@ -36,7 +36,7 @@ class WalkmeshSceneNode : public SceneNode {
 public:
     WalkmeshSceneNode(
         graphics::Walkmesh &walkmesh,
-        SceneGraph &sceneGraph,
+        ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :

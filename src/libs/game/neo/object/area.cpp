@@ -21,6 +21,7 @@
 #include "reone/game/neo/object/creature.h"
 #include "reone/game/neo/object/door.h"
 #include "reone/game/neo/object/encounter.h"
+#include "reone/game/neo/object/item.h"
 #include "reone/game/neo/object/placeable.h"
 #include "reone/game/neo/object/sound.h"
 #include "reone/game/neo/object/store.h"
@@ -110,47 +111,47 @@ void Area::load(IAreaObjectLoader &objectLoader,
 
 void Area::add(Camera &camera) {
     _cameras.push_back(camera);
-    addInternal(camera);
+    persist(camera);
 }
 
 void Area::add(Creature &creature) {
     _creatures.push_back(creature);
-    addInternal(creature);
+    persist(creature);
 }
 
 void Area::add(Door &door) {
     _doors.push_back(door);
-    addInternal(door);
+    persist(door);
 }
 
 void Area::add(Encounter &encounter) {
     _encounters.push_back(encounter);
-    addInternal(encounter);
+    persist(encounter);
 }
 
 void Area::add(Placeable &placeable) {
     _placeables.push_back(placeable);
-    addInternal(placeable);
+    persist(placeable);
 }
 
 void Area::add(Sound &sound) {
     _sounds.push_back(sound);
-    addInternal(sound);
+    persist(sound);
 }
 
 void Area::add(Store &store) {
     _stores.push_back(store);
-    addInternal(store);
+    persist(store);
 }
 
 void Area::add(Trigger &trigger) {
     _triggers.push_back(trigger);
-    addInternal(trigger);
+    persist(trigger);
 }
 
 void Area::add(Waypoint &waypoint) {
     _waypoints.push_back(waypoint);
-    addInternal(waypoint);
+    persist(waypoint);
 }
 
 } // namespace neo

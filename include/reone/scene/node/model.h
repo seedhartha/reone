@@ -85,7 +85,7 @@ public:
     ModelSceneNode(
         graphics::Model &model,
         ModelUsage usage,
-        SceneGraph &sceneGraph,
+        ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc);

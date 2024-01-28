@@ -28,7 +28,7 @@ namespace scene {
 class CameraSceneNode : public SceneNode {
 public:
     CameraSceneNode(
-        SceneGraph &sceneGraph,
+        ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :

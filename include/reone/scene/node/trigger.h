@@ -35,7 +35,7 @@ class TriggerSceneNode : public SceneNode {
 public:
     TriggerSceneNode(
         std::vector<glm::vec3> geometry,
-        SceneGraph &sceneGraph,
+        ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :

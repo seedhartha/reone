@@ -30,7 +30,7 @@ public:
     MeshSceneNode(
         ModelSceneNode &model,
         graphics::ModelNode &modelNode,
-        SceneGraph &sceneGraph,
+        ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :

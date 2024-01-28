@@ -51,7 +51,7 @@ protected:
     ModelNodeSceneNode(
         graphics::ModelNode &modelNode,
         SceneNodeType type,
-        SceneGraph &sceneGraph,
+        ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :

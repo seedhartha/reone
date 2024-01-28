@@ -48,7 +48,7 @@ static constexpr float kTransitionLength = 0.25f;
 ModelSceneNode::ModelSceneNode(
     Model &model,
     ModelUsage usage,
-    SceneGraph &sceneGraph,
+    ISceneGraph &sceneGraph,
     GraphicsServices &graphicsSvc,
     AudioServices &audioSvc,
     ResourceServices &resourceSvc) :
@@ -68,7 +68,9 @@ void ModelSceneNode::init() {
     if (!_nodeByNumber.empty()) {
         return;
     }
-    buildNodeTree(*_model->rootNode(), *this);
+    if (_model->rootNode()) {
+        buildNodeTree(*_model->rootNode(), *this);
+    }
     computeAABB();
     _point = _aabb.isDegenerate();
 }

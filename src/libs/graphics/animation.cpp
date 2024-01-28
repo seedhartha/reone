@@ -41,6 +41,9 @@ Animation::Animation(
 }
 
 void Animation::fillLookups() {
+    if (!_rootNode) {
+        return;
+    }
     std::stack<std::shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);
 

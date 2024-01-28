@@ -245,6 +245,14 @@ public:
         return *_movies;
     }
 
+    MockModels &models() {
+        return *_models;
+    }
+
+    MockWalkmeshes &walkmeshes() {
+        return *_walkmeshes;
+    }
+
     MockAudioClips &audioClips() {
         return *_audioClips;
     }

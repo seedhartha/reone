@@ -29,7 +29,7 @@ class ParticleSceneNode : public SceneNode {
 public:
     ParticleSceneNode(
         const EmitterSceneNode &emitter,
-        SceneGraph &sceneGraph,
+        ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :

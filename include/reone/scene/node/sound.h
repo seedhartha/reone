@@ -28,7 +28,7 @@ namespace scene {
 class SoundSceneNode : public SceneNode {
 public:
     SoundSceneNode(
-        SceneGraph &sceneGraph,
+        ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :

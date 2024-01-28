@@ -40,6 +40,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/audio/format/wavreader.cpp
     ${TESTS_SOURCE_DIR}/game/pathfinder.cpp
     ${TESTS_SOURCE_DIR}/game/neo/actionexecutor.cpp
+    ${TESTS_SOURCE_DIR}/game/neo/eventhandler.cpp
     ${TESTS_SOURCE_DIR}/game/neo/game.cpp
     ${TESTS_SOURCE_DIR}/game/neo/object.cpp
     ${TESTS_SOURCE_DIR}/game/neo/object/area.cpp

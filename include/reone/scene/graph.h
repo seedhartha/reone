@@ -83,6 +83,10 @@ public:
     virtual std::optional<std::reference_wrapper<CameraSceneNode>> camera() = 0;
 
     virtual void setAmbientLightColor(glm::vec3 color) = 0;
+    virtual bool hasShadowLight() const = 0;
+    virtual bool isShadowLightDirectional() const = 0;
+
+    virtual bool isFogEnabled() const = 0;
     virtual void setFog(FogProperties fog) = 0;
 
     virtual void setWalkableSurfaces(std::set<uint32_t> surfaces) = 0;
@@ -207,7 +211,7 @@ public:
 
     // Fog
 
-    bool isFogEnabled() const {
+    bool isFogEnabled() const override {
         return _fog.enabled;
     }
 
@@ -231,8 +235,8 @@ public:
 
     // Shadows
 
-    bool hasShadowLight() const { return _shadowLight; }
-    bool isShadowLightDirectional() const { return _shadowLight->isDirectional(); }
+    bool hasShadowLight() const override { return _shadowLight; }
+    bool isShadowLightDirectional() const override { return _shadowLight->isDirectional(); }
 
     glm::vec3 shadowLightPosition() const { return _shadowLight->origin(); }
     float shadowStrength() const { return _shadowStrength; }
