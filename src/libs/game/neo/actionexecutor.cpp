@@ -74,7 +74,7 @@ bool ActionExecutor::executeMoveToPoint(Creature &subject, const Action &action,
     if (scene.testWalk(oldPos, newPos, nullptr, collision)) {
         canMove = false;
     }
-    if (!scene.testElevation(newPos, collision)) {
+    if (canMove && !scene.testElevation(newPos, collision)) {
         canMove = false;
     }
     _sceneLock.unlock();

@@ -249,6 +249,10 @@ public:
         return *_audioClips;
     }
 
+    MockLayouts &layouts() {
+        return *_layouts;
+    }
+
     MockResourceDirector &director() {
         return *_director;
     }

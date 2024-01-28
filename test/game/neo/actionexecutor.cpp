@@ -51,8 +51,6 @@ protected:
         _resourceModule.init();
         _sceneModule.init();
 
-        ON_CALL(_sceneModule.graphs(), get(_)).WillByDefault(ReturnRef(_sceneGraph));
-
         _subject = std::make_unique<ActionExecutor>(
             _sceneLock,
             _resourceModule.services(),
@@ -68,10 +66,8 @@ TEST_F(ActionExecutorFixture, should_complete_move_to_point_action_given_less_th
     moveToPoint.type = ActionType::MoveToPoint;
     moveToPoint.location.position = glm::vec3 {0.05f, 0.0f, 0.0f};
 
-    // when
+    // expect
     bool completed = _subject->executeAction(creature, moveToPoint, 1.0f);
-
-    // then
     EXPECT_TRUE(completed);
     EXPECT_EQ(creature.moveType(), Creature::MoveType::None);
     EXPECT_EQ(creature.position(), glm::vec3 {0.0f});
@@ -84,12 +80,11 @@ TEST_F(ActionExecutorFixture, should_not_move_subject_given_move_to_point_action
     Action moveToPoint;
     moveToPoint.type = ActionType::MoveToPoint;
     moveToPoint.location.position = glm::vec3 {1.0f, 0.0f, 0.0f};
+
+    // expect
+    EXPECT_CALL(_sceneModule.graphs(), get(_)).WillOnce(ReturnRef(_sceneGraph));
     EXPECT_CALL(_sceneGraph, testWalk(_, _, _, _)).WillOnce(Return(true));
-
-    // when
     bool completed = _subject->executeAction(creature, moveToPoint, 1.0f);
-
-    // then
     EXPECT_FALSE(completed);
     EXPECT_EQ(creature.moveType(), Creature::MoveType::None);
     EXPECT_EQ(creature.position(), glm::vec3 {0.0f});
@@ -102,13 +97,12 @@ TEST_F(ActionExecutorFixture, should_not_move_subject_given_move_to_point_action
     Action moveToPoint;
     moveToPoint.type = ActionType::MoveToPoint;
     moveToPoint.location.position = glm::vec3 {1.0f, 0.0f, 0.0f};
+
+    // expect
+    EXPECT_CALL(_sceneModule.graphs(), get(_)).WillOnce(ReturnRef(_sceneGraph));
     EXPECT_CALL(_sceneGraph, testWalk(_, _, _, _)).WillOnce(Return(false));
     EXPECT_CALL(_sceneGraph, testElevation(_, _)).WillOnce(Return(false));
-
-    // when
     bool completed = _subject->executeAction(creature, moveToPoint, 1.0f);
-
-    // then
     EXPECT_FALSE(completed);
     EXPECT_EQ(creature.moveType(), Creature::MoveType::None);
     EXPECT_EQ(creature.position(), glm::vec3 {0.0f});
@@ -121,16 +115,15 @@ TEST_F(ActionExecutorFixture, should_move_subject_given_move_to_point_action) {
     Action moveToPoint;
     moveToPoint.type = ActionType::MoveToPoint;
     moveToPoint.location.position = glm::vec3 {1.0f, 0.0f, 0.0f};
+
+    // expect
+    EXPECT_CALL(_sceneModule.graphs(), get(_)).WillOnce(ReturnRef(_sceneGraph));
     EXPECT_CALL(_sceneGraph, testWalk(_, _, _, _)).WillOnce(Return(false));
     EXPECT_CALL(_sceneGraph, testElevation(_, _)).WillOnce([](const glm::vec2 &position, Collision &collision) {
         collision.intersection = glm::vec3 {1.0f, 0.0f, -1.0f};
         return true;
     });
-
-    // when
     bool completed = _subject->executeAction(creature, moveToPoint, 1.0f);
-
-    // then
     EXPECT_FALSE(completed);
     EXPECT_EQ(creature.moveType(), Creature::MoveType::Run);
     EXPECT_EQ(creature.position(), (glm::vec3 {1.0f, 0.0f, -1.0f}));

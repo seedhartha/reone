@@ -68,19 +68,6 @@ protected:
         _trigger = std::make_unique<Trigger>(10, "");
         _waypoint = std::make_unique<Waypoint>(11, "");
 
-        ON_CALL(_objectFactory, newArea(_)).WillByDefault(ReturnRef(*_area));
-        ON_CALL(_objectFactory, newCamera(_)).WillByDefault(ReturnRef(*_camera));
-        ON_CALL(_objectFactory, newCreature(_)).WillByDefault(ReturnRef(*_creature));
-        ON_CALL(_objectFactory, newDoor(_)).WillByDefault(ReturnRef(*_door));
-        ON_CALL(_objectFactory, newEncounter(_)).WillByDefault(ReturnRef(*_encounter));
-        ON_CALL(_objectFactory, newItem(_)).WillByDefault(ReturnRef(*_item));
-        ON_CALL(_objectFactory, newModule(_)).WillByDefault(ReturnRef(*_module));
-        ON_CALL(_objectFactory, newPlaceable(_)).WillByDefault(ReturnRef(*_placeable));
-        ON_CALL(_objectFactory, newSound(_)).WillByDefault(ReturnRef(*_sound));
-        ON_CALL(_objectFactory, newStore(_)).WillByDefault(ReturnRef(*_store));
-        ON_CALL(_objectFactory, newTrigger(_)).WillByDefault(ReturnRef(*_trigger));
-        ON_CALL(_objectFactory, newWaypoint(_)).WillByDefault(ReturnRef(*_waypoint));
-
         _subject = std::make_unique<ObjectLoader>(
             _objectFactory,
             _resourceModule.services());
@@ -107,8 +94,33 @@ protected:
     std::unique_ptr<ObjectLoader> _subject;
 };
 
+TEST_F(ObjectLoaderFixture, should_load_module) {
+    // given
+    auto ifo = Gff::Builder().build();
+
+    // expect
+    EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(ifo));
+    EXPECT_CALL(_objectFactory, newModule(_)).WillOnce(ReturnRef(*_module));
+    auto &module = _subject->loadModule("end_m01aa");
+}
+
+TEST_F(ObjectLoaderFixture, should_load_area) {
+    // given
+    auto are = Gff::Builder().build();
+    auto git = Gff::Builder().build();
+    auto layout = std::make_shared<Layout>();
+
+    // expect
+    EXPECT_CALL(_resourceModule.gffs(), get(_, ResType::Are)).WillOnce(Return(are));
+    EXPECT_CALL(_resourceModule.gffs(), get(_, ResType::Git)).WillOnce(Return(git));
+    EXPECT_CALL(_resourceModule.layouts(), get(_)).WillOnce(Return(layout));
+    EXPECT_CALL(_objectFactory, newArea(_)).WillOnce(ReturnRef(*_area));
+    auto &area = _subject->loadArea("m01aa");
+}
+
 TEST_F(ObjectLoaderFixture, should_load_camera) {
-    // when
+    // expect
+    EXPECT_CALL(_objectFactory, newCamera(_)).WillOnce(ReturnRef(*_camera));
     auto &camera = _subject->loadCamera();
 }
 
@@ -125,7 +137,28 @@ TEST_F(ObjectLoaderFixture, should_load_creature) {
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utc));
     EXPECT_CALL(_resourceModule.twoDas(), get("appearance")).WillOnce(Return(appearance));
     EXPECT_CALL(_resourceModule.twoDas(), get("heads")).WillOnce(Return(heads));
+    EXPECT_CALL(_objectFactory, newCreature(_)).WillOnce(ReturnRef(*_creature));
     auto &creature = _subject->loadCreature({"tmplt"});
+}
+
+TEST_F(ObjectLoaderFixture, should_load_creature_for_portrait) {
+    // given
+    std::shared_ptr<TwoDA> portraits = TwoDA::Builder()
+                                           .columns({"appearancenumber"})
+                                           .row({"0"})
+                                           .build();
+    std::shared_ptr<TwoDA> appearance = TwoDA::Builder()
+                                            .columns({"modeltype", "race", "racetex"})
+                                            .row({"F", "n_mandalorian", ""})
+                                            .build();
+    std::shared_ptr<TwoDA> heads = TwoDA::Builder().build();
+
+    // expect
+    EXPECT_CALL(_resourceModule.twoDas(), get("portraits")).WillOnce(Return(portraits));
+    EXPECT_CALL(_resourceModule.twoDas(), get("appearance")).WillOnce(Return(appearance));
+    EXPECT_CALL(_resourceModule.twoDas(), get("heads")).WillOnce(Return(heads));
+    EXPECT_CALL(_objectFactory, newCreature(_)).WillOnce(ReturnRef(*_creature));
+    auto &creature = _subject->loadCreature("tag", 0);
 }
 
 TEST_F(ObjectLoaderFixture, should_load_door) {
@@ -139,6 +172,7 @@ TEST_F(ObjectLoaderFixture, should_load_door) {
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utd));
     EXPECT_CALL(_resourceModule.twoDas(), get("genericdoors")).WillOnce(Return(genericDoors));
+    EXPECT_CALL(_objectFactory, newDoor(_)).WillOnce(ReturnRef(*_door));
     auto &door = _subject->loadDoor({"tmplt"});
 }
 
@@ -148,6 +182,7 @@ TEST_F(ObjectLoaderFixture, should_load_encounter) {
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(ute));
+    EXPECT_CALL(_objectFactory, newEncounter(_)).WillOnce(ReturnRef(*_encounter));
     auto &encounter = _subject->loadEncounter({"tmplt"});
 }
 
@@ -162,6 +197,7 @@ TEST_F(ObjectLoaderFixture, should_load_placeable) {
                                             .row({"plc_footlker"})
                                             .build();
     EXPECT_CALL(_resourceModule.twoDas(), get("placeables")).WillOnce(Return(placeables));
+    EXPECT_CALL(_objectFactory, newPlaceable(_)).WillOnce(ReturnRef(*_placeable));
     auto &placeable = _subject->loadPlaceable({"tmplt"});
 }
 
@@ -171,6 +207,7 @@ TEST_F(ObjectLoaderFixture, should_load_sound) {
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(uts));
+    EXPECT_CALL(_objectFactory, newSound(_)).WillOnce(ReturnRef(*_sound));
     auto &sound = _subject->loadSound({"tmplt"});
 }
 
@@ -180,6 +217,7 @@ TEST_F(ObjectLoaderFixture, should_load_store) {
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utm));
+    EXPECT_CALL(_objectFactory, newStore(_)).WillOnce(ReturnRef(*_store));
     auto &store = _subject->loadStore({"tmplt"});
 }
 
@@ -189,6 +227,7 @@ TEST_F(ObjectLoaderFixture, should_load_trigger) {
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utt));
+    EXPECT_CALL(_objectFactory, newTrigger(_)).WillOnce(ReturnRef(*_trigger));
     auto &trigger = _subject->loadTrigger({"tmplt"});
 }
 
@@ -198,5 +237,6 @@ TEST_F(ObjectLoaderFixture, should_load_waypoint) {
 
     // expect
     EXPECT_CALL(_resourceModule.gffs(), get(_, _)).WillOnce(Return(utw));
+    EXPECT_CALL(_objectFactory, newWaypoint(_)).WillOnce(ReturnRef(*_waypoint));
     auto &waypoint = _subject->loadWaypoint({"tmplt"});
 }
