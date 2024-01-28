@@ -42,6 +42,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/game/neo/actionexecutor.cpp
     ${TESTS_SOURCE_DIR}/game/neo/controller/playercamera.cpp
     ${TESTS_SOURCE_DIR}/game/neo/controller/selection.cpp
+    ${TESTS_SOURCE_DIR}/game/neo/conversation.cpp
     ${TESTS_SOURCE_DIR}/game/neo/eventhandler.cpp
     ${TESTS_SOURCE_DIR}/game/neo/game.cpp
     ${TESTS_SOURCE_DIR}/game/neo/object.cpp

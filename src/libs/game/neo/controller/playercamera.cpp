@@ -243,13 +243,15 @@ void PlayerCameraController::refreshCamera() {
 
 void PlayerCameraController::refreshPlayer() {
     (*_gameLogicExecutor)([this]() {
+        auto &player = _player->get();
+        player.clearAllActions();
         if (glm::length2(_playerMoveDir) > 0.0f) {
-            auto &player = _player->get();
-            player.clearAllActions();
             Action action;
             action.type = ActionType::MoveToPoint;
             action.location.position = player.position() + _playerMoveDir;
             player.add(std::move(action));
+        } else {
+            player.setMoveType(Creature::MoveType::None);
         }
     });
 }

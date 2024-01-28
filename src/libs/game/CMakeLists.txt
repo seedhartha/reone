@@ -282,6 +282,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/neo/actionexecutor.h
     ${GAME_INCLUDE_DIR}/neo/controller/playercamera.h
     ${GAME_INCLUDE_DIR}/neo/controller/selection.h
+    ${GAME_INCLUDE_DIR}/neo/conversation.h
     ${GAME_INCLUDE_DIR}/neo/effect.h
     ${GAME_INCLUDE_DIR}/neo/event.h
     ${GAME_INCLUDE_DIR}/neo/eventcollector.h
@@ -498,6 +499,7 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/neo/actionexecutor.cpp
     ${GAME_SOURCE_DIR}/neo/controller/playercamera.cpp
     ${GAME_SOURCE_DIR}/neo/controller/selection.cpp
+    ${GAME_SOURCE_DIR}/neo/conversation.cpp
     ${GAME_SOURCE_DIR}/neo/eventhandler.cpp
     ${GAME_SOURCE_DIR}/neo/game.cpp
     ${GAME_SOURCE_DIR}/neo/object.cpp
