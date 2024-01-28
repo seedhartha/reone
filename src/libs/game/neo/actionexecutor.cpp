@@ -42,6 +42,7 @@ namespace game {
 namespace neo {
 
 static constexpr float kPlayerMoveRate = 4.0f;
+static constexpr float kMinMoveDistance = 0.1f;
 
 bool ActionExecutor::executeAction(Object &subject, const Action &action, float dt) {
     checkThat(static_cast<bool>(_module), "Module must be present");
@@ -58,7 +59,7 @@ bool ActionExecutor::executeMoveToPoint(Creature &subject, const Action &action,
     auto oldPos = subject.position();
     auto delta = action.location.position - oldPos;
     auto distance = glm::length(delta);
-    if (distance < 0.1f) {
+    if (distance < kMinMoveDistance) {
         subject.setMoveType(Creature::MoveType::None);
         return true;
     }
