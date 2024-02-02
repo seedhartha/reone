@@ -25,6 +25,7 @@
 #include "reone/game/neo/controller/playercamera.h"
 #include "reone/game/neo/object/creature.h"
 #include "reone/input/event.h"
+#include "reone/scene/collision.h"
 
 using namespace reone;
 using namespace reone::audio;

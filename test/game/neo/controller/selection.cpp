@@ -28,6 +28,7 @@
 #include "reone/game/neo/object/module.h"
 #include "reone/graphics/options.h"
 #include "reone/input/event.h"
+#include "reone/scene/collision.h"
 
 using namespace reone;
 using namespace reone::audio;
