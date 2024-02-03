@@ -963,51 +963,70 @@ std::optional<std::reference_wrapper<ModelSceneNode>> SceneGraph::pickModelRay(c
 }
 
 std::shared_ptr<CameraSceneNode> SceneGraph::newCamera() {
-    return newSceneNode<CameraSceneNode>();
+    auto node = newSceneNode<CameraSceneNode>();
+    return std::move(node);
 }
 
 std::shared_ptr<DummySceneNode> SceneGraph::newDummy(ModelNode &modelNode) {
-    return newSceneNode<DummySceneNode, ModelNode &>(modelNode);
+    auto node = newSceneNode<DummySceneNode, ModelNode &>(modelNode);
+    return std::move(node);
 }
 
 std::shared_ptr<ModelSceneNode> SceneGraph::newModel(Model &model, ModelUsage usage) {
-    return newSceneNode<ModelSceneNode, Model &, ModelUsage>(model, usage);
+    auto node = newSceneNode<ModelSceneNode, Model &, ModelUsage>(model, usage);
+    node->init();
+    return std::move(node);
 }
 
 std::shared_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(Walkmesh &walkmesh) {
-    return newSceneNode<WalkmeshSceneNode, Walkmesh &>(walkmesh);
+    auto node = newSceneNode<WalkmeshSceneNode, Walkmesh &>(walkmesh);
+    node->init();
+    return std::move(node);
 }
 
 std::shared_ptr<SoundSceneNode> SceneGraph::newSound() {
-    return newSceneNode<SoundSceneNode>();
+    auto node = newSceneNode<SoundSceneNode>();
+    return std::move(node);
 }
 
 std::shared_ptr<MeshSceneNode> SceneGraph::newMesh(ModelSceneNode &model, ModelNode &modelNode) {
-    return newSceneNode<MeshSceneNode, ModelSceneNode &, ModelNode &>(model, modelNode);
+    auto node = newSceneNode<MeshSceneNode, ModelSceneNode &, ModelNode &>(model, modelNode);
+    node->init();
+    return std::move(node);
 }
 
 std::shared_ptr<LightSceneNode> SceneGraph::newLight(ModelSceneNode &model, ModelNode &modelNode) {
-    return newSceneNode<LightSceneNode, ModelSceneNode &, ModelNode &>(model, modelNode);
+    auto node = newSceneNode<LightSceneNode, ModelSceneNode &, ModelNode &>(model, modelNode);
+    node->init();
+    return std::move(node);
 }
 
 std::shared_ptr<TriggerSceneNode> SceneGraph::newTrigger(std::vector<glm::vec3> geometry) {
-    return newSceneNode<TriggerSceneNode, std::vector<glm::vec3>>(std::move(geometry));
+    auto node = newSceneNode<TriggerSceneNode, std::vector<glm::vec3>>(std::move(geometry));
+    node->init();
+    return std::move(node);
 }
 
 std::shared_ptr<EmitterSceneNode> SceneGraph::newEmitter(ModelNode &modelNode) {
-    return newSceneNode<EmitterSceneNode, ModelNode &>(modelNode);
+    auto node = newSceneNode<EmitterSceneNode, ModelNode &>(modelNode);
+    node->init();
+    return std::move(node);
 }
 
 std::shared_ptr<ParticleSceneNode> SceneGraph::newParticle(EmitterSceneNode &emitter) {
-    return newSceneNode<ParticleSceneNode, EmitterSceneNode &>(emitter);
+    auto node = newSceneNode<ParticleSceneNode, EmitterSceneNode &>(emitter);
+    return std::move(node);
 }
 
 std::shared_ptr<GrassSceneNode> SceneGraph::newGrass(GrassProperties properties, ModelNode &aabbNode) {
-    return newSceneNode<GrassSceneNode, GrassProperties, ModelNode &>(properties, aabbNode);
+    auto node = newSceneNode<GrassSceneNode, GrassProperties, ModelNode &>(properties, aabbNode);
+    node->init();
+    return std::move(node);
 }
 
 std::shared_ptr<GrassClusterSceneNode> SceneGraph::newGrassCluster(GrassSceneNode &grass) {
-    return newSceneNode<GrassClusterSceneNode>();
+    auto node = newSceneNode<GrassClusterSceneNode>();
+    return std::move(node);
 }
 
 } // namespace scene

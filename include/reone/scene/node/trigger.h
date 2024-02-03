@@ -46,8 +46,6 @@ public:
             audioSvc,
             resourceSvc),
         _geometry(std::move(geometry)) {
-
-        init();
     }
 
     void init();

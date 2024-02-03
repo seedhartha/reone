@@ -45,25 +45,6 @@ namespace scene {
 
 static constexpr float kTransitionLength = 0.25f;
 
-ModelSceneNode::ModelSceneNode(
-    Model &model,
-    ModelUsage usage,
-    ISceneGraph &sceneGraph,
-    GraphicsServices &graphicsSvc,
-    AudioServices &audioSvc,
-    ResourceServices &resourceSvc) :
-    SceneNode(
-        SceneNodeType::Model,
-        sceneGraph,
-        graphicsSvc,
-        audioSvc,
-        resourceSvc),
-    _model(&model),
-    _usage(usage) {
-
-    init();
-}
-
 void ModelSceneNode::init() {
     if (!_nodeByNumber.empty()) {
         return;

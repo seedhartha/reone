@@ -42,8 +42,6 @@ public:
             audioSvc,
             resourceSvc),
         _model(model) {
-
-        init();
     }
 
     void init();

@@ -88,7 +88,16 @@ public:
         ISceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
-        resource::ResourceServices &resourceSvc);
+        resource::ResourceServices &resourceSvc) :
+        SceneNode(
+            SceneNodeType::Model,
+            sceneGraph,
+            graphicsSvc,
+            audioSvc,
+            resourceSvc),
+        _model(&model),
+        _usage(usage) {
+    }
 
     void init();
 

@@ -43,8 +43,6 @@ public:
             graphicsSvc,
             audioSvc,
             resourceSvc) {
-
-        init();
     }
 
     void init();

@@ -52,8 +52,6 @@ public:
             resourceSvc),
         _properties(std::move(properties)),
         _aabbNode(aabbNode) {
-
-        init();
     }
 
     void init();

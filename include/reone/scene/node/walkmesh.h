@@ -49,8 +49,6 @@ public:
         _walkmesh(walkmesh) {
 
         _point = false;
-
-        init();
     }
 
     void init();
