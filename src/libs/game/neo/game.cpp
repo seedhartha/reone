@@ -222,6 +222,7 @@ void Game::handleEvents() {
             (_pc && event.object.objectId == _pc->get().id())) {
             auto sceneNode = scene.modelByExternalId(reinterpret_cast<void *>(_pc->get().id()));
             if (sceneNode) {
+                sceneNode->get().setPickable(false);
                 _playerCameraController->setPlayerSceneNode(sceneNode->get());
             }
         }

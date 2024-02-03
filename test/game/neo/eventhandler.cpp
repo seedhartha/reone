@@ -382,6 +382,21 @@ TEST_F(EventHandlerFixture, should_handle_door_state_changed_event) {
     event.door.objectId = 2;
     event.door.state = DoorState::Open;
     auto walkmesh = std::make_shared<Walkmesh>();
+    auto model = std::make_shared<Model>(
+        "",
+        0,
+        std::shared_ptr<ModelNode>(),
+        std::vector<std::shared_ptr<Animation>>(),
+        "",
+        1.0f);
+    auto modelSceneNode = std::make_shared<ModelSceneNode>(
+        *model,
+        ModelUsage::Door,
+        _sceneGraph,
+        _graphicsModule.services(),
+        _audioModule.services(),
+        _resourceModule.services());
+    modelSceneNode->setPickable(true);
     auto closedSceneNode = std::make_shared<WalkmeshSceneNode>(
         *walkmesh,
         _sceneGraph,
@@ -400,9 +415,11 @@ TEST_F(EventHandlerFixture, should_handle_door_state_changed_event) {
 
     // expect
     EXPECT_CALL(_sceneModule.graphs(), get(_)).WillOnce(ReturnRef(_sceneGraph));
+    EXPECT_CALL(_sceneGraph, modelByExternalId(_)).WillOnce(Return(std::ref(*modelSceneNode)));
     EXPECT_CALL(_sceneGraph, walkmeshesByExternalId(_)).WillOnce(Return(walkmeshSceneNodes));
     _subject->handle(event);
 
+    EXPECT_FALSE(modelSceneNode->isPickable());
     EXPECT_FALSE(closedSceneNode->isEnabled());
     EXPECT_TRUE(openSceneNode->isEnabled());
 }

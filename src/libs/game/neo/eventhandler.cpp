@@ -147,7 +147,7 @@ void EventHandler::onDoorLoaded(Door &door) {
     auto sceneNode = scene.newModel(*model, ModelUsage::Door);
     sceneNode->setLocalTransform(transform);
     // sceneNode->setDrawDistance(_graphicsOpt.drawDistance);
-    sceneNode->setPickable(true);
+    sceneNode->setPickable(door.isClosed());
     sceneNode->setExternalId(reinterpret_cast<void *>(door.id()));
     _sceneLock.lock();
     scene.addRoot(std::move(sceneNode));
@@ -233,6 +233,10 @@ void EventHandler::onObjectFireForgetAnimationFired(Object &object, const std::s
 
 void EventHandler::onDoorStateChanged(Door &door, DoorState state) {
     auto &scene = _sceneSvc.graphs.get(kSceneMain);
+    auto model = scene.modelByExternalId(reinterpret_cast<void *>(door.id()));
+    if (model) {
+        model->get().setPickable(state == DoorState::Closed);
+    }
     auto walkmeshes = scene.walkmeshesByExternalId(reinterpret_cast<void *>(door.id()));
     for (const auto &walkmesh : walkmeshes) {
         bool enabled = walkmesh.get()
