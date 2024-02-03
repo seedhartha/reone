@@ -252,13 +252,13 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
     std::shared_ptr<ModelNode::Danglymesh> danglymesh;
     std::shared_ptr<ModelNode::AABBTree> aabbTree;
 
-    Mesh::VertexSpec spec;
-    spec.stride = mdxVertexSize;
-    spec.offCoords = offMdxVertices;
-    spec.offNormals = offMdxNormals;
-    spec.offUV1 = offMdxTexCoords1;
-    spec.offUV2 = offMdxTexCoords2;
-    spec.offTanSpace = offMdxTanSpace;
+    Mesh::VertexLayout vertexLayout;
+    vertexLayout.stride = mdxVertexSize;
+    vertexLayout.offPosition = offMdxVertices;
+    vertexLayout.offNormals = offMdxNormals;
+    vertexLayout.offUV1 = offMdxTexCoords1;
+    vertexLayout.offUV2 = offMdxTexCoords2;
+    vertexLayout.offTanSpace = offMdxTanSpace;
 
     if (flags & MdlNodeFlags::skin) {
         // Skin Mesh Header
@@ -291,8 +291,8 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         skin->boneMap = std::move(boneMap);
         skin->boneMatrices = std::move(boneMatrices);
 
-        spec.offBoneIndices = static_cast<int>(offMdxBoneIndices);
-        spec.offBoneWeights = static_cast<int>(offMdxBoneWeights);
+        vertexLayout.offBoneIndices = static_cast<int>(offMdxBoneIndices);
+        vertexLayout.offBoneWeights = static_cast<int>(offMdxBoneWeights);
 
     } else if (flags & MdlNodeFlags::dangly) {
         // Dangly Mesh Header
@@ -371,10 +371,10 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
             *(verticesPtr++) = texCoordsPtr[0];
             *(verticesPtr++) = texCoordsPtr[1];
         }
-        spec.stride = 8 * sizeof(float);
-        spec.offCoords = 0;
-        spec.offNormals = 3 * sizeof(float);
-        spec.offUV1 = 6 * sizeof(float);
+        vertexLayout.stride = 8 * sizeof(float);
+        vertexLayout.offPosition = 0;
+        vertexLayout.offNormals = 3 * sizeof(float);
+        vertexLayout.offUV1 = 6 * sizeof(float);
     }
 
     // Read vertices
@@ -397,9 +397,9 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
             std::vector<uint16_t> faceIndices(_mdl.readUint16Array(3));
 
             Mesh::Face face;
-            face.indices[0] = faceIndices[0];
-            face.indices[1] = faceIndices[1];
-            face.indices[2] = faceIndices[2];
+            face.vertices[0] = faceIndices[0];
+            face.vertices[1] = faceIndices[1];
+            face.vertices[2] = faceIndices[2];
             face.adjacentFaces[0] = adjacentFaces[0];
             face.adjacentFaces[1] = adjacentFaces[1];
             face.adjacentFaces[2] = adjacentFaces[2];
@@ -427,10 +427,11 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         int indexOffset = 0;
         for (int i = 0; i < kNumSaberSegments + 1; ++i) {
             for (int j = 0; j < kNumSaberPieceFaces; ++j) {
-                faces.emplace_back(
-                    indexOffset + kSaberPieceFaceIndices[3 * j + 0],
-                    indexOffset + kSaberPieceFaceIndices[3 * j + 1],
-                    indexOffset + kSaberPieceFaceIndices[3 * j + 2]);
+                Mesh::Face face;
+                face.vertices[0] = indexOffset + kSaberPieceFaceIndices[3 * j + 0];
+                face.vertices[1] = indexOffset + kSaberPieceFaceIndices[3 * j + 1];
+                face.vertices[2] = indexOffset + kSaberPieceFaceIndices[3 * j + 2];
+                faces.push_back(std::move(face));
             }
             indexOffset += kNumSaberSegmentVertices;
         }
@@ -438,10 +439,11 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         indexOffset += kNumSaberSegmentVertices;
         for (int i = 0; i < kNumSaberSegments + 1; ++i) {
             for (int j = 0; j < kNumSaberPieceFaces; ++j) {
-                faces.emplace_back(
-                    indexOffset + kSaberPieceFaceIndices[3 * j + 2],
-                    indexOffset + kSaberPieceFaceIndices[3 * j + 1],
-                    indexOffset + kSaberPieceFaceIndices[3 * j + 0]);
+                Mesh::Face face;
+                face.vertices[0] = indexOffset + kSaberPieceFaceIndices[3 * j + 2];
+                face.vertices[1] = indexOffset + kSaberPieceFaceIndices[3 * j + 1];
+                face.vertices[2] = indexOffset + kSaberPieceFaceIndices[3 * j + 0];
+                faces.push_back(std::move(face));
             }
             indexOffset += kNumSaberSegmentVertices;
         }
@@ -449,8 +451,8 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
 
     auto mesh = std::make_unique<Mesh>(
         std::move(vertices),
+        std::move(vertexLayout),
         std::move(faces),
-        spec,
         _statistic);
 
     ModelNode::UVAnimation uvAnimation;

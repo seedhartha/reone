@@ -120,14 +120,14 @@ void GrassSceneNode::update(float dt) {
             continue;
         }
         auto &face = faces[faceIdx];
-        auto verts = mesh->getFaceVertexCoords(face);
+        auto verts = mesh->faceVertexCoords(face);
         for (int i = 0; i < getNumClustersInFace(face.area); ++i) {
             if (_clusterPool.empty()) {
                 return;
             }
             glm::vec3 baryPosition(getRandomBarycentric());
             glm::vec3 position(barycentricToCartesian(verts[0], verts[1], verts[2], baryPosition));
-            glm::vec2 lightmapUV(mesh->getUV2(face, baryPosition));
+            glm::vec2 lightmapUV(mesh->faceUV2(face, baryPosition));
             auto cluster = _clusterPool.top();
             _clusterPool.pop();
             cluster->setLocalTransform(glm::translate(position));

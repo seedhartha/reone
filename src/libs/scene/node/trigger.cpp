@@ -54,9 +54,9 @@ void TriggerSceneNode::init() {
         normals[i2] += normal;
 
         Mesh::Face face;
-        face.indices[0] = 0;
-        face.indices[1] = i1;
-        face.indices[2] = i2;
+        face.vertices[0] = 0;
+        face.vertices[1] = i1;
+        face.vertices[2] = i2;
         face.normal = std::move(normal);
         face.material = kMaxWalkmeshMaterials - 1;
         faces.push_back(std::move(face));
@@ -84,16 +84,16 @@ void TriggerSceneNode::init() {
         vertices.push_back(1.0f); // material
     }
 
-    Mesh::VertexSpec spec;
-    spec.stride = 7 * sizeof(float);
-    spec.offCoords = 0;
-    spec.offNormals = 3 * sizeof(float);
-    spec.offMaterial = 6 * sizeof(float);
+    Mesh::VertexLayout vertexLayout;
+    vertexLayout.stride = 7 * sizeof(float);
+    vertexLayout.offPosition = 0;
+    vertexLayout.offNormals = 3 * sizeof(float);
+    vertexLayout.offMaterial = 6 * sizeof(float);
 
     _mesh = std::make_unique<Mesh>(
         std::move(vertices),
+        std::move(vertexLayout),
         std::move(faces),
-        std::move(spec),
         _graphicsSvc.statistic);
     _mesh->init();
 
@@ -117,7 +117,7 @@ bool TriggerSceneNode::isIn(const glm::vec2 &pt) const {
     float distance = 0.0f;
 
     for (auto &face : _mesh->faces()) {
-        auto verts = _mesh->getFaceVertexCoords(face);
+        auto verts = _mesh->faceVertexCoords(face);
         if (glm::intersectRayTriangle(pointObjSpace, down, verts[0], verts[1], verts[2], intersection, distance)) {
             return true;
         }
