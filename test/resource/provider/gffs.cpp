@@ -25,7 +25,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(gffs, should_get_gff_with_caching) {
+TEST(Gffs, should_get_gff_with_caching) {
     // given
 
     auto resBytes = ByteBuffer();

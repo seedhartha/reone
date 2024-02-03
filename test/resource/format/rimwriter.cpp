@@ -26,7 +26,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(rim_writer, should_write_rim) {
+TEST(RimWriter, should_write_rim) {
     // given
 
     auto expectedOutput = StringBuilder()

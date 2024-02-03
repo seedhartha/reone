@@ -24,7 +24,7 @@
 
 using namespace reone;
 
-TEST(text_writer, should_write_text) {
+TEST(TextWriter, should_write_text) {
     // given
     auto expectedBytes = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 

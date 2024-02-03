@@ -24,7 +24,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(bif_reader, should_read_bif) {
+TEST(BifReader, should_read_bif) {
     // given
 
     auto input = StringBuilder()

@@ -24,7 +24,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(key_reader, should_read_key) {
+TEST(KeyReader, should_read_key) {
     // given
 
     auto input = StringBuilder()

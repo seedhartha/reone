@@ -21,7 +21,7 @@
 
 using namespace reone;
 
-TEST(code_points_from_utf8, should_convert_utf8_string_to_code_points) {
+TEST(UnicodeUtilities, should_convert_utf8_string_to_code_points) {
     // given
     auto utf8 = ",.09AZaz\xc2\xa0\xdf\xbf\xe0\xa2\xa0\xef\xbf\xae\xf0\x92\x80\x80\xf0\x9f\xa7\xbf";
 
@@ -46,7 +46,7 @@ TEST(code_points_from_utf8, should_convert_utf8_string_to_code_points) {
     EXPECT_EQ(codePoints[13], 0x1f9ff);
 }
 
-TEST(utf8_from_code_points, should_convert_code_points_to_utf8_string) {
+TEST(UnicodeUtilities, should_convert_code_points_to_utf8_string) {
     // given
     std::vector<uint32_t> codePoints {
         ',', '.',
@@ -64,7 +64,7 @@ TEST(utf8_from_code_points, should_convert_code_points_to_utf8_string) {
     EXPECT_EQ(utf8, ",.09AZaz\xc2\xa0\xdf\xbf\xe0\xa2\xa0\xef\xbf\xae\xf0\x92\x80\x80\xf0\x9f\xa7\xbf");
 }
 
-TEST(code_points_from_utf16, should_convert_utf16_string_to_code_points) {
+TEST(UnicodeUtilities, should_convert_utf16_string_to_code_points) {
     // given
     auto utf16 = u",.09AZaz\u00a0\u07ff\u08a0\uffee\U00012000\U0001f9ff";
 
@@ -89,7 +89,7 @@ TEST(code_points_from_utf16, should_convert_utf16_string_to_code_points) {
     EXPECT_EQ(codePoints[13], 0x1f9ff);
 }
 
-TEST(utf16_from_code_points, should_convert_code_points_to_ut16_string) {
+TEST(UnicodeUtilities, should_convert_code_points_to_ut16_string) {
     // given
     std::vector<uint32_t> codePoints {
         ',', '.',
@@ -107,7 +107,7 @@ TEST(utf16_from_code_points, should_convert_code_points_to_ut16_string) {
     EXPECT_EQ(utf16, u",.09AZaz\u00a0\u07ff\u08a0\uffee\U00012000\U0001f9ff");
 }
 
-TEST(is_code_point_alpha, should_return_true_for_alpha_chars_in_latin_and_cyrillic) {
+TEST(UnicodeUtilities, should_return_true_for_alpha_chars_in_latin_and_cyrillic) {
     EXPECT_FALSE(isCodePointAlpha(','));
     EXPECT_FALSE(isCodePointAlpha('.'));
     EXPECT_FALSE(isCodePointAlpha('0'));
@@ -124,7 +124,7 @@ TEST(is_code_point_alpha, should_return_true_for_alpha_chars_in_latin_and_cyrill
     EXPECT_TRUE(isCodePointAlpha(0x451));
 }
 
-TEST(code_point_to_lower, should_convert_alpha_chars_in_latin_in_cyrillic_to_lower_case) {
+TEST(UnicodeUtilities, should_convert_alpha_chars_in_latin_in_cyrillic_to_lower_case) {
     EXPECT_EQ(codePointToLower(','), ',');
     EXPECT_EQ(codePointToLower('.'), '.');
     EXPECT_EQ(codePointToLower('0'), '0');
@@ -141,7 +141,7 @@ TEST(code_point_to_lower, should_convert_alpha_chars_in_latin_in_cyrillic_to_low
     EXPECT_EQ(codePointToLower(0x451), 0x451);
 }
 
-TEST(code_point_to_upper, should_convert_alpha_chars_in_latin_in_cyrillic_to_upper_case) {
+TEST(UnicodeUtilities, should_convert_alpha_chars_in_latin_in_cyrillic_to_upper_case) {
     EXPECT_EQ(codePointToUpper(','), ',');
     EXPECT_EQ(codePointToUpper('.'), '.');
     EXPECT_EQ(codePointToUpper('0'), '0');

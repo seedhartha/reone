@@ -25,7 +25,7 @@
 using namespace reone;
 using namespace reone::script;
 
-TEST(ncs_reader, should_read_ncs) {
+TEST(NcsReader, should_read_ncs) {
     // given
 
     auto input = StringBuilder()

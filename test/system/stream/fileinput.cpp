@@ -23,7 +23,7 @@
 
 using namespace reone;
 
-TEST(file_input_stream, should_read_from_file) {
+TEST(FileInputStream, should_read_from_file) {
     // given
 
     auto tmpPath = std::filesystem::temp_directory_path();

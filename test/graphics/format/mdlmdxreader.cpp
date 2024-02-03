@@ -27,7 +27,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-TEST(mdl_reader, should_load_mdl) {
+TEST(MdlReader, should_load_mdl) {
     // given
     auto mdlBytes = StringBuilder()
                         // File Header (0)

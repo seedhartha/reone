@@ -48,7 +48,7 @@ public:
     }
 };
 
-TEST(object, should_be_constructed_in_created_state) {
+TEST(Object, should_be_constructed_in_created_state) {
     // given
     TestObject object {0, ""};
 
@@ -56,7 +56,7 @@ TEST(object, should_be_constructed_in_created_state) {
     EXPECT_TRUE(object.is(ObjectState::Created));
 }
 
-TEST(object, should_return_nullopt_for_current_action) {
+TEST(Object, should_return_nullopt_for_current_action) {
     // given
     TestObject object {0, ""};
 
@@ -67,7 +67,7 @@ TEST(object, should_return_nullopt_for_current_action) {
     EXPECT_EQ(action, std::nullopt);
 }
 
-TEST(object, should_add_action_to_action_queue) {
+TEST(Object, should_add_action_to_action_queue) {
     // given
     TestObject object {0, ""};
 
@@ -79,7 +79,7 @@ TEST(object, should_add_action_to_action_queue) {
     EXPECT_TRUE(action.has_value());
 }
 
-TEST(object, should_apply_effect) {
+TEST(Object, should_apply_effect) {
     // given
     TestObject object {0, ""};
 
@@ -89,7 +89,7 @@ TEST(object, should_apply_effect) {
     // then
 }
 
-TEST(spatial_object, should_be_created_at_world_zero_facing_east) {
+TEST(SpatialObject, should_be_created_at_world_zero_facing_east) {
     // given
     TestSpatialObject object {0, ""};
 
@@ -98,7 +98,7 @@ TEST(spatial_object, should_be_created_at_world_zero_facing_east) {
     EXPECT_EQ(object.facing(), 0.0f);
 }
 
-TEST(spatial_object, should_set_position) {
+TEST(SpatialObject, should_set_position) {
     // given
     TestSpatialObject object {0, ""};
 
@@ -114,7 +114,7 @@ TEST(spatial_object, should_set_position) {
     EXPECT_EQ(events.at(1).object.objectId, object.id());
 }
 
-TEST(spatial_object, should_set_facing) {
+TEST(SpatialObject, should_set_facing) {
     // given
     TestSpatialObject object {0, ""};
 
@@ -130,7 +130,7 @@ TEST(spatial_object, should_set_facing) {
     EXPECT_EQ(events.at(1).object.objectId, object.id());
 }
 
-TEST(spatial_object, should_set_facing_point) {
+TEST(SpatialObject, should_set_facing_point) {
     // given
     TestSpatialObject object {0, ""};
     object.setPosition({1.0f, 1.0f, 1.0f});

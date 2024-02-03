@@ -29,7 +29,7 @@ using namespace reone::game::neo;
 using namespace reone::resource;
 using namespace reone::resource::generated;
 
-TEST(door, should_load_utd) {
+TEST(Door, should_load_utd) {
     // given
     Door door {0, ""};
     UTD utd;

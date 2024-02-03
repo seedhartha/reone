@@ -22,11 +22,11 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(res_ref, should_truncate_value_to_16_chars_and_convert_to_lower_case) {
+TEST(ResRef, should_truncate_value_to_16_chars_and_convert_to_lower_case) {
     EXPECT_EQ(ResRef("longANDmixedCASEstring").value(), "longandmixedcase");
 }
 
-TEST(res_ref, should_be_equatable) {
+TEST(ResRef, should_be_equatable) {
     // given
     ResRef resRef1("A");
     ResRef resRef2("a");
@@ -38,7 +38,7 @@ TEST(res_ref, should_be_equatable) {
     EXPECT_NE(resRef2, resRef3);
 }
 
-TEST(res_ref, should_be_comparable) {
+TEST(ResRef, should_be_comparable) {
     // given
     ResRef resRef1("a");
     ResRef resRef2("ab");

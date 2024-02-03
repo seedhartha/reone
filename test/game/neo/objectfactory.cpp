@@ -35,7 +35,7 @@
 
 using namespace reone::game::neo;
 
-TEST(object_factory, should_instantiate_objects_with_incrementing_id) {
+TEST(ObjectFactory, should_instantiate_objects_with_incrementing_id) {
     // given
     ObjectFactory subject;
 

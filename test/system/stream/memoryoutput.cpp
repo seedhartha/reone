@@ -23,7 +23,7 @@
 
 using namespace reone;
 
-TEST(memory_output_stream, should_write_to_byte_buffer) {
+TEST(MemoryOutputStream, should_write_to_byte_buffer) {
     // given
     auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);

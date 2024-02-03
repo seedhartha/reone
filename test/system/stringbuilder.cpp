@@ -23,7 +23,7 @@
 
 using namespace reone;
 
-TEST(string_builder, should_build_a_string) {
+TEST(StringBuilder, should_build_a_string) {
     // given
     auto expectedStr = std::string("Hello, world!");
 

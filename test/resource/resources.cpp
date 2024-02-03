@@ -26,7 +26,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(resources, should_index_providers_and_get_resources_without_caching) {
+TEST(Resources, should_index_providers_and_get_resources_without_caching) {
     // given
 
     auto tmpDirPath = std::filesystem::temp_directory_path();

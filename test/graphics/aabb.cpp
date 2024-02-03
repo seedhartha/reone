@@ -22,7 +22,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-TEST(aabb, should_find_ray_aabb_intersection__intersection_from_within) {
+TEST(AABB, should_find_ray_aabb_intersection__intersection_from_within) {
     // given
     auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
 
@@ -35,7 +35,7 @@ TEST(aabb, should_find_ray_aabb_intersection__intersection_from_within) {
     EXPECT_NEAR(0.0f, distance, 1e-5);
 }
 
-TEST(aabb, should_find_ray_aabb_intersection__intersection_from_up_close) {
+TEST(AABB, should_find_ray_aabb_intersection__intersection_from_up_close) {
     // given
     auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
 
@@ -48,7 +48,7 @@ TEST(aabb, should_find_ray_aabb_intersection__intersection_from_up_close) {
     EXPECT_NEAR(1.0f, distance, 1e-5);
 }
 
-TEST(aabb, should_find_ray_aabb_intersection__intersection_from_too_far) {
+TEST(AABB, should_find_ray_aabb_intersection__intersection_from_too_far) {
     // given
     auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
 
@@ -60,7 +60,7 @@ TEST(aabb, should_find_ray_aabb_intersection__intersection_from_too_far) {
     EXPECT_TRUE(!intersected);
 }
 
-TEST(aabb, should_find_ray_aabb_intersection__no_intersection) {
+TEST(AABB, should_find_ray_aabb_intersection__no_intersection) {
     // given
     auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
 

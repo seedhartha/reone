@@ -23,7 +23,7 @@
 using namespace reone;
 using namespace reone::audio;
 
-TEST(audio_analyzer, should_return_silent_spans_given_mono8_audio_with_sound_and_silence_at_end) {
+TEST(AudioAnalyzer, should_return_silent_spans_given_mono8_audio_with_sound_and_silence_at_end) {
     // given
     unsigned char samples[] = {
         128, 160, 192, 224, 255, 224, 192, 160, //
@@ -45,7 +45,7 @@ TEST(audio_analyzer, should_return_silent_spans_given_mono8_audio_with_sound_and
     EXPECT_NEAR(spans[0].endExclusive, 1.0f, 0.01f);
 }
 
-TEST(audio_analyzer, should_return_waveform_given_mono8_audio_with_sound_and_silence_at_end) {
+TEST(AudioAnalyzer, should_return_waveform_given_mono8_audio_with_sound_and_silence_at_end) {
     // given
     unsigned char samples[] = {
         128, 160, 192, 224, 255, 224, 192, 160, //

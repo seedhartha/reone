@@ -31,7 +31,7 @@ using testing::_;
 using testing::Return;
 using testing::ReturnRef;
 
-TEST(virtual_machine, should_run_script_program__degenerate) {
+TEST(VirtualMachine, should_run_script_program__degenerate) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     auto context = std::make_unique<ExecutionContext>();
@@ -44,7 +44,7 @@ TEST(virtual_machine, should_run_script_program__degenerate) {
     EXPECT_EQ(-1, result);
 }
 
-TEST(virtual_machine, should_run_script_program__boolean_logic) {
+TEST(VirtualMachine, should_run_script_program__boolean_logic) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(0));              // 0
@@ -83,7 +83,7 @@ TEST(virtual_machine, should_run_script_program__boolean_logic) {
     EXPECT_EQ(1, machine.getStackVariable(5).intValue);
 }
 
-TEST(virtual_machine, should_run_script_program__math) {
+TEST(VirtualMachine, should_run_script_program__math) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(-7));              // -7
@@ -132,7 +132,7 @@ TEST(virtual_machine, should_run_script_program__math) {
     EXPECT_NEAR(-14.4f, machine.getStackVariable(0).floatValue, 1e-5);
 }
 
-TEST(virtual_machine, should_run_script_program__comparisons) {
+TEST(VirtualMachine, should_run_script_program__comparisons) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(2));           // 2
@@ -181,7 +181,7 @@ TEST(virtual_machine, should_run_script_program__comparisons) {
     EXPECT_EQ(8, result);
 }
 
-TEST(virtual_machine, should_run_script_program__loop) {
+TEST(VirtualMachine, should_run_script_program__loop) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(0));
@@ -203,7 +203,7 @@ TEST(virtual_machine, should_run_script_program__loop) {
     EXPECT_EQ(10, result);
 }
 
-TEST(virtual_machine, should_run_script_program__action) {
+TEST(VirtualMachine, should_run_script_program__action) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -235,7 +235,7 @@ TEST(virtual_machine, should_run_script_program__action) {
     EXPECT_EQ(1, std::get<0>(invocation[0])[1].intValue);
 }
 
-TEST(virtual_machine, should_run_script_program__action_with_vectors) {
+TEST(VirtualMachine, should_run_script_program__action_with_vectors) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -276,7 +276,7 @@ TEST(virtual_machine, should_run_script_program__action_with_vectors) {
     EXPECT_EQ(1, std::get<0>(invocation[0])[1].intValue);
 }
 
-TEST(virtual_machine, should_run_script_program__action_with_store_state) {
+TEST(VirtualMachine, should_run_script_program__action_with_store_state) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -324,7 +324,7 @@ TEST(virtual_machine, should_run_script_program__action_with_store_state) {
     EXPECT_EQ(5, actionContext->savedState->locals[0].intValue);
 }
 
-TEST(virtual_machine, should_run_script_program__globals) {
+TEST(VirtualMachine, should_run_script_program__globals) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction(InstructionType::RSADDI));
@@ -349,7 +349,7 @@ TEST(virtual_machine, should_run_script_program__globals) {
     EXPECT_EQ(42, result);
 }
 
-TEST(virtual_machine, should_run_script_program__subroutine) {
+TEST(VirtualMachine, should_run_script_program__subroutine) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction(InstructionType::RSADDI));
@@ -374,7 +374,7 @@ TEST(virtual_machine, should_run_script_program__subroutine) {
     EXPECT_EQ(42, result);
 }
 
-TEST(virtual_machine, should_run_script_program__vector_math) {
+TEST(VirtualMachine, should_run_script_program__vector_math) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTF(1.0f));        // 1.0
@@ -425,7 +425,7 @@ TEST(virtual_machine, should_run_script_program__vector_math) {
     EXPECT_NEAR(15015.0f, machine.getStackVariable(0).floatValue, 1e-5);
 }
 
-TEST(virtual_machine, should_run_script_program__structs) {
+TEST(VirtualMachine, should_run_script_program__structs) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));

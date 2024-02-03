@@ -25,7 +25,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-TEST(tga_reader, should_load_tga) {
+TEST(TgaReader, should_load_tga) {
     // given
     auto tgaBytes = StringBuilder()
                         // Header

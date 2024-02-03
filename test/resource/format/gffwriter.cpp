@@ -28,7 +28,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(gff_writer, should_write_gff) {
+TEST(GffWriter, should_write_gff) {
     // given
 
     auto expectedOutput = StringBuilder()

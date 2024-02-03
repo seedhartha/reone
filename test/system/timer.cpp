@@ -21,7 +21,7 @@
 
 using namespace reone;
 
-TEST(timer, should_elapse_after_update) {
+TEST(Timer, should_elapse_after_update) {
     // given
     Timer timer;
     timer.reset(0.9f);

@@ -26,7 +26,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(erf_writer, should_write_erf) {
+TEST(ErfWriter, should_write_erf) {
     // given
 
     auto expectedOutput = StringBuilder()

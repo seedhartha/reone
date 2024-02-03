@@ -22,7 +22,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-TEST(walkmesh, should_find_ray_walkmesh_intersection__intersection_from_close) {
+TEST(Walkmesh, should_find_ray_walkmesh_intersection__intersection_from_close) {
     // given
     auto walkmesh = Walkmesh();
     walkmesh.add(Walkmesh::Face {0, 0, std::vector<glm::vec3> {glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)}, glm::vec3(1.0f, 0.0f, 0.0f)});
@@ -55,7 +55,7 @@ TEST(walkmesh, should_find_ray_walkmesh_intersection__intersection_from_close) {
     EXPECT_NEAR(1.0f, distance, 1e-5);
 }
 
-TEST(walkmesh, should_find_ray_walkmesh_intersection__intersection_from_far) {
+TEST(Walkmesh, should_find_ray_walkmesh_intersection__intersection_from_far) {
     // given
     auto walkmesh = Walkmesh();
     walkmesh.add(Walkmesh::Face {0, 0, std::vector<glm::vec3> {glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)}, glm::vec3(1.0f, 0.0f, 0.0f)});
@@ -86,7 +86,7 @@ TEST(walkmesh, should_find_ray_walkmesh_intersection__intersection_from_far) {
     EXPECT_TRUE(!static_cast<bool>(face));
 }
 
-TEST(walkmesh, should_find_ray_walkmesh_intersection__no_intersection) {
+TEST(Walkmesh, should_find_ray_walkmesh_intersection__no_intersection) {
     // given
     auto walkmesh = Walkmesh();
     walkmesh.add(Walkmesh::Face {0, 0, std::vector<glm::vec3> {glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)}, glm::vec3(1.0f, 0.0f, 0.0f)});

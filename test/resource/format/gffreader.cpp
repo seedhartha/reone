@@ -27,7 +27,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(gff_reader, should_read_gff) {
+TEST(GffReader, should_read_gff) {
     // given
 
     auto input = StringBuilder()

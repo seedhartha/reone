@@ -25,7 +25,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(tlk_reader, should_read_tlk) {
+TEST(TlkReader, should_read_tlk) {
     // given
 
     auto input = StringBuilder()

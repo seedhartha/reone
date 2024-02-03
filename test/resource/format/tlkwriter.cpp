@@ -27,7 +27,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(tlk_writer, should_write_tlk) {
+TEST(TlkWriter, should_write_tlk) {
     // given
 
     auto expectedOutput = StringBuilder()

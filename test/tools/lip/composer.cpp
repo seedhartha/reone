@@ -26,7 +26,7 @@
 
 using namespace reone;
 
-TEST(pronouncing_dictionary, should_load_phonemes_from_stream) {
+TEST(PronouncingDictionary, should_load_phonemes_from_stream) {
     // given
     auto bytes = ByteBuffer();
     auto ostream = MemoryOutputStream(bytes);
@@ -45,7 +45,7 @@ TEST(pronouncing_dictionary, should_load_phonemes_from_stream) {
     EXPECT_EQ(phonemes, (std::vector<std::string> {"hh", "ah0", "l", "ow1"}));
 }
 
-TEST(pronouncing_dict, should_load_russian_phonemes_from_stream) {
+TEST(PronouncingDictionary, should_load_russian_phonemes_from_stream) {
     // given
     auto bytes = ByteBuffer();
     auto ostream = MemoryOutputStream(bytes);
@@ -63,7 +63,7 @@ TEST(pronouncing_dict, should_load_russian_phonemes_from_stream) {
     EXPECT_EQ(phonemes, (std::vector<std::string> {"p", "rj", "i0", "vj", "e1", "t"}));
 }
 
-TEST(lip_composer, should_compose_lip_file_from_text_with_implicit_word_groups_and_empty_silent_spans) {
+TEST(LipComposer, should_compose_lip_file_from_text_with_implicit_word_groups_and_empty_silent_spans) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
         {"hello", {"hh", "ah0", "l", "ow1"}}, //
@@ -101,7 +101,7 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_implicit_word_groups_a
     EXPECT_EQ(keyframes[8].shape, 0);
 }
 
-TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_word_groups_and_silent_spans) {
+TEST(LipComposer, should_compose_lip_file_from_text_with_explicit_word_groups_and_silent_spans) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
         {"hello", {"hh", "ah0", "l", "ow1"}},   //
@@ -176,7 +176,7 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_word_groups_a
     EXPECT_EQ(keyframes[23].shape, 0);
 }
 
-TEST(lip_composer, should_compose_lip_file_from_text_with_all_phonemes) {
+TEST(LipComposer, should_compose_lip_file_from_text_with_all_phonemes) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {{
         "all", {"aa", "ae", "ah", "ao", "aw", "ay", "b", "ch", "d", "dh", //
@@ -278,7 +278,7 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_all_phonemes) {
     EXPECT_EQ(keyframes[39].shape, 0);
 }
 
-TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_pauses) {
+TEST(LipComposer, should_compose_lip_file_from_text_with_explicit_pauses) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
         {"hello", {"hh", "ah0", "l", "ow1"}}, //
@@ -318,7 +318,7 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_pauses) {
     EXPECT_EQ(keyframes[9].shape, 0);
 }
 
-TEST(lip_composer, should_compose_lip_file_from_russian_text) {
+TEST(LipComposer, should_compose_lip_file_from_russian_text) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
         {u8"все", {

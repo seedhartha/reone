@@ -24,7 +24,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-TEST(txi_reader, should_load_txi) {
+TEST(TxiReader, should_load_txi) {
     // given
     auto txiBytes = StringBuilder()
                         .append("blending additive")

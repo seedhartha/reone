@@ -25,7 +25,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(strings, should_init_talktable_and_get_string_and_sound) {
+TEST(Strings, should_init_talktable_and_get_string_and_sound) {
     // given
 
     auto tmpDirPath = std::filesystem::temp_directory_path();

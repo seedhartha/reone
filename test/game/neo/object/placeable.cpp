@@ -29,7 +29,7 @@ using namespace reone::game::neo;
 using namespace reone::resource;
 using namespace reone::resource::generated;
 
-TEST(placeable, should_load_utp) {
+TEST(Placeable, should_load_utp) {
     // given
     Placeable placeable {0, ""};
     UTP utp;

@@ -25,7 +25,7 @@
 
 using namespace reone;
 
-TEST(binary_reader, should_seek_ignore_and_tell_in_little_endian_stream) {
+TEST(BinaryReader, should_seek_ignore_and_tell_in_little_endian_stream) {
     // given
     auto input = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\x00'};
     auto stream = MemoryInputStream(input);
@@ -41,7 +41,7 @@ TEST(binary_reader, should_seek_ignore_and_tell_in_little_endian_stream) {
     EXPECT_EQ(expectedPos, actualPos);
 }
 
-TEST(binary_reader, should_read_from_little_endian_stream) {
+TEST(BinaryReader, should_read_from_little_endian_stream) {
     // given
     auto input = StringBuilder()
                      .append("\xff", 1)
@@ -104,7 +104,7 @@ TEST(binary_reader, should_read_from_little_endian_stream) {
     EXPECT_EQ(expectedBytes, actualBytes) << notEqualMessage(expectedBytes, actualBytes);
 }
 
-TEST(binary_reader, should_read_from_big_endian_stream) {
+TEST(BinaryReader, should_read_from_big_endian_stream) {
     // given
     auto input = StringBuilder()
                      .append("\xff\x01", 2)

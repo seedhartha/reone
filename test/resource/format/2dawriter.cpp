@@ -28,7 +28,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(two_da_writer, should_write_two_da) {
+TEST(TwoDAWriter, should_write_two_da) {
     // given
 
     auto expectedOutput = StringBuilder()

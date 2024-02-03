@@ -27,7 +27,7 @@
 using namespace reone;
 using namespace reone::script;
 
-TEST(ncs_writer, should_write_ncs) {
+TEST(NcsWriter, should_write_ncs) {
     // given
 
     auto expectedOutput = StringBuilder()

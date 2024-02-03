@@ -23,7 +23,7 @@ using namespace reone;
 using namespace reone::game;
 using namespace reone::resource;
 
-TEST(pathfinder, should_find_shortest_path) {
+TEST(Pathfinder, should_find_shortest_path) {
     // given
     std::vector<Path::Point> points {{0.0f, 0.0f, {1, 4, 5}},
                                      {1.0f, 0.0f, {0, 2, 4, 5}},

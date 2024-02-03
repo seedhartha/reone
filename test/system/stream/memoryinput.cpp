@@ -24,7 +24,7 @@
 
 using namespace reone;
 
-TEST(memory_input_stream, should_read_from_byte_buffer) {
+TEST(MemoryInputStream, should_read_from_byte_buffer) {
     // given
     auto bytes = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
     auto stream = MemoryInputStream(bytes);

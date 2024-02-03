@@ -31,7 +31,7 @@ using namespace reone::game::neo;
 using namespace reone::resource;
 using namespace reone::resource::generated;
 
-TEST(creature, should_load_utc) {
+TEST(Creature, should_load_utc) {
     // given
     Creature creature {0, ""};
     UTC utc;
@@ -55,7 +55,7 @@ TEST(creature, should_load_utc) {
     EXPECT_EQ(creature.appearance().texture.value(), std::string {"n_mandalorian01"});
 }
 
-TEST(creature, should_load_utc_with_body_and_head_appearance) {
+TEST(Creature, should_load_utc_with_body_and_head_appearance) {
     // given
     Creature creature {0, ""};
     UTC utc;
@@ -82,7 +82,7 @@ TEST(creature, should_load_utc_with_body_and_head_appearance) {
     EXPECT_EQ(creature.appearance().texture.value(), std::string {"pmbal01"});
 }
 
-TEST(creature, should_equip_item) {
+TEST(Creature, should_equip_item) {
     // given
     Creature creature {0, ""};
     Item item {1, ""};
@@ -96,7 +96,7 @@ TEST(creature, should_equip_item) {
     EXPECT_EQ(equipment.at(InventorySlots::rightWeapon).get(), item);
 }
 
-TEST(creature, should_unequip_previously_equipped_item_on_equip) {
+TEST(Creature, should_unequip_previously_equipped_item_on_equip) {
     // given
     Creature creature {0, ""};
     Item item {1, ""};
@@ -115,7 +115,7 @@ TEST(creature, should_unequip_previously_equipped_item_on_equip) {
     EXPECT_EQ(items.front().get(), item);
 }
 
-TEST(creature, should_unequip_item) {
+TEST(Creature, should_unequip_item) {
     // given
     Creature creature {0, ""};
     Item item {1, ""};
@@ -132,7 +132,7 @@ TEST(creature, should_unequip_item) {
     EXPECT_EQ(items.front().get(), item);
 }
 
-TEST(creature, should_give_item) {
+TEST(Creature, should_give_item) {
     // given
     Creature creature {0, ""};
     Item item {1, ""};

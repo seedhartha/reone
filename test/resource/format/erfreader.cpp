@@ -24,7 +24,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(erf_reader, should_read_erf) {
+TEST(ErfReader, should_read_erf) {
     // given
 
     auto input = StringBuilder()

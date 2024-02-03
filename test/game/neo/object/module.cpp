@@ -31,7 +31,7 @@ using namespace reone::resource::generated;
 using testing::_;
 using testing::ReturnRef;
 
-TEST(module, should_load_ifo) {
+TEST(Module, should_load_ifo) {
     // given
     MockObjectLoader objectLoader;
     Module module {0, ""};
@@ -54,7 +54,7 @@ TEST(module, should_load_ifo) {
     EXPECT_EQ(module.entryFacing(), glm::radians(-135.0f));
 }
 
-TEST(module, should_throw_for_area_when_has_no_areas) {
+TEST(Module, should_throw_for_area_when_has_no_areas) {
     // given
     Module module {0, ""};
 
@@ -73,7 +73,7 @@ public:
 
     MOCK_METHOD(void, update, (IActionExecutor & actionExecutor, float), (override));
 };
-TEST(module, should_update_current_area_on_update) {
+TEST(Module, should_update_current_area_on_update) {
     // given
     MockObjectLoader objectLoader;
     MockActionExecutor actionExecutor;
@@ -90,7 +90,7 @@ TEST(module, should_update_current_area_on_update) {
     module.update(actionExecutor, 1.0f);
 }
 
-TEST(module, should_find_object_by_id) {
+TEST(Module, should_find_object_by_id) {
     // given
     Creature creature {2, ""};
     Area area {1, ""};

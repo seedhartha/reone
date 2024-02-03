@@ -31,7 +31,7 @@ using namespace reone::audio;
 using testing::_;
 using testing::Return;
 
-TEST(wav_reader, should_load_plain_wav) {
+TEST(WavReader, should_load_plain_wav) {
     // given
     auto wavBytes = StringBuilder()
                         // Header
@@ -71,7 +71,7 @@ TEST(wav_reader, should_load_plain_wav) {
     EXPECT_EQ(32767, samples[0]);
 }
 
-TEST(wav_reader, should_load_obfuscated_wav) {
+TEST(WavReader, should_load_obfuscated_wav) {
     // given
     auto wavBytes = StringBuilder()
                         // Header
@@ -121,7 +121,7 @@ TEST(wav_reader, should_load_obfuscated_wav) {
     EXPECT_EQ(99, samples[7]);
 }
 
-TEST(wav_reader, should_load_obfuscated_mp3) {
+TEST(WavReader, should_load_obfuscated_mp3) {
     // given
     auto wavBytes = StringBuilder()
                         // Header

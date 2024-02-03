@@ -39,7 +39,7 @@ using namespace reone::scene;
 using testing::_;
 using testing::ReturnRef;
 
-TEST(model_scene_node, should_build_from_model) {
+TEST(ModelSceneNode, should_build_from_model) {
     // given
     auto graphicsOpt = GraphicsOptions();
     auto pipelineFactory = MockRenderPipelineFactory();
@@ -106,7 +106,7 @@ TEST(model_scene_node, should_build_from_model) {
     EXPECT_EQ(static_cast<int>(SceneNodeType::Emitter), static_cast<int>(emitterSceneNode->type()));
 }
 
-TEST(model_scene_node, should_play_single_fire_forget_animation) {
+TEST(ModelSceneNode, should_play_single_fire_forget_animation) {
     // given
     auto graphicsOpt = GraphicsOptions();
     auto pipelineFactory = MockRenderPipelineFactory();
@@ -159,7 +159,7 @@ TEST(model_scene_node, should_play_single_fire_forget_animation) {
     EXPECT_NEAR(3.0f, rootPosition.z, 1e-5);
 }
 
-TEST(model_scene_node, should_play_single_looping_animation) {
+TEST(ModelSceneNode, should_play_single_looping_animation) {
     // given
     auto graphicsOpt = GraphicsOptions();
     auto pipelineFactory = MockRenderPipelineFactory();
@@ -211,7 +211,7 @@ TEST(model_scene_node, should_play_single_looping_animation) {
     EXPECT_NEAR(3.0f, rootPosition.z, 1e-5);
 }
 
-TEST(model_scene_node, should_play_two_overlayed_animations) {
+TEST(ModelSceneNode, should_play_two_overlayed_animations) {
     // given
     auto graphicsOpt = GraphicsOptions();
     auto pipelineFactory = MockRenderPipelineFactory();
@@ -281,7 +281,7 @@ TEST(model_scene_node, should_play_two_overlayed_animations) {
     EXPECT_NEAR(3.75f, dummyPosition.z, 1e-5);
 }
 
-TEST(model_scene_node, hould_transition_between_two_animations) {
+TEST(ModelSceneNode, hould_transition_between_two_animations) {
     // given
     auto graphicsOpt = GraphicsOptions();
     auto pipelineFactory = MockRenderPipelineFactory();

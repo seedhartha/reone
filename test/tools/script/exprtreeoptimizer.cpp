@@ -21,7 +21,7 @@
 
 using namespace reone::script;
 
-TEST(expression_tree_optimizer, should_optimize_expression_tree) {
+TEST(ExpressionTreeOptimizer, should_optimize_expression_tree) {
     // given
 
     // when

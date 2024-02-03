@@ -33,7 +33,7 @@ using namespace reone::resource::generated;
 using testing::_;
 using testing::ReturnRef;
 
-TEST(area, should_load_are_and_git) {
+TEST(Area, should_load_are_and_git) {
     // given
     MockObjectLoader objectLoader;
     Area area {0, ""};
@@ -101,7 +101,7 @@ TEST(area, should_load_are_and_git) {
     EXPECT_EQ(area.rooms().at(1).visibleRooms, (std::set {std::string {"m01aa_01a"}}));
 }
 
-TEST(area, should_add_objects) {
+TEST(Area, should_add_objects) {
     // given
     Area area {0, ""};
     Camera camera {1, ""};
@@ -169,7 +169,7 @@ public:
     MOCK_METHOD(void, update, (IActionExecutor &, float), (override));
 };
 
-TEST(area, should_update_objects_on_update) {
+TEST(Area, should_update_objects_on_update) {
     // given
     MockActionExecutor actionExecutor;
     Area area {0, ""};
@@ -181,7 +181,7 @@ TEST(area, should_update_objects_on_update) {
     area.update(actionExecutor, 1.0f);
 }
 
-TEST(area, should_find_object_by_id) {
+TEST(Area, should_find_object_by_id) {
     // given
     Creature creature {1, ""};
     Area area {0, ""};
@@ -201,7 +201,7 @@ TEST(area, should_find_object_by_id) {
     EXPECT_EQ(found->get(), creature);
 }
 
-TEST(area, should_find_object_by_tag) {
+TEST(Area, should_find_object_by_tag) {
     // given
     Creature creature1 {1, "tag1"};
     Creature creature2 {2, "tag2"};

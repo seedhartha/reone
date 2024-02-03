@@ -31,7 +31,7 @@ public:
     void optimize(ExpressionTree &tree) {}
 };
 
-TEST(expression_tree, should_decompile_minimal_program_with_main) {
+TEST(ExpressionTree, should_decompile_minimal_program_with_main) {
     // given
 
     auto program = ScriptProgram("");
@@ -85,7 +85,7 @@ TEST(expression_tree, should_decompile_minimal_program_with_main) {
     EXPECT_EQ(nullptr, func1expr1ret.value);
 }
 
-TEST(expression_tree, should_decompile_program_with_starting_conditional_and_no_globals) {
+TEST(ExpressionTree, should_decompile_program_with_starting_conditional_and_no_globals) {
     // given
 
     auto program = ScriptProgram("");
@@ -144,7 +144,7 @@ TEST(expression_tree, should_decompile_program_with_starting_conditional_and_no_
     EXPECT_EQ(nullptr, static_cast<ReturnExpression *>(&func1expr2)->value);
 }
 
-TEST(expression_tree, should_decompile_program_with_main_and_globals) {
+TEST(ExpressionTree, should_decompile_program_with_main_and_globals) {
     // given
 
     auto program = ScriptProgram("");
@@ -206,7 +206,7 @@ TEST(expression_tree, should_decompile_program_with_main_and_globals) {
     EXPECT_EQ(ExpressionType::Return, func1expr3.type);
 }
 
-TEST(expression_tree, should_decompile_program_with_conditionals) {
+TEST(ExpressionTree, should_decompile_program_with_conditionals) {
     // given
 
     auto program = ScriptProgram("");
@@ -275,7 +275,7 @@ TEST(expression_tree, should_decompile_program_with_conditionals) {
     EXPECT_EQ(ExpressionType::Return, func1.block->expressions[6]->type);
 }
 
-TEST(expression_tree, should_decompile_program_with_a_loop) {
+TEST(ExpressionTree, should_decompile_program_with_a_loop) {
     // given
 
     auto program = ScriptProgram("");
@@ -341,7 +341,7 @@ TEST(expression_tree, should_decompile_program_with_a_loop) {
     EXPECT_EQ(ExpressionType::Return, func1.block->expressions[9]->type);
 }
 
-TEST(expression_tree, should_decompile_program_with_vectors) {
+TEST(ExpressionTree, should_decompile_program_with_vectors) {
     // given
 
     auto program = ScriptProgram("");

@@ -24,7 +24,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-TEST(tpc_reader, should_load_tpc) {
+TEST(TpcReader, should_load_tpc) {
     // given
     auto tpcBytes = StringBuilder()
                         // Header

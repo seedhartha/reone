@@ -25,7 +25,7 @@
 
 using namespace reone;
 
-TEST(binary_writer, should_write_to_little_endian_stream) {
+TEST(BinaryWriter, should_write_to_little_endian_stream) {
     // given
     auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
@@ -61,7 +61,7 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
     EXPECT_EQ(expectedOutput, output) << notEqualMessage(expectedOutput, output);
 }
 
-TEST(binary_writer, should_write_to_big_endian_stream) {
+TEST(BinaryWriter, should_write_to_big_endian_stream) {
     // given
     auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);

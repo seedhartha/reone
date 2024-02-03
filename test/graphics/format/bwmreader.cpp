@@ -24,7 +24,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-TEST(bwm_reader, should_load_pwk_dwk) {
+TEST(BwmReader, should_load_pwk_dwk) {
     // given
     auto bwmBytes = StringBuilder()
                         .append("BWM V1.0")
@@ -61,7 +61,7 @@ TEST(bwm_reader, should_load_pwk_dwk) {
     auto walkmesh = reader.walkmesh();
 }
 
-TEST(bwm_reader, should_load_wok) {
+TEST(BwmReader, should_load_wok) {
     // given
     auto wokBytes = StringBuilder()
                         .append("BWM V1.0")

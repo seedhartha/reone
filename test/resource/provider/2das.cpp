@@ -26,7 +26,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(two_das, should_get_2da_with_caching) {
+TEST(TwoDAs, should_get_2da_with_caching) {
     // given
 
     auto resBytes = ByteBuffer();

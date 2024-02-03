@@ -21,7 +21,7 @@
 
 using namespace reone;
 
-TEST(file_util, should_find_file_ignoring_case) {
+TEST(FileUtilities, should_find_file_ignoring_case) {
     // given
     auto tmpDirPath = std::filesystem::temp_directory_path();
     tmpDirPath.append("reone_test_file_util");

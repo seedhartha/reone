@@ -24,7 +24,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(rim_reader, should_read_rim) {
+TEST(RimReader, should_read_rim) {
     // given
 
     auto input = StringBuilder()

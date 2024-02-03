@@ -38,7 +38,7 @@ struct CompositeKeyComparer {
     }
 };
 
-TEST(cache, should_create_and_cache_value_when_get_called_twice_with_the_same_key) {
+TEST(Cache, should_create_and_cache_value_when_get_called_twice_with_the_same_key) {
     // given
     Cache<std::string, int> cache;
     int counter = 0;
@@ -55,7 +55,7 @@ TEST(cache, should_create_and_cache_value_when_get_called_twice_with_the_same_ke
     EXPECT_TRUE(value3 && ((*value3) == 0));
 }
 
-TEST(cache, should_create_and_cache_complex_value_using_custom_comparer) {
+TEST(Cache, should_create_and_cache_complex_value_using_custom_comparer) {
     // given
     Cache<CompositeKey, int, CompositeKeyComparer> cache;
     int counter = 0;
@@ -74,7 +74,7 @@ TEST(cache, should_create_and_cache_complex_value_using_custom_comparer) {
     EXPECT_TRUE(value4 && ((*value4) == 0));
 }
 
-TEST(cache, should_clear_cached_items) {
+TEST(Cache, should_clear_cached_items) {
     // given
     Cache<int, int> cache;
 

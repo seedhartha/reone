@@ -21,7 +21,7 @@
 
 using namespace reone;
 
-TEST(thread_pool, should_execute_enqueued_tasks_in_parallel) {
+TEST(ThreadPool, should_execute_enqueued_tasks_in_parallel) {
     // given
     ThreadPool pool;
     pool.init();
@@ -51,7 +51,7 @@ TEST(thread_pool, should_execute_enqueued_tasks_in_parallel) {
     EXPECT_EQ(2, shared);
 }
 
-TEST(thread_pool, should_cancel_enqueued_task) {
+TEST(ThreadPool, should_cancel_enqueued_task) {
     // given
     ThreadPool pool;
     pool.init();

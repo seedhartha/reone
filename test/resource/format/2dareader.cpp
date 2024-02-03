@@ -26,7 +26,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-TEST(two_da_reader, should_read_two_da) {
+TEST(TwoDAReader, should_read_two_da) {
     // given
 
     auto input = StringBuilder()

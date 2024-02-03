@@ -23,7 +23,7 @@
 using namespace reone::game;
 using namespace reone::game::neo;
 
-TEST(inventory, should_add_item) {
+TEST(Inventory, should_add_item) {
     // given
     Inventory inventory {0, ""};
     Item item {1, ""};
