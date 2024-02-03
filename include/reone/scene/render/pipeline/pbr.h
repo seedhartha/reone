@@ -31,6 +31,7 @@ public:
                       graphics::MeshRegistry &meshRegistry,
                       graphics::PBRTextures &pbrTextures,
                       graphics::ShaderRegistry &shaderRegistry,
+                      graphics::IStatistic &statistic,
                       graphics::TextureRegistry &textureRegistry,
                       graphics::Uniforms &uniforms) :
         RenderPipelineBase(
@@ -39,6 +40,7 @@ public:
             context,
             meshRegistry,
             shaderRegistry,
+            statistic,
             textureRegistry,
             uniforms),
         _pbrTextures(pbrTextures) {

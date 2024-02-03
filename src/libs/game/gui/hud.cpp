@@ -319,7 +319,7 @@ void HUD::renderHealth(int memberIndex) {
         locals.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpColor));
-    _services.graphics.meshRegistry.get(MeshName::quad).draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw(_services.graphics.statistic);
 }
 
 void HUD::toggleCombat(bool enabled) {

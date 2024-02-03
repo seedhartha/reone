@@ -30,6 +30,7 @@ public:
                         graphics::Context &context,
                         graphics::MeshRegistry &meshRegistry,
                         graphics::ShaderRegistry &shaderRegistry,
+                        graphics::IStatistic &statistic,
                         graphics::TextureRegistry &textureRegistry,
                         graphics::Uniforms &uniforms) :
         RenderPipelineBase(
@@ -38,6 +39,7 @@ public:
             context,
             meshRegistry,
             shaderRegistry,
+            statistic,
             textureRegistry,
             uniforms) {
     }

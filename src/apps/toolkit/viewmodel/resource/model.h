@@ -61,7 +61,7 @@ public:
                            resource::ResourceModule &resourceSvc,
                            scene::SceneModule &sceneSvc) :
         _systemSvc(systemSvc),
-        _graphicsSvc(graphicsSvc),
+        _graphicsModule(graphicsSvc),
         _resourceSvc(resourceSvc),
         _sceneSvc(sceneSvc) {
     }
@@ -88,7 +88,7 @@ public:
 
 private:
     SystemModule &_systemSvc;
-    graphics::GraphicsModule &_graphicsSvc;
+    graphics::GraphicsModule &_graphicsModule;
     resource::ResourceModule &_resourceSvc;
     scene::SceneModule &_sceneSvc;
 

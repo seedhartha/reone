@@ -127,7 +127,7 @@ void Profiler::renderBackground() {
         locals.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         locals.color.a = 0.5f;
     });
-    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw(_graphicsSvc.statistic);
 }
 
 void Profiler::renderFrameTimes(const TimedThread &thread, int xOffset) {
@@ -170,7 +170,7 @@ void Profiler::renderFrameTimes(const TimedThread &thread, int xOffset) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw(_graphicsSvc.statistic);
 
     auto targetTime = str(boost::format("%.04fs (%dfps)") % oneOverFpsTarget % static_cast<int>(_fpsTarget));
     _font->render(

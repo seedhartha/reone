@@ -56,7 +56,7 @@ void ModelResourceViewModel::openModel(const ResourceId &id, IInputStream &mdl) 
         throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef.value());
     }
     auto mdx = MemoryInputStream(mdxRes->data);
-    auto reader = MdlMdxReader(mdl, mdx, _graphicsSvc.statistic());
+    auto reader = MdlMdxReader(mdl, mdx, _graphicsModule.statistic());
     reader.load();
 
     auto &scene = _sceneSvc.graphs().get(kSceneMain);
@@ -111,12 +111,12 @@ void ModelResourceViewModel::render3D(int w, int h) {
 
     auto &scene = _sceneSvc.graphs().get(kSceneMain);
     auto &output = scene.render(glm::ivec2(w, h));
-    _graphicsSvc.uniforms().setLocals(std::bind(&LocalUniforms::reset, std::placeholders::_1));
-    _graphicsSvc.context().useProgram(_graphicsSvc.shaderRegistry().get(ShaderProgramId::ndcTexture));
-    _graphicsSvc.context().bindTexture(output);
-    _graphicsSvc.context().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
-        _graphicsSvc.context().clearColorDepth();
-        _graphicsSvc.meshRegistry().get(MeshName::quadNDC).draw();
+    _graphicsModule.uniforms().setLocals(std::bind(&LocalUniforms::reset, std::placeholders::_1));
+    _graphicsModule.context().useProgram(_graphicsModule.shaderRegistry().get(ShaderProgramId::ndcTexture));
+    _graphicsModule.context().bindTexture(output);
+    _graphicsModule.context().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
+        _graphicsModule.context().clearColorDepth();
+        _graphicsModule.meshRegistry().get(MeshName::quadNDC).draw(_graphicsModule.statistic());
     });
 }
 

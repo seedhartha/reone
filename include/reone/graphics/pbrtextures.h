@@ -52,6 +52,7 @@ namespace graphics {
 class IContext;
 class IMeshRegistry;
 class IShaderRegistry;
+class IStatistic;
 class IUniforms;
 
 class IPBRTextures {
@@ -70,10 +71,12 @@ public:
     PBRTextures(IContext &context,
                 IMeshRegistry &meshRegistry,
                 IShaderRegistry &shaderRegistry,
+                IStatistic &statistic,
                 IUniforms &uniforms) :
         _context(context),
         _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
+        _statistic(statistic),
         _uniforms(uniforms) {
     }
 
@@ -107,6 +110,7 @@ private:
     IContext &_context;
     IMeshRegistry &_meshRegistry;
     IShaderRegistry &_shaderRegistry;
+    IStatistic &_statistic;
     IUniforms &_uniforms;
 
     std::shared_ptr<Texture> _brdfLUT;

@@ -221,7 +221,7 @@ void Console::renderBackground() {
         locals.color.a = 0.5f;
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpColor));
-    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw(_graphicsSvc.statistic);
 }
 
 void Console::renderLines() {

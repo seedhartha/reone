@@ -88,7 +88,7 @@ void PBRTextures::initBRDFLUT() {
             locals.reset();
         });
         _context.clearColorDepth();
-        _meshRegistry.get(MeshName::quadNDC).draw();
+        _meshRegistry.get(MeshName::quadNDC).draw(_statistic);
         _context.resetDrawFramebuffer();
     });
 }
@@ -165,7 +165,7 @@ void PBRTextures::refreshIrradianceMap(const EnvMapDerivedRequest &request, int 
                 globals.view = kCubeMapViews[i];
             });
             _context.clearColorDepth();
-            _meshRegistry.get(MeshName::cubemap).draw();
+            _meshRegistry.get(MeshName::cubemap).draw(_statistic);
         }
     });
     _context.resetDrawFramebuffer();
@@ -194,7 +194,7 @@ void PBRTextures::refreshPrefilteredEnvMap(const EnvMapDerivedRequest &request, 
                 float roughness = mip / static_cast<float>(kNumPrefilteredMipMaps - 1);
                 shader.setUniform("uRoughness", mip);
                 _context.clearColorDepth();
-                _meshRegistry.get(MeshName::cubemap).draw();
+                _meshRegistry.get(MeshName::cubemap).draw(_statistic);
             }
         });
     }

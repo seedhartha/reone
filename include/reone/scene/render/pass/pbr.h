@@ -34,6 +34,7 @@ public:
     PBRRenderPass(graphics::GraphicsOptions &options,
                   graphics::IContext &context,
                   graphics::IShaderRegistry &shaderRegistry,
+                  graphics::IStatistic &statistic,
                   graphics::IMeshRegistry &meshRegistry,
                   graphics::IPBRTextures &pbrTextures,
                   graphics::ITextureRegistry &textureRegistry,
@@ -41,6 +42,7 @@ public:
         _options(options),
         _context(context),
         _shaderRegistry(shaderRegistry),
+        _statistic(statistic),
         _meshRegistry(meshRegistry),
         _pbrTextures(pbrTextures),
         _textureRegistry(textureRegistry),
@@ -100,6 +102,7 @@ private:
     graphics::GraphicsOptions &_options;
     graphics::IContext &_context;
     graphics::IShaderRegistry &_shaderRegistry;
+    graphics::IStatistic &_statistic;
     graphics::IMeshRegistry &_meshRegistry;
     graphics::IPBRTextures &_pbrTextures;
     graphics::ITextureRegistry &_textureRegistry;

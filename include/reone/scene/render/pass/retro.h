@@ -34,12 +34,14 @@ public:
     RetroRenderPass(graphics::GraphicsOptions &options,
                     graphics::IContext &context,
                     graphics::IShaderRegistry &shaderRegistry,
+                    graphics::IStatistic &statistic,
                     graphics::IMeshRegistry &meshRegistry,
                     graphics::ITextureRegistry &textureRegistry,
                     graphics::IUniforms &uniforms) :
         _options(options),
         _context(context),
         _shaderRegistry(shaderRegistry),
+        _statistic(statistic),
         _meshRegistry(meshRegistry),
         _textureRegistry(textureRegistry),
         _uniforms(uniforms) {
@@ -98,6 +100,7 @@ private:
     graphics::GraphicsOptions &_options;
     graphics::IContext &_context;
     graphics::IShaderRegistry &_shaderRegistry;
+    graphics::IStatistic &_statistic;
     graphics::IMeshRegistry &_meshRegistry;
     graphics::ITextureRegistry &_textureRegistry;
     graphics::IUniforms &_uniforms;

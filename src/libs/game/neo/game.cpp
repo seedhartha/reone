@@ -238,7 +238,7 @@ void Game::render() {
     auto &program = _graphicsSvc.shaderRegistry.get(ShaderProgramId::ndcTexture);
     _graphicsSvc.context.useProgram(program);
     _graphicsSvc.context.bindTexture(output);
-    _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw(_graphicsSvc.statistic);
 
     // Overlays
     _selectionOverlay->render(screenSize);

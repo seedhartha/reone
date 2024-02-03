@@ -23,6 +23,8 @@ namespace reone {
 
 namespace graphics {
 
+class IStatistic;
+
 class Context;
 class MeshRegistry;
 class ShaderRegistry;
@@ -49,11 +51,13 @@ public:
         graphics::Context &context,
         graphics::MeshRegistry &meshRegistry,
         graphics::ShaderRegistry &shaderRegistry,
+        graphics::IStatistic &statistic,
         Textures &textures,
         graphics::Uniforms &uniforms) :
         _context(context),
         _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
+        _statistic(statistic),
         _textures(textures),
         _uniforms(uniforms) {
     }
@@ -79,6 +83,7 @@ private:
     graphics::Context &_context;
     graphics::MeshRegistry &_meshRegistry;
     graphics::ShaderRegistry &_shaderRegistry;
+    graphics::IStatistic &_statistic;
     Textures &_textures;
     graphics::Uniforms &_uniforms;
 

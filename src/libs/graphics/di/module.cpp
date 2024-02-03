@@ -32,6 +32,7 @@ void GraphicsModule::init() {
         *_context,
         *_meshRegistry,
         *_shaderRegistry,
+        *_statistic,
         *_uniforms);
 
     _services = std::make_unique<GraphicsServices>(

@@ -175,8 +175,7 @@ static std::unique_ptr<Mesh> makeMesh(std::vector<Mesh::Vertex> vertices,
     auto mesh = std::make_unique<Mesh>(
         std::move(vertices),
         std::move(vertexLayout),
-        std::move(faces),
-        statistic);
+        std::move(faces));
     mesh->init();
     return mesh;
 }

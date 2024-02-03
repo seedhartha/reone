@@ -27,6 +27,7 @@ class IContext;
 class IMeshRegistry;
 class IPBRTextures;
 class IShaderRegistry;
+class IStatistic;
 class ITextureRegistry;
 class IUniforms;
 class Mesh;

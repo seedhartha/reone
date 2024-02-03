@@ -411,7 +411,7 @@ void Game::renderScene() {
     _services.graphics.uniforms.setLocals(std::bind(&LocalUniforms::reset, std::placeholders::_1));
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::ndcTexture));
     _services.graphics.context.bindTexture(output);
-    _services.graphics.meshRegistry.get(MeshName::quadNDC).draw();
+    _services.graphics.meshRegistry.get(MeshName::quadNDC).draw(_services.graphics.statistic);
 }
 
 void Game::toggleInGameCameraType() {

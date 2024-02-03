@@ -165,6 +165,7 @@ Texture &RetroRenderPipeline::render() {
     auto pass = RetroRenderPass {_options,
                                  _context,
                                  _shaderRegistry,
+                                 _statistic,
                                  _meshRegistry,
                                  _textureRegistry,
                                  _uniforms};
@@ -245,7 +246,7 @@ Texture &RetroRenderPipeline::render() {
         _context.bindTexture(*_targets.transparentAccum, TextureUnits::oitAccum);
         _context.bindTexture(*_targets.transparentRevealage, TextureUnits::oitRevealage);
         _context.clearColorDepth();
-        _meshRegistry.get(MeshName::quadNDC).draw();
+        _meshRegistry.get(MeshName::quadNDC).draw(_statistic);
 
         if (_options.fxaa && _options.sharpen) {
             applyFXAA(*_targets.outputColor, *_targets.ping, _targetSize);

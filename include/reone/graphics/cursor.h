@@ -21,6 +21,8 @@ namespace reone {
 
 namespace graphics {
 
+class IStatistic;
+
 class Context;
 class MeshRegistry;
 class ShaderRegistry;
@@ -35,13 +37,15 @@ public:
         Context &context,
         MeshRegistry &meshRegistry,
         ShaderRegistry &shaderRegistry,
-        Uniforms &uniforms) :
+        Uniforms &uniforms,
+        IStatistic &statistic) :
         _up(std::move(up)),
         _down(std::move(down)),
         _context(context),
         _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
-        _uniforms(uniforms) {
+        _uniforms(uniforms),
+        _statistic(statistic) {
     }
 
     void render();
@@ -62,6 +66,7 @@ private:
     MeshRegistry &_meshRegistry;
     ShaderRegistry &_shaderRegistry;
     Uniforms &_uniforms;
+    IStatistic &_statistic;
 
     // END Services
 };

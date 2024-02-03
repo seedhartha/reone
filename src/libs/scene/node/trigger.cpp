@@ -93,8 +93,7 @@ void TriggerSceneNode::init() {
     _mesh = std::make_unique<Mesh>(
         std::move(vertices),
         std::move(vertexLayout),
-        std::move(faces),
-        _graphicsSvc.statistic);
+        std::move(faces));
     _mesh->init();
 
     for (auto &point : _geometry) {

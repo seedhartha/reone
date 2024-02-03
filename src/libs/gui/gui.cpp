@@ -253,6 +253,7 @@ void GUI::render() {
             _options,
             _graphicsSvc.context,
             _graphicsSvc.shaderRegistry,
+            _graphicsSvc.statistic,
             _graphicsSvc.meshRegistry,
             _graphicsSvc.textureRegistry,
             _graphicsSvc.uniforms);
@@ -260,6 +261,7 @@ void GUI::render() {
             _options,
             _graphicsSvc.context,
             _graphicsSvc.shaderRegistry,
+            _graphicsSvc.statistic,
             _graphicsSvc.meshRegistry,
             _graphicsSvc.pbrTextures,
             _graphicsSvc.textureRegistry,

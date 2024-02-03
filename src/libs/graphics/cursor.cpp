@@ -42,7 +42,7 @@ void Cursor::render() {
     });
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::mvpTexture));
     _context.withBlendMode(BlendMode::Normal, [this]() {
-        _meshRegistry.get(MeshName::quad).draw();
+        _meshRegistry.get(MeshName::quad).draw(_statistic);
     });
 }
 

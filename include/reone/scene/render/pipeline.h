@@ -37,6 +37,8 @@ namespace reone {
 
 namespace graphics {
 
+class IStatistic;
+
 class Context;
 class MeshRegistry;
 class PBRTextures;
@@ -97,6 +99,7 @@ protected:
     graphics::Context &_context;
     graphics::MeshRegistry &_meshRegistry;
     graphics::ShaderRegistry &_shaderRegistry;
+    graphics::IStatistic &_statistic;
     graphics::TextureRegistry &_textureRegistry;
     graphics::Uniforms &_uniforms;
 
@@ -113,6 +116,7 @@ protected:
                        graphics::Context &context,
                        graphics::MeshRegistry &meshRegistry,
                        graphics::ShaderRegistry &shaderRegistry,
+                       graphics::IStatistic &statistic,
                        graphics::TextureRegistry &textureRegistry,
                        graphics::Uniforms &uniforms) :
         _targetSize(std::move(targetSize)),
@@ -120,6 +124,7 @@ protected:
         _context(context),
         _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
+        _statistic(statistic),
         _textureRegistry(textureRegistry),
         _uniforms(uniforms) {
     }
@@ -138,6 +143,7 @@ public:
                           graphics::MeshRegistry &meshRegistry,
                           graphics::PBRTextures &pbrTextures,
                           graphics::ShaderRegistry &shaderRegistry,
+                          graphics::IStatistic &statistic,
                           graphics::TextureRegistry &textureRegistry,
                           graphics::Uniforms &uniforms) :
         _options(options),
@@ -145,6 +151,7 @@ public:
         _meshRegistry(meshRegistry),
         _pbrTextures(pbrTextures),
         _shaderRegistry(shaderRegistry),
+        _statistic(statistic),
         _textureRegistry(textureRegistry),
         _uniforms(uniforms) {
     }
@@ -157,6 +164,7 @@ private:
     graphics::MeshRegistry &_meshRegistry;
     graphics::PBRTextures &_pbrTextures;
     graphics::ShaderRegistry &_shaderRegistry;
+    graphics::IStatistic &_statistic;
     graphics::TextureRegistry &_textureRegistry;
     graphics::Uniforms &_uniforms;
 };

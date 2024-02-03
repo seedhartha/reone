@@ -101,7 +101,7 @@ void Movie::render() {
             glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::ndcTexture));
-    _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw(_graphicsSvc.statistic);
 }
 
 } // namespace movie

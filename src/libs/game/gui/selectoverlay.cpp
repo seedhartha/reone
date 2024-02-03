@@ -274,7 +274,7 @@ void SelectionOverlay::renderReticle(std::shared_ptr<Texture> texture, const glm
         locals.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpTexture));
-    _services.graphics.meshRegistry.get(MeshName::quad).draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw(_services.graphics.statistic);
 }
 
 void SelectionOverlay::renderTitleBar() {
@@ -301,7 +301,7 @@ void SelectionOverlay::renderTitleBar() {
             locals.color.a = 0.5f;
         });
         _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpColor));
-        _services.graphics.meshRegistry.get(MeshName::quad).draw();
+        _services.graphics.meshRegistry.get(MeshName::quad).draw(_services.graphics.statistic);
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -333,7 +333,7 @@ void SelectionOverlay::renderHealthBar() {
         locals.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpColor));
-    _services.graphics.meshRegistry.get(MeshName::quad).draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw(_services.graphics.statistic);
 }
 
 void SelectionOverlay::renderActionBar() {
@@ -369,7 +369,7 @@ void SelectionOverlay::renderActionFrame(int index) {
         locals.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpTexture));
-    _services.graphics.meshRegistry.get(MeshName::quad).draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw(_services.graphics.statistic);
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
@@ -431,7 +431,7 @@ void SelectionOverlay::renderActionIcon(int index) {
         locals.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpTexture));
-    _services.graphics.meshRegistry.get(MeshName::quad).draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw(_services.graphics.statistic);
 }
 
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {

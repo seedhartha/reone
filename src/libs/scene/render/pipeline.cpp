@@ -21,6 +21,7 @@
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/pbrtextures.h"
 #include "reone/graphics/shaderregistry.h"
+#include "reone/graphics/statistic.h"
 #include "reone/graphics/textureregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/scene/render/pipeline/pbr.h"
@@ -38,7 +39,7 @@ void RenderPipelineBase::applyBoxBlur(Texture &srcTexture, Framebuffer &dst, con
     _context.bindTexture(srcTexture);
     _context.withViewport(glm::ivec4(0, 0, size), [this]() {
         _context.clearColorDepth();
-        _meshRegistry.get(MeshName::quadNDC).draw();
+        _meshRegistry.get(MeshName::quadNDC).draw(_statistic);
     });
 }
 
@@ -58,7 +59,7 @@ void RenderPipelineBase::applyGaussianBlur(Texture &tex,
     _context.bindTexture(tex);
     _context.withViewport(glm::ivec4(0, 0, size), [this]() {
         _context.clearColorDepth();
-        _meshRegistry.get(MeshName::quadNDC).draw();
+        _meshRegistry.get(MeshName::quadNDC).draw(_statistic);
     });
 }
 
@@ -73,7 +74,7 @@ void RenderPipelineBase::applyMedianFilter(Texture &tex,
     _context.bindTexture(tex);
     _context.withViewport(glm::ivec4(0, 0, size), [this]() {
         _context.clearColorDepth();
-        _meshRegistry.get(MeshName::quadNDC).draw();
+        _meshRegistry.get(MeshName::quadNDC).draw(_statistic);
     });
 }
 
@@ -87,7 +88,7 @@ void RenderPipelineBase::applyFXAA(Texture &tex, Framebuffer &dst, const glm::iv
     _context.bindTexture(tex);
     _context.withViewport(glm::ivec4(0, 0, size), [this]() {
         _context.clearColorDepth();
-        _meshRegistry.get(MeshName::quadNDC).draw();
+        _meshRegistry.get(MeshName::quadNDC).draw(_statistic);
     });
 }
 
@@ -105,7 +106,7 @@ void RenderPipelineBase::applySharpen(Texture &tex,
     _context.bindTexture(tex);
     _context.withViewport(glm::ivec4(0, 0, size), [this]() {
         _context.clearColorDepth();
-        _meshRegistry.get(MeshName::quadNDC).draw();
+        _meshRegistry.get(MeshName::quadNDC).draw(_statistic);
     });
 }
 
@@ -118,6 +119,7 @@ std::unique_ptr<IRenderPipeline> RenderPipelineFactory::create(RendererType type
             _context,
             _meshRegistry,
             _shaderRegistry,
+            _statistic,
             _textureRegistry,
             _uniforms);
     case RendererType::PBR:
@@ -128,6 +130,7 @@ std::unique_ptr<IRenderPipeline> RenderPipelineFactory::create(RendererType type
             _meshRegistry,
             _pbrTextures,
             _shaderRegistry,
+            _statistic,
             _textureRegistry,
             _uniforms);
     default:

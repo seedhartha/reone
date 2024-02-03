@@ -113,17 +113,17 @@ void Mesh::deinit() {
     _inited = false;
 }
 
-void Mesh::draw() {
+void Mesh::draw(IStatistic &statistic) {
     glBindVertexArray(_vaoId);
     glDrawElements(
         GL_TRIANGLES,
         static_cast<GLsizei>(3 * _faces.size()),
         GL_UNSIGNED_SHORT,
         nullptr);
-    _statistic.incrementDrawCalls();
+    statistic.incrementDrawCalls();
 }
 
-void Mesh::drawInstanced(int count) {
+void Mesh::drawInstanced(int count, IStatistic &statistic) {
     glBindVertexArray(_vaoId);
     glDrawElementsInstanced(
         GL_TRIANGLES,
@@ -131,7 +131,7 @@ void Mesh::drawInstanced(int count) {
         GL_UNSIGNED_SHORT,
         nullptr,
         count);
-    _statistic.incrementDrawCalls();
+    statistic.incrementDrawCalls();
 }
 
 void Mesh::computeVertexDataFromVertices() {

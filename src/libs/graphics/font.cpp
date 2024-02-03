@@ -87,7 +87,7 @@ void Font::render(const std::string &text, const glm::vec3 &position, const glm:
                 textOffset.x += glyph.size.x;
             }
         });
-        _meshRegistry.get(MeshName::quad).drawInstanced(numChars);
+        _meshRegistry.get(MeshName::quad).drawInstanced(numChars, _statistic);
     }
 }
 

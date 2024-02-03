@@ -85,7 +85,7 @@ void SelectionOverlay::render(const glm::ivec2 &screenSize) {
                             locals.reset();
                             locals.model = std::move(transform);
                         });
-                        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+                        _graphicsSvc.meshRegistry.get(MeshName::quad).draw(_graphicsSvc.statistic);
                     }
                 }
             }
@@ -107,7 +107,7 @@ void SelectionOverlay::render(const glm::ivec2 &screenSize) {
                             locals.reset();
                             locals.model = std::move(transform);
                         });
-                        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+                        _graphicsSvc.meshRegistry.get(MeshName::quad).draw(_graphicsSvc.statistic);
                     }
                 }
             }

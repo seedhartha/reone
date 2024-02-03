@@ -220,50 +220,12 @@ public:
         }
     };
 
-    class Builder {
-    public:
-        Builder(IStatistic &statistic) :
-            _statistic(statistic) {
-        }
-
-        Builder &vertex(Vertex vertex) {
-            _vertices.push_back(std::move(vertex));
-            return *this;
-        }
-
-        Builder &vertexLayout(VertexLayout layout) {
-            _vertexLayout = std::move(layout);
-            return *this;
-        }
-
-        Builder &face(Face face) {
-            _faces.push_back(std::move(face));
-            return *this;
-        }
-
-        std::unique_ptr<Mesh> build() {
-            return std::make_unique<Mesh>(
-                _vertices,
-                _vertexLayout,
-                _faces,
-                _statistic);
-        }
-
-    private:
-        std::vector<Vertex> _vertices;
-        VertexLayout _vertexLayout;
-        std::vector<Face> _faces;
-        IStatistic &_statistic;
-    };
-
     Mesh(std::vector<Vertex> vertices,
          VertexLayout vertexLayout,
-         std::vector<Face> faces,
-         IStatistic &statistic) :
+         std::vector<Face> faces) :
         _vertices(std::move(vertices)),
         _vertexLayout(std::move(vertexLayout)),
-        _faces(std::move(faces)),
-        _statistic(statistic) {
+        _faces(std::move(faces)) {
         computeVertexDataFromVertices();
         computeFaceData();
         computeAABB();
@@ -271,12 +233,10 @@ public:
 
     Mesh(std::vector<float> vertexData,
          VertexLayout vertexLayout,
-         std::vector<Face> faces,
-         IStatistic &statistic) :
+         std::vector<Face> faces) :
         _vertexData(std::move(vertexData)),
         _vertexLayout(std::move(vertexLayout)),
-        _faces(std::move(faces)),
-        _statistic(statistic) {
+        _faces(std::move(faces)) {
         computeVerticesFromVertexData();
         computeFaceData();
         computeAABB();
@@ -287,8 +247,8 @@ public:
     void init();
     void deinit();
 
-    void draw();
-    void drawInstanced(int count);
+    void draw(IStatistic &statistic);
+    void drawInstanced(int count, IStatistic &statistic);
 
     std::vector<glm::vec3> vertexCoords() const;
     std::vector<glm::vec3> faceVertexCoords(const Face &face) const;
@@ -302,7 +262,6 @@ public:
 private:
     VertexLayout _vertexLayout;
     std::vector<Face> _faces;
-    IStatistic &_statistic;
 
     bool _inited {false};
 
