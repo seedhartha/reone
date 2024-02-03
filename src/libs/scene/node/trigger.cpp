@@ -95,6 +95,7 @@ void TriggerSceneNode::init() {
         std::move(faces),
         std::move(spec),
         _graphicsSvc.statistic);
+    _mesh->init();
 
     for (auto &point : _geometry) {
         _aabb.expand(point);

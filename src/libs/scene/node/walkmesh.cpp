@@ -67,6 +67,7 @@ void WalkmeshSceneNode::init() {
         std::move(faces),
         std::move(spec),
         _graphicsSvc.statistic);
+    _mesh->init();
 }
 
 void WalkmeshSceneNode::render(IRenderPass &pass) {

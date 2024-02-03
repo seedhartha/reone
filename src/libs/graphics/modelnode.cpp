@@ -59,6 +59,9 @@ void ModelNode::computeAbsoluteTransform() {
 }
 
 void ModelNode::init() {
+    if (_mesh && _mesh->mesh) {
+        _mesh->mesh->init();
+    }
     for (auto &child : _children) {
         child->init();
     }

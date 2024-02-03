@@ -46,6 +46,7 @@ void Movie::init() {
             TextureType::TwoDim,
             getTextureProperties(TextureUsage::Movie));
         _texture->clear(1, 1, PixelFormat::RGB8);
+        _texture->init();
     }
     if (!_audioSource && _audioStream) {
         _audioSource = _audioPlayer.play(_audioStream, AudioType::Movie);
@@ -73,9 +74,6 @@ void Movie::deinit() {
 }
 
 void Movie::update(float dt) {
-    if (!_inited) {
-        init();
-    }
     if (!_videoStream || _finished) {
         return;
     }
@@ -87,9 +85,6 @@ void Movie::update(float dt) {
 }
 
 void Movie::render() {
-    if (!_inited) {
-        init();
-    }
     if (!_videoStream) {
         return;
     }

@@ -66,6 +66,7 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
                 auto superModel = get(model->superModelName());
                 model->setSuperModel(std::move(superModel));
             }
+            model->init();
         } catch (const ValidationException &e) {
             error(str(boost::format("Error loading model %s: %s") % resRef % std::string(e.what())), LogChannel::Graphics);
         }

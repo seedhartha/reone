@@ -134,9 +134,6 @@ void Texture::deinit() {
 }
 
 void Texture::bind() {
-    if (!_inited) {
-        init();
-    }
     glBindTexture(getTargetGL(), _nameGL);
 }
 
@@ -350,7 +347,7 @@ void Texture::clear(int w, int h, PixelFormat format, int numLayers, bool refres
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, Layer layer, bool refresh) {
-    setPixels(w, h, format, std::vector<Layer>{std::move(layer)}, refresh);
+    setPixels(w, h, format, std::vector<Layer> {std::move(layer)}, refresh);
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers, bool refresh) {

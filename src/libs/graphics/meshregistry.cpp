@@ -159,11 +159,13 @@ static std::unique_ptr<Mesh> makeMesh(std::vector<float> vertices,
                                       std::vector<Mesh::Face> faces,
                                       Mesh::VertexSpec spec,
                                       Statistic &statistic) {
-    return std::make_unique<Mesh>(
+    auto mesh = std::make_unique<Mesh>(
         std::move(vertices),
         std::move(faces),
         std::move(spec),
         statistic);
+    mesh->init();
+    return mesh;
 }
 
 void MeshRegistry::init() {

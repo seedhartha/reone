@@ -113,9 +113,6 @@ void Mesh::deinit() {
 }
 
 void Mesh::draw() {
-    if (!_inited) {
-        init();
-    }
     glBindVertexArray(_vaoId);
     glDrawElements(
         GL_TRIANGLES,
@@ -126,9 +123,6 @@ void Mesh::draw() {
 }
 
 void Mesh::drawInstanced(int count) {
-    if (!_inited) {
-        init();
-    }
     glBindVertexArray(_vaoId);
     glDrawElementsInstanced(
         GL_TRIANGLES,
