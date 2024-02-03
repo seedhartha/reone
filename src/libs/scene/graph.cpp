@@ -796,8 +796,10 @@ std::vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const 
 bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollision) const {
     static glm::vec3 down(0.0f, 0.0f, -1.0f);
 
-    glm::vec3 origin(position, kElevationTestZ);
+    bool walkable = false;
+    float minDistance = std::numeric_limits<float>::max();
 
+    glm::vec3 origin {position, kElevationTestZ};
     for (auto &root : _walkmeshRoots) {
         if (!root->isEnabled()) {
             continue;
@@ -811,20 +813,20 @@ bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollisio
         auto objSpaceOrigin = glm::vec3(root->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
         float distance = 0.0f;
         auto face = root->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, down, 2.0f * kElevationTestZ, distance);
-        if (face) {
-            if (_walkableSurfaces.count(face->material) == 0) {
-                // non-walkable
-                return false;
-            }
+        if (!face || distance >= minDistance) {
+            continue;
+        }
+        walkable = _walkableSurfaces.count(face->material) > 0;
+        if (walkable) {
             outCollision.user = root->user();
             outCollision.intersection = origin + distance * down;
-            outCollision.normal = root->absoluteTransform() * glm::vec4(face->normal, 0.0f);
+            outCollision.normal = root->absoluteTransform() * glm::vec4 {face->normal, 0.0f};
             outCollision.material = face->material;
-            return true;
         }
+        minDistance = distance;
     }
 
-    return false;
+    return walkable;
 }
 
 bool SceneGraph::testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const {
