@@ -321,7 +321,7 @@ TEST(LipComposer, should_compose_lip_file_from_text_with_explicit_pauses) {
 TEST(LipComposer, should_compose_lip_file_from_russian_text) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
-        {u8"все", {
+        {u8"all", {
                       "a", "b", "c", "ch",  //
                       "d", "e", "f", "g",   //
                       "h", "i", "j", "k",   //
@@ -334,7 +334,7 @@ TEST(LipComposer, should_compose_lip_file_from_russian_text) {
     auto composer = LipComposer(dict);
 
     // when
-    auto anim = composer.compose("name", u8"все", 1.0f);
+    auto anim = composer.compose("name", u8"all", 1.0f);
 
     // then
     EXPECT_TRUE(anim);

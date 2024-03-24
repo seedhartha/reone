@@ -43,10 +43,11 @@ namespace neo {
 
 enum class DoorState;
 
+struct Event;
+
 class Area;
 class Creature;
 class Door;
-class Event;
 class Module;
 class Object;
 class Placeable;
