@@ -47,9 +47,6 @@ public:
     MOCK_METHOD(void, removeRoot, (GrassSceneNode &), (override));
     MOCK_METHOD(void, removeRoot, (SoundSceneNode &), (override));
 
-    MOCK_METHOD(std::optional<std::reference_wrapper<ModelSceneNode>>, modelByExternalId, (void *), (override));
-    MOCK_METHOD(std::vector<std::reference_wrapper<WalkmeshSceneNode>>, walkmeshesByExternalId, (void *), (override));
-
     MOCK_METHOD(bool, testElevation, (const glm::vec2 &, Collision &), (const override));
     MOCK_METHOD(bool, testLineOfSight, (const glm::vec3 &, const glm::vec3 &, Collision &), (const override));
     MOCK_METHOD(bool, testWalk, (const glm::vec3 &, const glm::vec3 &, const IUser *, Collision &), (const override));
