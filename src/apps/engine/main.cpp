@@ -30,7 +30,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-static constexpr char kLogFilename[] = "reone.log";
+static constexpr char kLogFilename[] = "engine.log";
 
 int main(int argc, char **argv) {
 #ifdef _WIN32

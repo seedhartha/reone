@@ -106,7 +106,7 @@ add_subdirectory(src/libs/tools) # tools static library
 # Applications
 
 add_subdirectory(src/apps/shaderpack) # shaderpack application
-add_subdirectory(src/apps/reone) # reone application
+add_subdirectory(src/apps/engine) # engine application
 
 if(BUILD_LAUNCHER)
     add_subdirectory(src/apps/launcher) # launcher application

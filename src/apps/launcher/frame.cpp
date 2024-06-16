@@ -388,7 +388,7 @@ void LauncherFrame::LoadConfiguration() {
 void LauncherFrame::OnLaunch(wxCommandEvent &event) {
     SaveConfiguration();
 
-    std::string exe("reone");
+    std::string exe("engine");
 #ifndef _WIN32
     exe.insert(0, "./");
 #endif
