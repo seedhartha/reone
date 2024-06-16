@@ -32,8 +32,6 @@ using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
 
-#define R_NEO_GAME 1
-
 namespace reone {
 
 static const std::string kMainThreadName {"main"};
@@ -128,20 +126,6 @@ void Engine::init() {
         _services->resource);
     _console->init();
 
-#if R_NEO_GAME
-    _services->resource.director.onModuleLoad("end_m01aa");
-    _neoGame = std::make_unique<neo::Game>(
-        *_optionsView,
-        _services->system,
-        _services->graphics,
-        _services->resource,
-        _services->scene,
-        *_console,
-        *_profiler);
-    _neoGame->init();
-    // showCursor(false);
-    // setRelativeMouseMode(true);
-#else
     _game = std::make_unique<Game>(
         gameId,
         _options.game.path,
@@ -149,17 +133,12 @@ void Engine::init() {
         *_services,
         *_console);
     _game->init();
-#endif
 }
 
 void Engine::deinit() {
     _console.reset();
     _profiler.reset();
-#if R_NEO_GAME
-    _neoGame.reset();
-#else
     _game.reset();
-#endif
     _services.reset();
 
     _gameModule.reset();
@@ -190,9 +169,6 @@ int Engine::run() {
             break;
         }
         bool focus = _window->isInFocus();
-#if R_NEO_GAME
-        _neoGame->pause(!focus);
-#endif
         if (!focus) {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
             continue;
@@ -210,11 +186,6 @@ int Engine::run() {
                 if (_console->handle(event)) {
                     continue;
                 }
-#if R_NEO_GAME
-                if (_neoGame->handle(event)) {
-                    continue;
-                }
-#else
                 if (_game->handle(event)) {
                     if (_game->isQuitRequested()) {
                         quit = true;
@@ -222,22 +193,17 @@ int Engine::run() {
                     }
                     continue;
                 }
-#endif
             }
         });
         if (quit) {
             break;
         }
         _profiler->measure(kMainThreadName, kProfilerUpdateTimeIndex, [this, &frameTime]() {
-#if R_NEO_GAME
-            _neoGame->update(frameTime);
-#else
             _game->update(frameTime);
             bool showcur = _game->cursorType() == CursorType::None;
             bool relmouse = _game->relativeMouseMode();
             showCursor(showcur);
             setRelativeMouseMode(relmouse);
-#endif
             _profiler->update(frameTime);
         });
         _profiler->measure(kMainThreadName, kProfilerRenderGraphicsTimeIndex, [this]() {
@@ -246,11 +212,7 @@ int Engine::run() {
                 _services->graphics.pbrTextures.refresh();
             }
             _services->graphics.context.clearColorDepth();
-#if R_NEO_GAME
-            _neoGame->render();
-#else
             _game->render();
-#endif
             _profiler->render();
             _console->render();
             _window->swap();
@@ -259,9 +221,6 @@ int Engine::run() {
             _services->audio.mixer.render();
         });
     }
-#if R_NEO_GAME
-    _neoGame->quit();
-#endif
 
     return 0;
 }
