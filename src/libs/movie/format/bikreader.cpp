@@ -192,19 +192,20 @@ private:
     }
 
     void initResamplingContext() {
-#if FF_API_OLD_CHANNEL_LAYOUT
-        _swrContext = swr_alloc_set_opts(
-            nullptr,
-            AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, _audioCodecCtx->sample_rate,
-            _audioCodecCtx->channel_layout, _audioCodecCtx->sample_fmt, _audioCodecCtx->sample_rate,
-            0, nullptr);
-#else
+#if (LIBSWRESAMPLE_VERSION_MAJOR > 4) || \
+    (LIBSWRESAMPLE_VERSION_MAJOR == 4 && LIBSWRESAMPLE_VERSION_MINOR >= 7)
         AVChannelLayout outChLayout(AV_CHANNEL_LAYOUT_MONO);
         const auto &inChLayout = _audioCodecCtx->ch_layout;
         swr_alloc_set_opts2(
             &_swrContext,
             &outChLayout, AV_SAMPLE_FMT_S16, _audioCodecCtx->sample_rate,
             &inChLayout, _audioCodecCtx->sample_fmt, _audioCodecCtx->sample_rate,
+            0, nullptr);
+#else
+        _swrContext = swr_alloc_set_opts(
+            nullptr,
+            AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, _audioCodecCtx->sample_rate,
+            _audioCodecCtx->channel_layout, _audioCodecCtx->sample_fmt, _audioCodecCtx->sample_rate,
             0, nullptr);
 #endif
         swr_init(_swrContext);
