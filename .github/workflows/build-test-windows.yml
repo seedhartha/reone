@@ -1,0 +1,32 @@
+name: Build and run tests on Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |-
+          vcpkg install --triplet x64-windows `
+            boost-algorithm boost-endian boost-format boost-functional boost-program-options `
+            glm sdl2 glew openal-soft libmad ffmpeg wxwidgets gtest
+
+      - name: Generate solution
+        run: |-
+          mkdir build
+          cmake -S . -B build `
+            -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake
+
+      - name: Build solution
+        working-directory: ${{github.workspace}}/build
+        run: cmake --build .
+
+      - name: Run tests
+        working-directory: ${{github.workspace}}/build
+        run: ctest -V
