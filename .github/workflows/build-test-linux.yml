@@ -1,6 +1,10 @@
-name: CMake
+name: Build and run tests on Linux
 
-on: push
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
 
 env:
   BUILD_TYPE: Release
@@ -9,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: >
