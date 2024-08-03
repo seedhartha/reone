@@ -38,19 +38,7 @@
 #undef Always
 #endif
 
-#include "reone/audio/context.h"
-#include "reone/audio/source.h"
-#include "reone/game/types.h"
-#include "reone/graphics/lipanimation.h"
-#include "reone/resource/format/keyreader.h"
-#include "reone/resource/gff.h"
-#include "reone/resource/id.h"
-#include "reone/system/stream/input.h"
-
-#include "../../viewmodel/resource/audio.h"
 #include "../../viewmodel/resource/explorer.h"
-#include "../../viewmodel/resource/image.h"
-#include "../../viewmodel/resource/model.h"
 
 namespace reone {
 

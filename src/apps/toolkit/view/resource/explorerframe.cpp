@@ -21,28 +21,8 @@
 #include <wx/dirdlg.h>
 #include <wx/mstream.h>
 
-#include "reone/audio/clip.h"
-#include "reone/audio/format/mp3reader.h"
-#include "reone/audio/format/wavreader.h"
-#include "reone/game/script/routines.h"
-#include "reone/graphics/format/lipreader.h"
-#include "reone/graphics/lipanimation.h"
-#include "reone/resource/format/2dareader.h"
-#include "reone/resource/format/bifreader.h"
-#include "reone/resource/format/erfreader.h"
-#include "reone/resource/format/gffreader.h"
-#include "reone/resource/format/keyreader.h"
-#include "reone/resource/format/rimreader.h"
-#include "reone/resource/format/ssfreader.h"
-#include "reone/resource/format/tlkreader.h"
-#include "reone/resource/talktable.h"
 #include "reone/resource/typeutil.h"
 #include "reone/system/fileutil.h"
-#include "reone/system/hexutil.h"
-#include "reone/system/stream/fileinput.h"
-#include "reone/system/stream/fileoutput.h"
-#include "reone/system/stream/memoryinput.h"
-#include "reone/system/stream/memoryoutput.h"
 
 #include "../../viewmodel/resource/gff.h"
 #include "../../viewmodel/resource/ncs.h"
@@ -223,6 +203,7 @@ void ResourceExplorerFrame::BindViewModel() {
             wxDataViewItem appended;
             if (resItem->container) {
                 appended = m_resourcesTreeCtrl->AppendContainer(parentItem, resItem->displayName, -1, -1, new ResourcesItemClientData {resItem->id});
+                m_resourcesTreeCtrl->AppendItem(appended, "[placeholder]");
             } else {
                 appended = m_resourcesTreeCtrl->AppendItem(parentItem, resItem->displayName, -1, new ResourcesItemClientData {resItem->id});
             }
@@ -248,6 +229,7 @@ void ResourceExplorerFrame::BindViewModel() {
                 wxDataViewItem appended;
                 if (resItem->container) {
                     appended = m_resourcesTreeCtrl->AppendContainer(parentItem, resItem->displayName, -1, -1, new ResourcesItemClientData {resItem->id});
+                    m_resourcesTreeCtrl->AppendItem(appended, "[placeholder]");
                 } else {
                     appended = m_resourcesTreeCtrl->AppendItem(parentItem, resItem->displayName, -1, new ResourcesItemClientData {resItem->id});
                 }
@@ -446,6 +428,7 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &ev
     if (resItem.loaded) {
         return;
     }
+    m_resourcesTreeCtrl->DeleteChildren(item);
     m_viewModel.onResourcesItemExpanding(resItemId);
     resItem.loaded = true;
 }
