@@ -1,13 +1,9 @@
 name: Build and run tests on Linux
-
 on:
   push:
     branches: [master]
   pull_request:
   workflow_dispatch:
-
-env:
-  BUILD_TYPE: Release
 
 jobs:
   build:
@@ -27,7 +23,7 @@ jobs:
       - name: Configure CMake
         working-directory: ${{github.workspace}}/build
         shell: bash
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         working-directory: ${{github.workspace}}/build
