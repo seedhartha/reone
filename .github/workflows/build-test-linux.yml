@@ -12,10 +12,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: >
-          sudo sed -i 's/azure\.//' /etc/apt/sources.list &&
-          sudo apt-get update &&
-          sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libwxgtk3.0-gtk3-dev libgmock-dev
+        run: |-
+          sudo sed -i 's/azure\.//' /etc/apt/sources.list
+          sudo apt-get update
+          sudo apt install \
+            libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libwxgtk3.0-gtk3-dev libgmock-dev \
+            libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev
 
       - name: Create Build Environment
         run: cmake -E make_directory ${{github.workspace}}/build
