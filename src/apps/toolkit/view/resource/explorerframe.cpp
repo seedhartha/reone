@@ -17,6 +17,7 @@
 
 #include "explorerframe.h"
 
+#include <wx/artprov.h>
 #include <wx/choicdlg.h>
 #include <wx/dirdlg.h>
 #include <wx/mstream.h>
@@ -136,14 +137,19 @@ void ResourceExplorerFrame::InitControls() {
 
     auto resourcesPanel = new wxPanel(m_splitter);
 
-    m_resourcesTreeCtrl = new wxDataViewTreeCtrl(resourcesPanel, wxID_ANY);
-    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding, this);
-    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu, this);
-    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated, this);
-    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &ResourceExplorerFrame::OnResourcesTreeCtrlItemStartEditing, this);
+    m_resourcesListBox = new wxListBox(resourcesPanel, wxID_ANY);
+    m_resourcesListBox->Bind(wxEVT_CONTEXT_MENU, &ResourceExplorerFrame::OnResourcesListBoxContextMenu, this);
+    m_resourcesListBox->Bind(wxEVT_LISTBOX_DCLICK, &ResourceExplorerFrame::OnResourcesListBoxDoubleClick, this);
+
+    auto navigationPanel = new wxPanel(resourcesPanel);
+    auto artProvider = new wxArtProvider();
+    m_goToParentButton = new wxBitmapButton(navigationPanel, wxID_ANY, artProvider->GetBitmapBundle(wxART_GO_TO_PARENT));
+    m_goToParentButton->Disable();
+    m_goToParentButton->Bind(wxEVT_BUTTON, &ResourceExplorerFrame::OnGoToParentButton, this);
 
     auto resourcesSizer = new wxStaticBoxSizer(wxVERTICAL, resourcesPanel, "Resources");
-    resourcesSizer->Add(m_resourcesTreeCtrl, 1, wxEXPAND);
+    resourcesSizer->Add(navigationPanel, 0, wxEXPAND);
+    resourcesSizer->Add(m_resourcesListBox, 1, wxEXPAND);
     resourcesPanel->SetSizer(resourcesSizer);
 
     m_notebook = new wxAuiNotebook(m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE));
@@ -192,50 +198,18 @@ void ResourceExplorerFrame::BindEvents() {
 }
 
 void ResourceExplorerFrame::BindViewModel() {
+    m_viewModel.goToParentEnabled().addChangedHandler([this](const auto &enabled) {
+        m_goToParentButton->Enable(enabled);
+    });
     m_viewModel.resourcesItems().addChangedHandler([this](const auto &args) {
         switch (args.type) {
-        case CollectionChangeType::Add: {
-            auto &resItem = args.addedItem->get();
-            wxDataViewItem parentItem;
-            if (resItem->parentId) {
-                parentItem = _resItemIdToTreeItem.at(*resItem->parentId);
-            }
-            wxDataViewItem appended;
-            if (resItem->container) {
-                appended = m_resourcesTreeCtrl->AppendContainer(parentItem, resItem->displayName, -1, -1, new ResourcesItemClientData {resItem->id});
-                m_resourcesTreeCtrl->AppendItem(appended, "[placeholder]");
-            } else {
-                appended = m_resourcesTreeCtrl->AppendItem(parentItem, resItem->displayName, -1, new ResourcesItemClientData {resItem->id});
-            }
-            _resItemIdToTreeItem.insert({resItem->id, appended});
-            break;
-        }
-        case CollectionChangeType::Remove: {
-            auto item = args.removedItem->get();
-            auto &treeItem = _resItemIdToTreeItem.at(item->id);
-            m_resourcesTreeCtrl->DeleteItem(treeItem);
-            _resItemIdToTreeItem.erase(item->id);
-            break;
-        }
         case CollectionChangeType::Reset: {
-            m_resourcesTreeCtrl->Freeze();
-            m_resourcesTreeCtrl->DeleteAllItems();
-            _resItemIdToTreeItem.clear();
+            m_resourcesListBox->Freeze();
+            m_resourcesListBox->Clear();
             for (const auto &resItem : *m_viewModel.resourcesItems()) {
-                wxDataViewItem parentItem;
-                if (resItem->parentId) {
-                    parentItem = _resItemIdToTreeItem.at(*resItem->parentId);
-                }
-                wxDataViewItem appended;
-                if (resItem->container) {
-                    appended = m_resourcesTreeCtrl->AppendContainer(parentItem, resItem->displayName, -1, -1, new ResourcesItemClientData {resItem->id});
-                    m_resourcesTreeCtrl->AppendItem(appended, "[placeholder]");
-                } else {
-                    appended = m_resourcesTreeCtrl->AppendItem(parentItem, resItem->displayName, -1, new ResourcesItemClientData {resItem->id});
-                }
-                _resItemIdToTreeItem.insert({resItem->id, appended});
+                m_resourcesListBox->Append(resItem->displayName, new ResourcesItemClientData {resItem->id});
             }
-            m_resourcesTreeCtrl->Thaw();
+            m_resourcesListBox->Thaw();
             break;
         }
         default:
@@ -417,38 +391,32 @@ void ResourceExplorerFrame::OnOpenDirectoryCommand(wxCommandEvent &event) {
     m_viewModel.onResourcesDirectoryChanged(gameId, resourcesPath);
 }
 
-void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event) {
-    auto item = event.GetItem();
-    if (!item.IsOk()) {
-        return;
-    }
-    auto itemData = m_resourcesTreeCtrl->GetItemData(item);
-    auto &resItemId = static_cast<ResourcesItemClientData *>(itemData)->id();
-    auto &resItem = m_viewModel.getResourcesItemById(resItemId);
-    if (resItem.loaded) {
-        return;
-    }
-    m_resourcesTreeCtrl->DeleteChildren(item);
-    m_viewModel.onResourcesItemExpanding(resItemId);
-    resItem.loaded = true;
+void ResourceExplorerFrame::OnGoToParentButton(wxCommandEvent &event) {
+    m_viewModel.onGoToParentButton();
 }
 
-void ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated(wxDataViewEvent &event) {
-    auto item = event.GetItem();
-    if (!item.IsOk()) {
+void ResourceExplorerFrame::OnResourcesListBoxDoubleClick(wxCommandEvent &event) {
+    int itemIdx = event.GetInt();
+    if (itemIdx == -1) {
         return;
     }
-    auto itemData = m_resourcesTreeCtrl->GetItemData(item);
+    auto *itemData = m_resourcesListBox->GetClientObject(itemIdx);
+    if (!itemData) {
+        return;
+    }
     auto &resItemId = static_cast<ResourcesItemClientData *>(itemData)->id();
-    m_viewModel.onResourcesItemActivated(resItemId);
+    m_viewModel.onResourcesListBoxDoubleClick(resItemId);
 }
 
-void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
-    auto item = event.GetItem();
-    if (!item.IsOk()) {
+void ResourceExplorerFrame::OnResourcesListBoxContextMenu(wxCommandEvent &event) {
+    int itemIdx = event.GetInt();
+    if (itemIdx == -1) {
         return;
     }
-    auto itemData = m_resourcesTreeCtrl->GetItemData(item);
+    auto *itemData = m_resourcesListBox->GetClientObject(itemIdx);
+    if (!itemData) {
+        return;
+    }
     auto &resItemId = static_cast<ResourcesItemClientData *>(itemData)->id();
     auto &resItem = m_viewModel.getResourcesItemById(resItemId);
     auto menu = wxMenu();
@@ -474,11 +442,7 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &
     }
     menu.SetClientData(new ResourcesItemClientData {resItemId});
     menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ResourceExplorerFrame::OnPopupCommandSelected), nullptr, this);
-    PopupMenu(&menu, event.GetPosition());
-}
-
-void ResourceExplorerFrame::OnResourcesTreeCtrlItemStartEditing(wxDataViewEvent &event) {
-    event.Veto();
+    PopupMenu(&menu);
 }
 
 void ResourceExplorerFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {

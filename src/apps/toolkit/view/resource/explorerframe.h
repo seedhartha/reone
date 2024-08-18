@@ -53,8 +53,6 @@ public:
 private:
     ResourceExplorerViewModel &m_viewModel;
 
-    std::map<ResourcesItemId, wxDataViewItem> _resItemIdToTreeItem;
-
     // Menus
 
     wxMenuItem *m_saveFileMenuItem {nullptr};
@@ -66,7 +64,8 @@ private:
     wxSplitterWindow *m_splitter {nullptr};
     wxProgressDialog *m_progressDialog {nullptr};
 
-    wxDataViewTreeCtrl *m_resourcesTreeCtrl {nullptr};
+    wxButton *m_goToParentButton {nullptr};
+    wxListBox *m_resourcesListBox {nullptr};
     wxListBox *m_modulesListBox {nullptr};
     wxAuiNotebook *m_notebook {nullptr};
 
@@ -95,11 +94,10 @@ private:
     void OnExtractAllBifsCommand(wxCommandEvent &event);
     void OnBatchConvertTpcToTgaCommand(wxCommandEvent &event);
     void OnComposeLipCommand(wxCommandEvent &event);
+    void OnGoToParentButton(wxCommandEvent &event);
 
-    void OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event);
-    void OnResourcesTreeCtrlItemActivated(wxDataViewEvent &event);
-    void OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &event);
-    void OnResourcesTreeCtrlItemStartEditing(wxDataViewEvent &event);
+    void OnResourcesListBoxDoubleClick(wxCommandEvent &event);
+    void OnResourcesListBoxContextMenu(wxCommandEvent &event);
 
     void OnNotebookPageClose(wxAuiNotebookEvent &event);
     void OnNotebookPageChanged(wxAuiNotebookEvent &event);

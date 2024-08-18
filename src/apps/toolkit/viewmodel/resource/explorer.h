@@ -125,16 +125,6 @@ class ResourceExplorerViewModel : public ResourceViewModel {
 public:
     ResourceExplorerViewModel();
 
-    void extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
-    void decompile(ResourcesItemId itemId, bool optimize = true);
-
-    void extractAllBifs(const std::filesystem::path &destPath);
-    void batchConvertTpcToTga(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
-
-    bool invokeTool(Operation operation,
-                    const std::filesystem::path &srcPath,
-                    const std::filesystem::path &destPath);
-
     resource::GameID gameId() const {
         return _gameId;
     }
@@ -169,7 +159,7 @@ public:
 
     // Properties
 
-    CollectionProperty<std::shared_ptr<ResourcesItem>> &resourcesItems() {
+    CollectionProperty<ResourcesItem *> &resourcesItems() {
         return _resItems;
     }
 
@@ -189,6 +179,10 @@ public:
         return _renderEnabled;
     }
 
+    Property<bool> &goToParentEnabled() {
+        return _goToParentEnabled;
+    }
+
     // END Properties
 
     // Commands
@@ -203,6 +197,16 @@ public:
 
     void saveFile(Page &page, const std::filesystem::path &destPath);
 
+    void extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
+    void decompile(ResourcesItemId itemId, bool optimize = true);
+
+    void extractAllBifs(const std::filesystem::path &destPath);
+    void batchConvertTpcToTga(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
+
+    bool invokeTool(Operation operation,
+                    const std::filesystem::path &srcPath,
+                    const std::filesystem::path &destPath);
+
     // END Commands
 
     void onViewCreated();
@@ -211,8 +215,8 @@ public:
     void onNotebookPageClose(int page);
 
     void onResourcesDirectoryChanged(resource::GameID gameId, std::filesystem::path path);
-    void onResourcesItemExpanding(const ResourcesItemId &id);
-    void onResourcesItemActivated(const ResourcesItemId &id);
+    void onResourcesListBoxDoubleClick(const ResourcesItemId &id);
+    void onGoToParentButton();
 
 private:
     resource::GameID _gameId {resource::GameID::KotOR};
@@ -225,6 +229,8 @@ private:
     std::unique_ptr<game::Routines> _routines;
 
     std::map<ResourcesItemId, ResourcesItem *> _idToResItem;
+    std::list<std::shared_ptr<ResourcesItem>> _allResItems;
+    std::optional<ResourcesItemId> _expandedItem;
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
@@ -238,12 +244,13 @@ private:
 
     // Properties
 
-    CollectionProperty<std::shared_ptr<ResourcesItem>> _resItems;
+    CollectionProperty<ResourcesItem *> _resItems;
     CollectionProperty<std::shared_ptr<Page>> _pages;
 
     Property<int> _selectedPage;
     Property<Progress> _progress;
     Property<bool> _renderEnabled;
+    Property<bool> _goToParentEnabled;
 
     // END Properties
 
