@@ -143,7 +143,11 @@ void ResourceExplorerFrame::InitControls() {
 
     auto navigationPanel = new wxPanel(resourcesPanel);
     auto artProvider = new wxArtProvider();
+#if wxCHECK_VERSION(3, 1, 6)
     m_goToParentButton = new wxBitmapButton(navigationPanel, wxID_ANY, artProvider->GetBitmapBundle(wxART_GO_TO_PARENT));
+#else
+    m_goToParentButton = new wxBitmapButton(navigationPanel, wxID_ANY, artProvider->GetBitmap(wxART_GO_TO_PARENT));
+#endif
     m_goToParentButton->Disable();
     m_goToParentButton->Bind(wxEVT_BUTTON, &ResourceExplorerFrame::OnGoToParentButton, this);
 
