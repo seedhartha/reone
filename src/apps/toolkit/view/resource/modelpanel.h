@@ -49,6 +49,8 @@ class ModelResourcePanel : public wxPanel {
 public:
     ModelResourcePanel(ModelResourceViewModel &viewModel, wxWindow *parent);
 
+    void InitGL();
+
     void RefreshGL() {
         m_glCanvas->Refresh();
     }
@@ -66,6 +68,7 @@ private:
     wxButton *m_lipLoadBtn {nullptr};
 
     std::shared_ptr<graphics::LipAnimation> m_lipAnim;
+    bool _glInited {false};
 
     void InitControls();
     void BindEvents();

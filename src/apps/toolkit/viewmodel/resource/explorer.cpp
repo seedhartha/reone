@@ -298,24 +298,23 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Mdl) {
-        loadEngine();
-
         _renderEnabled = false;
-        _modelResViewModel->openModel(id, data);
 
         _pages.removeIf([](auto &page) { return page->type == PageType::Model; });
         auto page = std::make_shared<Page>(PageType::Model, id.string(), id);
         _pages.add(std::move(page));
 
+        loadEngine();
+        _modelResViewModel->openModel(id, data);
         _renderEnabled = true;
 
     } else if (id.type == ResType::Wav) {
-        loadEngine();
-        _audioResViewModel->openAudio(id, data);
-
         _pages.removeIf([](auto &page) { return page->type == PageType::Audio; });
         auto page = std::make_shared<Page>(PageType::Audio, id.string(), id);
         _pages.add(std::move(page));
+
+        loadEngine();
+        _audioResViewModel->openAudio(id, data);
 
     } else {
         return;

@@ -239,6 +239,11 @@ void ResourceExplorerFrame::BindViewModel() {
                     page->dirty = true;
                 });
             }
+            if (page->type == PageType::Model || page->type == PageType::Audio) {
+                m_modelPanel->Show();
+                m_modelPanel->InitGL();
+                m_modelPanel->Hide();
+            }
             window->SetClientData(new PageClientData {page->resourceId});
             window->Show();
             m_notebook->AddPage(window, page->displayName, true);

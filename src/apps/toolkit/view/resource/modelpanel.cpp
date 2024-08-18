@@ -42,15 +42,6 @@ void ModelResourcePanel::InitControls() {
 
     m_glCanvas = new wxGLCanvas(m_renderSplitter, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
 
-#if wxCHECK_VERSION(3, 1, 0)
-    wxGLContextAttrs glCtxAttrs;
-    glCtxAttrs.CoreProfile().OGLVersion(4, 0).EndList();
-    auto glContext = new wxGLContext(m_glCanvas, nullptr, &glCtxAttrs);
-#else
-    auto glContext = new wxGLContext(m_glCanvas);
-#endif
-    glContext->SetCurrent(*m_glCanvas);
-
     m_animationPanel = new wxPanel(m_renderSplitter);
 
     m_animPauseResumeBtn = new wxButton(m_animationPanel, wxID_ANY, "Pause");
@@ -126,7 +117,25 @@ void ModelResourcePanel::BindViewModel() {
     });
 }
 
+void ModelResourcePanel::InitGL() {
+    if (_glInited) {
+        return;
+    }
+#if wxCHECK_VERSION(3, 1, 0)
+    wxGLContextAttrs glCtxAttrs;
+    glCtxAttrs.CoreProfile().OGLVersion(4, 0).EndList();
+    auto glContext = new wxGLContext(m_glCanvas, nullptr, &glCtxAttrs);
+#else
+    auto glContext = new wxGLContext(m_glCanvas);
+#endif
+    glContext->SetCurrent(*m_glCanvas);
+    _glInited = true;
+}
+
 void ModelResourcePanel::OnGLCanvasPaint(wxPaintEvent &event) {
+    if (!_glInited) {
+        return;
+    }
     wxPaintDC dc(m_glCanvas);
 
     auto clientSize = m_glCanvas->GetClientSize();
