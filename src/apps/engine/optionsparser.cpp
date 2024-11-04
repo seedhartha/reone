@@ -42,8 +42,9 @@ std::unique_ptr<Options> OptionsParser::parse() {
     descCommon.add_options()                                                                                                    //
         ("game", value<std::string>(), "path to game directory")                                                                //
         ("dev", value<bool>()->default_value(options->game.developer), "enable developer mode")                                 //
-        ("width", value<int>()->default_value(options->graphics.width), "window width")                                         //
-        ("height", value<int>()->default_value(options->graphics.height), "window height")                                      //
+        ("width", value<int>()->default_value(options->graphics.width), "render width")                                         //
+        ("height", value<int>()->default_value(options->graphics.height), "render height")                                      //
+        ("winscale", value<int>()->default_value(options->graphics.winScale), "window scale")                                   //
         ("fullscreen", value<bool>()->default_value(options->graphics.fullscreen), "enable fullscreen")                         //
         ("vsync", value<bool>()->default_value(options->graphics.vsync), "enable v-sync")                                       //
         ("grass", value<bool>()->default_value(options->graphics.grass), "enable grass")                                        //
@@ -81,6 +82,7 @@ std::unique_ptr<Options> OptionsParser::parse() {
     options->game.developer = vars["dev"].as<bool>();
     options->graphics.width = vars["width"].as<int>();
     options->graphics.height = vars["height"].as<int>();
+    options->graphics.winScale = vars["winscale"].as<int>();
     options->graphics.fullscreen = vars["fullscreen"].as<bool>();
     options->graphics.vsync = vars["vsync"].as<bool>();
     options->graphics.grass = vars["grass"].as<bool>();

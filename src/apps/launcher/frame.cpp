@@ -55,7 +55,7 @@ LauncherFrame::LauncherFrame() :
 
     // Graphics
 
-    // Screen Resolution
+    // Render Resolution
 
     wxArrayString resChoices;
     resChoices.Add("800x600");
@@ -83,7 +83,7 @@ LauncherFrame::LauncherFrame() :
         resSelection = resChoices.GetCount() - 1;
     }
 
-    auto labelResolution = new wxStaticText(this, wxID_ANY, "Screen Resolution", wxDefaultPosition, wxDefaultSize);
+    auto labelResolution = new wxStaticText(this, wxID_ANY, "Render Resolution", wxDefaultPosition, wxDefaultSize);
 
     _choiceResolution = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, resChoices);
     _choiceResolution->SetSelection(resSelection);
@@ -92,7 +92,30 @@ LauncherFrame::LauncherFrame() :
     resSizer->Add(labelResolution, wxSizerFlags(0).Expand());
     resSizer->Add(_choiceResolution, wxSizerFlags(0).Expand());
 
-    // END Screen Resolution
+    // END Render Resolution
+
+    // Window Scale
+
+    auto winScalesLabel = new wxStaticText(this, wxID_ANY, "Window Scale", wxDefaultPosition, wxDefaultSize);
+
+    wxArrayString winScales;
+    winScales.Add("100%");
+    winScales.Add("125%");
+    winScales.Add("150%");
+    winScales.Add("175%");
+    winScales.Add("200%");
+    int winScaleSel = winScales.Index(str(boost::format("%d%%") % _config.winscale));
+    if (winScaleSel == wxNOT_FOUND) {
+        winScaleSel = 0;
+    }
+    _choiceWinScale = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, winScales);
+    _choiceWinScale->SetSelection(winScaleSel);
+
+    auto winScaleSizer = new wxBoxSizer(wxVERTICAL);
+    winScaleSizer->Add(winScalesLabel, wxSizerFlags(0).Expand());
+    winScaleSizer->Add(_choiceWinScale, wxSizerFlags(0).Expand());
+
+    // END Window Scale
 
     // Renderer
 
@@ -218,6 +241,7 @@ LauncherFrame::LauncherFrame() :
 
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(winScaleSizer, wxSizerFlags(0).Expand());
     graphicsSizer->Add(rendererSizer, wxSizerFlags(0).Expand());
     graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand());
     graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand());
@@ -334,6 +358,7 @@ void LauncherFrame::LoadConfiguration() {
         ("dev", value<bool>()->default_value(_config.devMode))            //
         ("width", value<int>()->default_value(_config.width))             //
         ("height", value<int>()->default_value(_config.height))           //
+        ("winscale", value<int>()->default_value(_config.winscale))       //
         ("fullscreen", value<bool>()->default_value(_config.fullscreen))  //
         ("vsync", value<bool>()->default_value(_config.vsync))            //
         ("grass", value<bool>()->default_value(_config.grass))            //
@@ -365,6 +390,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.devMode = vars["dev"].as<bool>();
     _config.width = vars["width"].as<int>();
     _config.height = vars["height"].as<int>();
+    _config.winscale = vars["winscale"].as<int>();
     _config.fullscreen = vars["fullscreen"].as<bool>();
     _config.vsync = vars["vsync"].as<bool>();
     _config.grass = vars["grass"].as<bool>();
@@ -404,6 +430,7 @@ void LauncherFrame::SaveConfiguration() {
         "dev=",
         "width=",
         "height=",
+        "winscale=",
         "fullscreen=",
         "vsync=",
         "grass=",
@@ -462,10 +489,15 @@ void LauncherFrame::SaveConfiguration() {
         logch |= static_cast<int>(LogChannel::Script3);
     }
 
+    int winScaleSel = _choiceWinScale->GetSelection();
+    auto winScaleSelStr = _choiceWinScale->GetString(winScaleSel).Mid(0, 3);
+    int winScale = atoi(winScaleSelStr);
+
     _config.gameDir = _textCtrlGameDir->GetValue();
     _config.devMode = _checkBoxDev->IsChecked();
     _config.width = stoi(tokens[0]);
     _config.height = stoi(tokens[1]);
+    _config.winscale = winScale;
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.vsync = _checkBoxVSync->IsChecked();
     _config.grass = _checkBoxGrass->IsChecked();
@@ -506,6 +538,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "dev=" << (_config.devMode ? 1 : 0) << std::endl;
     config << "width=" << _config.width << std::endl;
     config << "height=" << _config.height << std::endl;
+    config << "winscale=" << _config.winscale << std::endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << std::endl;
     config << "vsync=" << (_config.vsync ? 1 : 0) << std::endl;
     config << "grass=" << (_config.grass ? 1 : 0) << std::endl;

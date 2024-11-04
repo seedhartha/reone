@@ -33,14 +33,15 @@ void Window::init() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
+    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
     if (_options.fullscreen) {
         flags |= SDL_WINDOW_FULLSCREEN;
     }
     _window = SDL_CreateWindow(
         "reone",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        _options.width, _options.height,
+        _options.width * _options.winScale / 100,
+        _options.height * _options.winScale / 100,
         flags);
     if (!_window) {
         throw std::runtime_error("SDL_CreateWindow failed: " + std::string(SDL_GetError()));
