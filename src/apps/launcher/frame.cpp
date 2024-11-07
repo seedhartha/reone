@@ -491,7 +491,7 @@ void LauncherFrame::SaveConfiguration() {
 
     int winScaleSel = _choiceWinScale->GetSelection();
     auto winScaleSelStr = _choiceWinScale->GetString(winScaleSel).Mid(0, 3);
-    int winScale = atoi(winScaleSelStr);
+    int winScale = atoi(winScaleSelStr.c_str());
 
     _config.gameDir = _textCtrlGameDir->GetValue();
     _config.devMode = _checkBoxDev->IsChecked();
