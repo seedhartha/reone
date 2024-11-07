@@ -274,6 +274,10 @@ void Engine::setRelativeMouseMode(bool relative) {
     _relativeMouseMode = relative;
 }
 
+static constexpr int scaleWinCoord(int coord, int winScale) {
+    return coord * 100 / winScale;
+}
+
 std::optional<input::Event> Engine::eventFromSDLEvent(const SDL_Event &sdlEvent) const {
     switch (sdlEvent.type) {
     case SDL_KEYDOWN:
@@ -290,8 +294,8 @@ std::optional<input::Event> Engine::eventFromSDLEvent(const SDL_Event &sdlEvent)
             static_cast<bool>(sdlEvent.key.repeat)});
     case SDL_MOUSEMOTION:
         return input::Event::newMouseMotion(input::MouseMotionEvent {
-            sdlEvent.motion.x,
-            sdlEvent.motion.y,
+            scaleWinCoord(sdlEvent.motion.x, _options.graphics.winScale),
+            scaleWinCoord(sdlEvent.motion.y, _options.graphics.winScale),
             sdlEvent.motion.xrel,
             sdlEvent.motion.yrel});
     case SDL_MOUSEBUTTONDOWN:
@@ -299,15 +303,15 @@ std::optional<input::Event> Engine::eventFromSDLEvent(const SDL_Event &sdlEvent)
             static_cast<input::MouseButton>(sdlEvent.button.button),
             sdlEvent.button.state == SDL_PRESSED,
             sdlEvent.button.clicks,
-            sdlEvent.button.x,
-            sdlEvent.button.y});
+            scaleWinCoord(sdlEvent.button.x, _options.graphics.winScale),
+            scaleWinCoord(sdlEvent.button.y, _options.graphics.winScale)});
     case SDL_MOUSEBUTTONUP:
         return input::Event::newMouseButtonUp(input::MouseButtonEvent {
             static_cast<input::MouseButton>(sdlEvent.button.button),
             sdlEvent.button.state == SDL_PRESSED,
             sdlEvent.button.clicks,
-            sdlEvent.button.x,
-            sdlEvent.button.y});
+            scaleWinCoord(sdlEvent.button.x, _options.graphics.winScale),
+            scaleWinCoord(sdlEvent.button.y, _options.graphics.winScale)});
     case SDL_MOUSEWHEEL: {
         return input::Event::newMouseWheel(input::MouseWheelEvent {
             sdlEvent.wheel.x,
