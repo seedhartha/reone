@@ -52,6 +52,7 @@ public:
 
 private:
     ResourceExplorerViewModel &m_viewModel;
+    int _resListBoxSelection {0};
 
     // Menus
 
@@ -96,8 +97,9 @@ private:
     void OnComposeLipCommand(wxCommandEvent &event);
     void OnGoToParentButton(wxCommandEvent &event);
 
+    void OnResourcesListBox(wxCommandEvent &event);
+    void OnResourcesListBoxContextMenu(wxContextMenuEvent &event);
     void OnResourcesListBoxDoubleClick(wxCommandEvent &event);
-    void OnResourcesListBoxContextMenu(wxCommandEvent &event);
 
     void OnNotebookPageClose(wxAuiNotebookEvent &event);
     void OnNotebookPageChanged(wxAuiNotebookEvent &event);

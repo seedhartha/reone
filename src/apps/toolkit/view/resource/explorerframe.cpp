@@ -139,6 +139,7 @@ void ResourceExplorerFrame::InitControls() {
 
     m_resourcesListBox = new wxListBox(resourcesPanel, wxID_ANY);
     m_resourcesListBox->Bind(wxEVT_CONTEXT_MENU, &ResourceExplorerFrame::OnResourcesListBoxContextMenu, this);
+    m_resourcesListBox->Bind(wxEVT_LISTBOX, &ResourceExplorerFrame::OnResourcesListBox, this);
     m_resourcesListBox->Bind(wxEVT_LISTBOX_DCLICK, &ResourceExplorerFrame::OnResourcesListBoxDoubleClick, this);
 
     auto navigationPanel = new wxPanel(resourcesPanel);
@@ -404,6 +405,10 @@ void ResourceExplorerFrame::OnGoToParentButton(wxCommandEvent &event) {
     m_viewModel.onGoToParentButton();
 }
 
+void ResourceExplorerFrame::OnResourcesListBox(wxCommandEvent &event) {
+    _resListBoxSelection = event.GetSelection();
+}
+
 void ResourceExplorerFrame::OnResourcesListBoxDoubleClick(wxCommandEvent &event) {
     int itemIdx = event.GetInt();
     if (itemIdx == -1) {
@@ -417,12 +422,8 @@ void ResourceExplorerFrame::OnResourcesListBoxDoubleClick(wxCommandEvent &event)
     m_viewModel.onResourcesListBoxDoubleClick(resItemId);
 }
 
-void ResourceExplorerFrame::OnResourcesListBoxContextMenu(wxCommandEvent &event) {
-    int itemIdx = event.GetInt();
-    if (itemIdx == -1) {
-        return;
-    }
-    auto *itemData = m_resourcesListBox->GetClientObject(itemIdx);
+void ResourceExplorerFrame::OnResourcesListBoxContextMenu(wxContextMenuEvent &event) {
+    auto *itemData = m_resourcesListBox->GetClientObject(_resListBoxSelection);
     if (!itemData) {
         return;
     }
