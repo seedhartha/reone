@@ -195,7 +195,7 @@ private:
 #if (LIBSWRESAMPLE_VERSION_MAJOR > 4) || \
     (LIBSWRESAMPLE_VERSION_MAJOR == 4 && LIBSWRESAMPLE_VERSION_MINOR >= 7)
         AVChannelLayout outChLayout(AV_CHANNEL_LAYOUT_MONO);
-        const auto &inChLayout = _audioCodecCtx->ch_layout;
+        auto &inChLayout = _audioCodecCtx->ch_layout;
         swr_alloc_set_opts2(
             &_swrContext,
             &outChLayout, AV_SAMPLE_FMT_S16, _audioCodecCtx->sample_rate,
