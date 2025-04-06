@@ -371,8 +371,11 @@ void ResourceExplorerViewModel::loadResources() {
     _routines = std::make_unique<Routines>(_gameId, nullptr, nullptr);
     _routines->init();
 
-    std::list<ResourcesItem *> resItems;
     _idToResItem.clear();
+    _allResItems.clear();
+    _expandedItemId.reset();
+
+    std::list<ResourcesItem *> resItems;
     for (auto &file : std::filesystem::directory_iterator(_resourcesPath)) {
         auto filename = boost::to_lower_copy(file.path().filename().string());
         auto extension = boost::to_lower_copy(file.path().extension().string());
@@ -403,10 +406,13 @@ void ResourceExplorerViewModel::loadResources() {
         _idToResItem.insert({item->id, item.get()});
         _allResItems.push_back(std::move(item));
     }
+
     _resItems = std::move(resItems);
 
     _resourceModule->setGameID(_gameId);
     _resourceModule->setGamePath(_resourcesPath);
+
+    _goToParentEnabled = false;
 }
 
 void ResourceExplorerViewModel::loadTools() {
@@ -907,25 +913,25 @@ void ResourceExplorerViewModel::onResourcesListBoxDoubleClick(const ResourcesIte
         }
         expandingItem.loaded = true;
     }
-    _expandedItem = expandingItem.id;
+    _expandedItemId = expandingItem.id;
     _resItems = std::move(resItems);
     _goToParentEnabled = true;
 }
 
 void ResourceExplorerViewModel::onGoToParentButton() {
-    if (!_expandedItem) {
+    if (!_expandedItemId) {
         return;
     }
-    auto &parent = _idToResItem.at(*_expandedItem);
+    auto &expandedItem = _idToResItem.at(*_expandedItemId);
     std::list<ResourcesItem *> resItems;
     for (auto &item : _allResItems) {
-        if (item->parentId == parent->parentId) {
+        if (item->parentId == expandedItem->parentId) {
             resItems.push_back(item.get());
         }
     }
     _resItems = std::move(resItems);
-    _expandedItem = parent->parentId;
-    _goToParentEnabled = _expandedItem.has_value();
+    _expandedItemId = expandedItem->parentId;
+    _goToParentEnabled = _expandedItemId.has_value();
 }
 
 } // namespace reone

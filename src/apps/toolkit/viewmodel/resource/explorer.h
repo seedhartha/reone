@@ -230,7 +230,7 @@ private:
 
     std::map<ResourcesItemId, ResourcesItem *> _idToResItem;
     std::list<std::shared_ptr<ResourcesItem>> _allResItems;
-    std::optional<ResourcesItemId> _expandedItem;
+    std::optional<ResourcesItemId> _expandedItemId;
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
