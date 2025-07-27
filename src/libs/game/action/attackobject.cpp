@@ -37,6 +37,7 @@ void AttackObjectAction::execute(std::shared_ptr<Action> self, Object &actor, fl
     // Make the actor follow its target. When reached, register an attack.
     if (creatureActor->navigateTo(_attackee->position(), true, creatureActor->getAttackRange(), dt)) {
         _game.combat().addAttack(std::move(creatureActor), _attackee, self);
+        complete();
     }
 }
 

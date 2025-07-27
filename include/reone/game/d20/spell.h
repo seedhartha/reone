@@ -26,10 +26,13 @@ namespace reone {
 namespace game {
 
 struct Spell {
+    SpellType type;
     std::string name;
     std::string description;
     std::shared_ptr<graphics::Texture> icon;
     uint32_t pips {1}; // 1-3, position in a feat chain
+    uint32_t maxcr {0}; // challenge rating of the spell
+    uint32_t category;
 };
 
 } // namespace game

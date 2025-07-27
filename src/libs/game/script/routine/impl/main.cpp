@@ -15,9 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "reone/game/action/castspellatobject.h"
 #include "reone/game/action/docommand.h"
 #include "reone/game/action/jumptolocation.h"
 #include "reone/game/action/jumptoobject.h"
+#include "reone/game/action/movetoobject.h"
+#include "reone/game/action/usefeat.h"
+#include "reone/game/action/usetalentonobject.h"
+#include "reone/game/d20/feats.h"
+#include "reone/game/d20/spells.h"
 #include "reone/game/event.h"
 #include "reone/game/game.h"
 #include "reone/game/reputes.h"
@@ -2617,9 +2623,67 @@ static Variable GetCreatureHasTalent(const std::vector<Variable> &args, const Ro
     auto oCreature = getObjectOrCaller(args, 1, ctx);
 
     // Transform
+    auto creature = checkCreature(oCreature);
 
     // Execute
-    throw RoutineNotImplementedException("GetCreatureHasTalent");
+    bool result = 0;
+    switch (tTalent->type()) {
+    case TalentType::Spell: {
+        SpellType spell = static_cast<SpellType>(tTalent->value());
+        result = creature->attributes().hasSpell(spell);
+        break;
+    }
+    case TalentType::Feat: {
+        FeatType feat = static_cast<FeatType>(tTalent->value());
+        result = creature->attributes().hasFeat(feat);
+        break;
+    }
+    default:
+        break;
+    }
+
+    return Variable::ofInt(result);
+}
+
+// Talents (feats and spells) are sorted by category. Returns an iterator to a
+// random talent, or `end` otherwise.
+template <typename T, typename C>
+static T findRandomTalentByCategory(T begin, T end, uint32_t category, C cond) {
+    auto cmp = [](const typename T::value_type &v, const uint32_t &cat) {
+        return v->category < cat;
+    };
+
+    auto lower = std::lower_bound(begin, end, category, cmp);
+
+    // TODO: We effectively evaluate the same condition twice: once to
+    // compute the total number of matching talents, and another to find the
+    // matching one. Perhaps it is better to store candidates in an array,
+    // and then do a constant lookup?
+
+    unsigned numChoices = 0;
+    for (auto it = lower; it != end && (*it)->category == category; ++it) {
+        if (cond(it)) {
+            ++numChoices;
+        }
+    }
+
+    if (!numChoices) {
+        return end;
+    }
+
+    unsigned chosen = randomInt(0, numChoices - 1);
+    unsigned current = 0;
+    for (auto it = lower; it != end && (*it)->category == category; ++it) {
+        if (!cond(it)) {
+            continue;
+        }
+        if (current == chosen) {
+            return it;
+        }
+        ++current;
+    }
+
+    return end;
 }
 
 static Variable GetCreatureTalentRandom(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2629,9 +2693,64 @@ static Variable GetCreatureTalentRandom(const std::vector<Variable> &args, const
     auto nInclusion = getIntOrElse(args, 2, 0);
 
     // Transform
+    auto creature = checkCreature(oCreature);
+
+    // TODO: we ignore nInclusion here, because it is inconsistent. Enemy
+    // scripts in Kotor ask for feat categories with nInclusion == 0 (aka "Force
+    // Power"). Always search both feats and spells.
 
     // Execute
-    throw RoutineNotImplementedException("GetCreatureTalentRandom");
+
+    IFeats &feats = ctx.services.game.feats;
+
+    auto checkFeat = [&](IFeats::ConstIterator it) -> bool {
+        return creature->attributes().hasFeat((*it)->type);
+    };
+
+    auto featIt = findRandomTalentByCategory(
+            feats.begin(), feats.end(), nCategory, checkFeat);
+    if (featIt != feats.end()) {
+        auto talent = ctx.game.newTalent(
+                TalentType::Feat, static_cast<int>((*featIt)->type));
+        return Variable::ofTalent(talent);
+    }
+
+    // Same algorithm for spells
+    ISpells &spells = ctx.services.game.spells;
+
+    auto checkSpell = [&](ISpells::ConstIterator it) -> bool {
+        return creature->attributes().hasSpell((*it)->type);
+    };
+
+    auto spellIt = findRandomTalentByCategory(
+            spells.begin(), spells.end(), nCategory, checkSpell);
+    if (spellIt != spells.end()) {
+        auto talent = ctx.game.newTalent(
+                TalentType::Spell, static_cast<int>((*spellIt)->type));
+        return Variable::ofTalent(talent);
+    }
+
+    auto invalid = ctx.game.newTalent(TalentType::Invalid, 0);
+    return Variable::ofTalent(invalid);
+}
+
+// Talents (feats and spells) are sorted by category. Returns the first one
+// that matches `cond`, or `end` otherwise.
+template <typename T, typename C>
+static T findFirstTalentByCategory(T begin, T end, uint32_t category, C cond) {
+    auto cmp = [](const typename T::value_type &v, const uint32_t &cat) {
+        return v->category < cat;
+    };
+
+    auto it = std::lower_bound(begin, end, category, cmp);
+
+    while (it != end && (*it)->category == category) {
+        if (cond(it)) {
+            return it;
+        }
+        ++it;
+    }
+    return end;
 }
 
 static Variable GetCreatureTalentBest(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2644,9 +2763,55 @@ static Variable GetCreatureTalentBest(const std::vector<Variable> &args, const R
     auto nExcludeId = getIntOrElse(args, 5, -1);
 
     // Transform
+    auto creature = checkCreature(oCreature);
 
     // Execute
-    throw RoutineNotImplementedException("GetCreatureTalentBest");
+
+    // TODO: it is unclear how nInclusion and nExcludeType are supposed to
+    // work. If nInclusion means a single talent type, then nExcludeType is
+    // almost useless.
+    //
+    // When nExcludeType != nInclusion, nExcludeType can be ignored.
+    // When nExcludeType == nInclusion, nExcludeId allows to ignore a single
+    // talent.
+    //
+    // This could make sense if nInclusion was a bitmask, but TalentType enum is
+    // sequential, so it is not going to work.
+    //
+    // Fow now we ignore all three of these arguments, and assume that
+    // a category is fine-grained enough to not cause a problem.
+
+    auto checkFeat = [&](IFeats::ConstIterator it) -> bool {
+        return (*it)->maxcr <= nCRMax && creature->attributes().hasFeat((*it)->type);
+    };
+
+    IFeats &feats = ctx.services.game.feats;
+    auto featIt = findFirstTalentByCategory(
+            feats.begin(), feats.end(), nCategory, checkFeat);
+
+    if (featIt != feats.end()) {
+        auto talent = ctx.game.newTalent(
+                TalentType::Feat, static_cast<int>((*featIt)->type));
+        return Variable::ofTalent(talent);
+    }
+
+    // Same algorithm, but for force powers.
+    auto checkSpell = [&](ISpells::ConstIterator it) -> bool {
+        return (*it)->maxcr <= nCRMax && creature->attributes().hasSpell((*it)->type);
+    };
+
+    ISpells &spells = ctx.services.game.spells;
+    auto spellIt = findFirstTalentByCategory(
+            spells.begin(), spells.end(), nCategory, checkSpell);
+
+    if (spellIt != spells.end()) {
+        auto talent = ctx.game.newTalent(
+                TalentType::Spell, static_cast<int>((*spellIt)->type));
+        return Variable::ofTalent(talent);
+    }
+
+    auto invalid = ctx.game.newTalent(TalentType::Invalid, 0);
+    return Variable::ofTalent(invalid);
 }
 
 static Variable GetGoldPieceValue(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -3127,7 +3292,7 @@ static Variable GetIdFromTalent(const std::vector<Variable> &args, const Routine
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("GetIdFromTalent");
+    return Variable::ofInt(tTalent->value());
 }
 
 static Variable PlayPazaak(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -3224,8 +3389,32 @@ static Variable SendMessageToPC(const std::vector<Variable> &args, const Routine
 }
 
 static Variable GetAttemptedSpellTarget(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
+    auto caller = getCaller(ctx);
+
+    // Transform
+    auto creature = checkCreature(caller);
+
     // Execute
-    throw RoutineNotImplementedException("GetAttemptedSpellTarget");
+    const Creature::ActionHistory &history = creature->combatActionHistory();
+    for (auto i = history.rbegin(), e = history.rend(); i != e; ++i) {
+        const Action &action = **i;
+        switch (action.type()) {
+        case ActionType::CastSpellAtObject: {
+            auto *castSpell = (CastSpellAtObjectAction*) &action;
+            return Variable::ofObject(castSpell->target()->id());
+        }
+        case ActionType::UseTalentOnObject: {
+            auto *useTalent = (UseTalentOnObjectAction*) &action;
+            if (useTalent->talent()->type() == TalentType::Spell) {
+                return Variable::ofObject(useTalent->target()->id());
+            }
+        }
+        default:
+            break;
+        }
+    }
+    return Variable::ofObject(kObjectInvalid);
 }
 
 static Variable GetLastOpenedBy(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -3240,9 +3429,12 @@ static Variable GetHasSpell(const std::vector<Variable> &args, const RoutineCont
     auto oCreature = getObjectOrCaller(args, 1, ctx);
 
     // Transform
+    auto spell = static_cast<SpellType>(nSpell);
+    auto creature = checkCreature(oCreature);
 
     // Execute
-    throw RoutineNotImplementedException("GetHasSpell");
+    bool hasSpell = creature->attributes().hasSpell(spell);
+    return Variable::ofInt(static_cast<int>(hasSpell));
 }
 
 static Variable OpenStore(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -3463,9 +3655,9 @@ static Variable GetIsEncounterCreature(const std::vector<Variable> &args, const 
     auto oCreature = getObjectOrCaller(args, 0, ctx);
 
     // Transform
+    auto creature = checkCreature(oCreature);
 
-    // Execute
-    throw RoutineNotImplementedException("GetIsEncounterCreature");
+    return Variable::ofInt(static_cast<int>(creature->isSpawned()));
 }
 
 static Variable GetLastPlayerDying(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -3479,14 +3671,16 @@ static Variable GetStartingLocation(const std::vector<Variable> &args, const Rou
 }
 
 static Variable ChangeToStandardFaction(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    // Load
     auto oCreatureToChange = getObject(args, 0, ctx);
     auto nStandardFaction = getInt(args, 1);
 
-    // Transform
+    if (nStandardFaction <= (int)Faction::Invalid || nStandardFaction >= (int)Faction::Last) {
+        throw RoutineArgumentException(str(boost::format("Invalid faction: %d") % nStandardFaction));
+    }
 
-    // Execute
-    throw RoutineNotImplementedException("ChangeToStandardFaction");
+    auto creature = checkCreature(oCreatureToChange);
+    creature->setFaction((Faction)nStandardFaction);
+    return Variable::ofNull();
 }
 
 static Variable SoundObjectPlay(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -3793,13 +3987,8 @@ static Variable TakeGoldFromCreature(const std::vector<Variable> &args, const Ro
 }
 
 static Variable GetIsInConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    // Load
     auto oObject = getObject(args, 0, ctx);
-
-    // Transform
-
-    // Execute
-    throw RoutineNotImplementedException("GetIsInConversation");
+    return Variable::ofInt(oObject->isInConversation());
 }
 
 static Variable GetPlotFlag(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -3949,8 +4138,26 @@ static Variable GetNearestTrapToObject(const std::vector<Variable> &args, const 
 }
 
 static Variable GetAttemptedMovementTarget(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
+    auto caller = getCaller(ctx);
+
+    // Transform
+    auto creature = checkCreature(caller);
+
     // Execute
-    throw RoutineNotImplementedException("GetAttemptedMovementTarget");
+    const Creature::ActionHistory &actionHistory = creature->combatActionHistory();
+    for (auto i = actionHistory.rbegin(), e = actionHistory.rend(); i != e; ++i) {
+        const Action &action = **i;
+        switch (action.type()) {
+        case ActionType::MoveToObject: {
+            auto *move = (MoveToObjectAction*) &action;
+            return Variable::ofObject(move->target()->id());
+        }
+        default:
+            break;
+        }
+    }
+    return Variable::ofObject(kObjectInvalid);
 }
 
 static Variable GetBlockingCreature(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -5096,7 +5303,8 @@ static Variable IsNPCPartyMember(const std::vector<Variable> &args, const Routin
 
 static Variable GetIsConversationActive(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    throw RoutineNotImplementedException("GetIsConversationActive");
+    bool active = ctx.game.currentScreen() == game::Game::Screen::Conversation;
+    return Variable::ofInt(static_cast<int>(active));
 }
 
 static Variable GetPartyAIStyle(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -5181,14 +5389,12 @@ static Variable ShowPartySelectionGUI(const std::vector<Variable> &args, const R
 
     // Transform
     auto exitScript = boost::to_lower_copy(sExitScript);
-    auto forceNPC1 = static_cast<bool>(nForceNPC1);
-    auto forceNPC2 = static_cast<bool>(nForceNPC2);
 
     // Execute
     PartySelectionContext partyCtx;
     partyCtx.exitScript = exitScript;
-    partyCtx.forceNpc1 = forceNPC1;
-    partyCtx.forceNpc2 = forceNPC2;
+    partyCtx.forceNpc1 = nForceNPC1;
+    partyCtx.forceNpc2 = nForceNPC2;
     ctx.game.openPartySelection(partyCtx);
     return Variable::ofNull();
 }
@@ -5271,19 +5477,66 @@ static Variable GetLastHostileTarget(const std::vector<Variable> &args, const Ro
     auto oAttacker = getObjectOrCaller(args, 0, ctx);
 
     // Transform
+    auto attacker = checkCreature(oAttacker);
 
     // Execute
-    throw RoutineNotImplementedException("GetLastHostileTarget");
+    const Combat::AttackHistory &history = ctx.game.combat().attackHistory(*attacker);
+    if (!history.empty()) {
+        Combat::Attack &lastAttack = *history.back();
+        return Variable::ofObject(lastAttack.target->id());
+    }
+
+    const auto &reputes = ctx.services.game.reputes;
+
+    // TODO: spells should be implemented in Combat. For now, check the
+    // character action history to find a hostile target of a spell.
+    const Creature::ActionHistory &actionHistory = attacker->combatActionHistory();
+    for (auto i = actionHistory.rbegin(), e = actionHistory.rend(); i != e; ++i) {
+        const Action &action = **i;
+        const Object *target = nullptr;
+        switch (action.type()) {
+        case ActionType::CastSpellAtObject: {
+            auto *castSpell = (CastSpellAtObjectAction*) &action;
+            target = castSpell->target().get();
+            break;
+        }
+        case ActionType::UseTalentOnObject: {
+            auto *useTalent = (UseTalentOnObjectAction*) &action;
+            target = useTalent->target().get();
+            break;
+        }
+        default:
+            break;
+        }
+
+        if (!target || target->type() != ObjectType::Creature) {
+            continue;
+        }
+        auto *targetCreature = (const Creature *) target;
+
+        if (reputes.getIsEnemy(*targetCreature, *attacker)) {
+            return Variable::ofObject(targetCreature->id());
+        }
+    }
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
-static Variable GetLastAttackObjectAction(const std::vector<Variable> &args, const RoutineContext &ctx) {
+static Variable GetLastAttackAction(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Load
     auto oAttacker = getObjectOrCaller(args, 0, ctx);
 
     // Transform
+    auto attacker = checkCreature(oAttacker);
 
     // Execute
-    throw RoutineNotImplementedException("GetLastAttackObjectAction");
+    const Combat::AttackHistory &history = ctx.game.combat().attackHistory(*attacker);
+    if (history.empty()) {
+        return Variable::ofInt(static_cast<int>(ActionType::QueueEmpty));
+    }
+
+    Combat::Attack &lastAttack = *history.back();
+    return Variable::ofInt(static_cast<int>(lastAttack.action->type()));
 }
 
 static Variable GetLastForcePowerUsed(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -5301,9 +5554,29 @@ static Variable GetLastCombatFeatUsed(const std::vector<Variable> &args, const R
     auto oAttacker = getObjectOrCaller(args, 0, ctx);
 
     // Transform
+    auto attacker = checkCreature(oAttacker);
 
     // Execute
-    throw RoutineNotImplementedException("GetLastCombatFeatUsed");
+    const Combat::AttackHistory &history = ctx.game.combat().attackHistory(*attacker);
+    for (auto i = history.rbegin(), e = history.rend(); i != e; ++i) {
+        Combat::Attack &attack = **i;
+        switch (attack.action->type()) {
+        case ActionType::UseFeat: {
+            auto featAction = std::static_pointer_cast<UseFeatAction>(attack.action);
+            return Variable::ofInt(static_cast<int>(featAction->feat()));
+        }
+        case ActionType::UseTalentOnObject: {
+            auto talentAction = std::static_pointer_cast<UseTalentOnObjectAction>(attack.action);
+            if (talentAction->talent()->type() == TalentType::Feat) {
+                return Variable::ofInt(talentAction->talent()->value());
+            }
+        }
+        default:
+            break;
+        }
+    }
+
+    return Variable::ofInt(static_cast<int>(FeatType::Invalid));
 }
 
 static Variable GetLastAttackResult(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -5311,9 +5584,16 @@ static Variable GetLastAttackResult(const std::vector<Variable> &args, const Rou
     auto oAttacker = getObjectOrCaller(args, 0, ctx);
 
     // Transform
+    auto attacker = checkCreature(oAttacker);
 
     // Execute
-    throw RoutineNotImplementedException("GetLastAttackResult");
+    const Combat::AttackHistory &history = ctx.game.combat().attackHistory(*attacker);
+    if (history.empty()) {
+        return Variable::ofInt(static_cast<int>(AttackResultType::Invalid));
+    }
+
+    Combat::Attack &lastAttack = *history.back();
+    return Variable::ofInt(static_cast<int>(lastAttack.resultType));
 }
 
 static Variable GetWasForcePowerSuccessful(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -5408,10 +5688,8 @@ static Variable GetCategoryFromTalent(const std::vector<Variable> &args, const R
     // Load
     auto tTalent = getTalent(args, 0);
 
-    // Transform
-
     // Execute
-    throw RoutineNotImplementedException("GetCategoryFromTalent");
+    return Variable::ofInt(static_cast<int>(tTalent->type()));
 }
 
 static Variable SurrenderByFaction(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -7081,7 +7359,7 @@ void Routines::registerMainKotorRoutines() {
     insert(719, "SetGlobalFadeIn", R_VOID, {R_FLOAT, R_FLOAT, R_FLOAT, R_FLOAT, R_FLOAT}, &SetGlobalFadeIn);
     insert(720, "SetGlobalFadeOut", R_VOID, {R_FLOAT, R_FLOAT, R_FLOAT, R_FLOAT, R_FLOAT}, &SetGlobalFadeOut);
     insert(721, "GetLastHostileTarget", R_OBJECT, {R_OBJECT}, &GetLastHostileTarget);
-    insert(722, "GetLastAttackObjectAction", R_INT, {R_OBJECT}, &GetLastAttackObjectAction);
+    insert(722, "GetLastAttackAction", R_INT, {R_OBJECT}, &GetLastAttackAction);
     insert(723, "GetLastForcePowerUsed", R_INT, {R_OBJECT}, &GetLastForcePowerUsed);
     insert(724, "GetLastCombatFeatUsed", R_INT, {R_OBJECT}, &GetLastCombatFeatUsed);
     insert(725, "GetLastAttackResult", R_INT, {R_OBJECT}, &GetLastAttackResult);
@@ -7637,7 +7915,7 @@ void Routines::registerMainTslRoutines() {
     insert(719, "SetGlobalFadeIn", R_VOID, {R_FLOAT, R_FLOAT, R_FLOAT, R_FLOAT, R_FLOAT}, &SetGlobalFadeIn);
     insert(720, "SetGlobalFadeOut", R_VOID, {R_FLOAT, R_FLOAT, R_FLOAT, R_FLOAT, R_FLOAT}, &SetGlobalFadeOut);
     insert(721, "GetLastHostileTarget", R_OBJECT, {R_OBJECT}, &GetLastHostileTarget);
-    insert(722, "GetLastAttackObjectAction", R_INT, {R_OBJECT}, &GetLastAttackObjectAction);
+    insert(722, "GetLastAttackAction", R_INT, {R_OBJECT}, &GetLastAttackAction);
     insert(723, "GetLastForcePowerUsed", R_INT, {R_OBJECT}, &GetLastForcePowerUsed);
     insert(724, "GetLastCombatFeatUsed", R_INT, {R_OBJECT}, &GetLastCombatFeatUsed);
     insert(725, "GetLastAttackResult", R_INT, {R_OBJECT}, &GetLastAttackResult);

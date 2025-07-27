@@ -44,8 +44,11 @@ void Feats::init() {
         auto preReqFeat2 = static_cast<FeatType>(feats->getHexInt(row, "prereqfeat2"));
         auto successor = static_cast<FeatType>(feats->getHexInt(row, "successor"));
         uint32_t pips = feats->getHexInt(row, "pips");
+        uint32_t maxcr = feats->getInt(row, "maxcr", 0);
+        uint32_t category = feats->getHexInt(row, "category", 0);
 
         auto feat = std::make_shared<Feat>();
+        feat->type = static_cast<FeatType>(row);
         feat->name = std::move(name);
         feat->description = std::move(description);
         feat->icon = std::move(icon);
@@ -54,8 +57,22 @@ void Feats::init() {
         feat->preReqFeat2 = preReqFeat2;
         feat->successor = successor;
         feat->pips = pips;
-        _feats.insert(std::make_pair(static_cast<FeatType>(row), std::move(feat)));
+        feat->maxcr = maxcr;
+        feat->category = category;
+        _featsArray.push_back(feat);
+        _feats.insert(std::make_pair(feat->type, std::move(feat)));
     }
+
+    // Sort feats by CR from highest (best feats) to lowest.
+    std::sort(_featsArray.begin(), _featsArray.end(), [](auto lhs, auto rhs) {
+        return lhs->maxcr > rhs->maxcr;
+    });
+
+    // Then sort by category, keeping order of CR for feats with the same
+    // category.
+    std::stable_sort(_featsArray.begin(), _featsArray.end(), [](auto lhs, auto rhs) {
+        return lhs->category < rhs->category;
+    });
 }
 
 std::shared_ptr<Feat> Feats::get(FeatType type) const {

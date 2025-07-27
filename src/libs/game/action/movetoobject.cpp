@@ -29,6 +29,7 @@ void MoveToObjectAction::execute(std::shared_ptr<Action> self, Object &actor, fl
     auto dest = _moveTo->position();
     auto creatureActor = _game.getObjectById<Creature>(actor.id());
 
+    creatureActor->addCombatActionToHistory(self);
     bool reached = creatureActor->navigateTo(dest, _run, _range, dt);
     if (reached) {
         complete();

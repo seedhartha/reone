@@ -973,6 +973,7 @@ std::shared_ptr<Object> Area::createObject(ObjectType type, const std::string &b
         creature->loadFromBlueprint(blueprintResRef);
         creature->setPosition(location->position());
         creature->setFacing(location->facing());
+        creature->setIsSpawned(true);
         object = std::move(creature);
         break;
     }

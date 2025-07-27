@@ -57,6 +57,18 @@ static bool isRoundPastFirstAttack(float time) {
     return time >= 0.5f * kRoundDuration;
 }
 
+static void addAttackToHistory(Combat::AttackHistory &history,
+                               std::unique_ptr<Combat::Attack> attack) {
+    if (!attack->action) {
+        // ignore attacks from CutsceneAttack routine
+        return;
+    }
+    history.push_back(std::move(attack));
+    if (history.size() > 64) {
+        history.pop_front();
+    }
+}
+
 void Combat::addAttack(std::shared_ptr<Creature> attacker,
                        std::shared_ptr<Object> target,
                        std::shared_ptr<Action> action,
@@ -97,6 +109,15 @@ void Combat::update(float dt) {
 
         // Remove finished combat rounds
         if (round.state == RoundState::Finished) {
+
+            // Save the attacks to the history
+            AttackHistory &history1 = _attackHistory[round.attack1->attacker->id()];
+            addAttackToHistory(history1, std::move(round.attack1));
+            if (round.duel) {
+                AttackHistory &history2 = _attackHistory[round.attack2->attacker->id()];
+                addAttackToHistory(history2, std::move(round.attack2));
+            }
+
             it = _roundByAttacker.erase(it);
         } else {
             ++it;
@@ -468,6 +489,10 @@ void Combat::resetProjectile(Round &round) {
     auto &sceneGraph = _services.scene.graphs.get(kSceneMain);
     sceneGraph.removeRoot(*round.projectile);
     round.projectile.reset();
+}
+
+const Combat::AttackHistory &Combat::attackHistory(const Creature &attacker) {
+    return _attackHistory[attacker.id()];
 }
 
 } // namespace game

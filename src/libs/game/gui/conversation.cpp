@@ -176,7 +176,9 @@ void Conversation::loadVoiceOver() {
     }
     if (!voiceResRef.empty()) {
         auto clip = _services.resource.audioClips.get(voiceResRef);
-        _currentVoice = _services.audio.mixer.play(std::move(clip), AudioType::Voice);
+        if (clip) {
+            _currentVoice = _services.audio.mixer.play(std::move(clip), AudioType::Voice);
+        }
     }
 }
 

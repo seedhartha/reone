@@ -45,6 +45,8 @@ public:
     int getStackSize() const;
     const Variable &getStackVariable(int index) const;
 
+    void dump() const;
+
 private:
     std::shared_ptr<ScriptProgram> _program;
     std::unique_ptr<ExecutionContext> _context;
