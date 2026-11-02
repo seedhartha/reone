@@ -117,8 +117,9 @@ glm::vec2 Font::getTextOffset(const std::string &text, TextGravity gravity) cons
 
 float Font::measure(const std::string &text) const {
     float w = 0.0f;
-    for (auto &glyph : text) {
-        w += _glyphs[static_cast<int>(glyph)].size.x;
+    for (int i = 0; i < text.size(); i++) {
+        auto ustr = reinterpret_cast<const unsigned char *>(text.c_str());
+        w += _glyphs.at(ustr[i]).size.x;
     }
     return w;
 }
