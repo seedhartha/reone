@@ -40,6 +40,12 @@ public:
     virtual void init() = 0;
 
     virtual std::shared_ptr<Feat> get(FeatType type) const = 0;
+
+    using FeatsArray = std::vector<std::shared_ptr<Feat>>;
+    using ConstIterator = FeatsArray::const_iterator;
+
+    virtual ConstIterator begin() const = 0;
+    virtual ConstIterator end() const = 0;
 };
 
 class Feats : public IFeats, boost::noncopyable {
@@ -57,8 +63,16 @@ public:
 
     std::shared_ptr<Feat> get(FeatType type) const override;
 
+    IFeats::ConstIterator begin() const override { return _featsArray.begin(); }
+    IFeats::ConstIterator end() const override { return _featsArray.end(); }
+
 private:
     std::unordered_map<FeatType, std::shared_ptr<Feat>> _feats;
+
+    // Same as _feats above, but linear and sorted by category (e.g. Flurry and
+    // Master Flurry have the same category). With a category, feats are sorted
+    // by CR (highest to lowest, so Master Flurry comes first).
+    IFeats::FeatsArray _featsArray;
 
     // Services
 

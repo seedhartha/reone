@@ -79,11 +79,14 @@ public:
         std::shared_ptr<Object> lastPerceived;
     };
 
+    using ActionHistory = std::deque<std::shared_ptr<Action>>;
+
     struct CombatState {
         bool active {false};
         bool debilitated {false};
         std::shared_ptr<Object> attackTarget;
         Timer deactivationTimer;
+        ActionHistory actionHistory;
     };
 
     Creature(
@@ -136,6 +139,7 @@ public:
     Subrace subrace() const { return _subrace; }
     NPCAIStyle aiStyle() const { return _aiStyle; }
     int walkmeshMaterial() const { return _walkmeshMaterial; }
+    bool isSpawned() const { return _isSpawned; }
 
     void setGender(Gender gender) { _gender = gender; }
     void setAppearance(int appearance) { _appearance = appearance; }
@@ -146,6 +150,7 @@ public:
     void setXP(int xp) { _xp = xp; }
     void setAIStyle(NPCAIStyle style) { _aiStyle = style; }
     void setWalkmeshMaterial(int material) { _walkmeshMaterial = material; }
+    void setIsSpawned(bool spawned) { _isSpawned = spawned; }
 
     // Animation
 
@@ -209,6 +214,10 @@ public:
 
     std::shared_ptr<Object> getAttemptedAttackTarget() const;
     std::shared_ptr<Object> getAttackTarget() const { return _combatState.attackTarget; }
+
+    void addCombatActionToHistory(const std::shared_ptr<Action> &action);
+    const ActionHistory &combatActionHistory() { return _combatState.actionHistory; }
+
     int getAttackBonus(bool offHand = false) const;
     int getDefense() const;
     void getMainHandDamage(int &min, int &max) const;
@@ -287,6 +296,7 @@ private:
     int _walkmeshMaterial {-1};
     int _gold {0}; /**< aka credits */
     std::string _envmap;
+    bool _isSpawned {false};
 
     std::shared_ptr<audio::AudioSource> _audioSourceVoice;
     std::shared_ptr<audio::AudioSource> _audioSourceFootstep;

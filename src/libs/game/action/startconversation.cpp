@@ -32,7 +32,7 @@ void StartConversationAction::execute(std::shared_ptr<Action> self, Object &acto
     auto creatureActor = std::static_pointer_cast<Creature>(actorPtr);
 
     bool reached =
-        !creatureActor ||
+        actorPtr->type() != ObjectType::Creature ||
         _ignoreStartRange ||
         creatureActor->navigateTo(_objectToConverse->position(), true, kMaxConversationDistance, dt);
 

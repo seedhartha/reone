@@ -26,6 +26,7 @@ namespace reone {
 namespace game {
 
 struct Feat {
+    FeatType type;
     std::string name;
     std::string description;
     std::shared_ptr<graphics::Texture> icon;
@@ -34,6 +35,8 @@ struct Feat {
     FeatType preReqFeat2 {FeatType::Invalid};
     FeatType successor {FeatType::Invalid};
     uint32_t pips {1}; // 1-3, position in a feat chain
+    uint32_t maxcr {0}; // challenge rating of the feat
+    uint32_t category;
 };
 
 } // namespace game

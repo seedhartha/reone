@@ -109,7 +109,10 @@ void Console::trimOutput() {
 }
 
 bool Console::handle(const input::Event &event) {
-    if (_open && _input.handle(event)) {
+    if (!_open) {
+        return false;
+    }
+    if (_input.handle(event)) {
         return true;
     }
     switch (event.type) {

@@ -987,6 +987,13 @@ const Variable &VirtualMachine::getStackVariable(int index) const {
     return _stack[index];
 }
 
+void VirtualMachine::dump() const {
+    std::cerr << "PROGRAM " << _program->name() << "\n";
+    for (const Instruction &inst : _program->instructions()) {
+        std::cerr << describeInstruction(inst, *_context->routines) << "\n";
+    }
+}
+
 } // namespace script
 
 } // namespace reone

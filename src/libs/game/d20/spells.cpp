@@ -39,14 +39,32 @@ void Spells::init() {
         std::string description(_strings.getText(spells->getInt(row, "spelldesc", -1)));
         std::shared_ptr<Texture> icon(_textures.get(spells->getString(row, "iconresref"), TextureUsage::GUI));
         uint32_t pips = spells->getHexInt(row, "pips");
+        uint32_t maxcr = spells->getInt(row, "maxcr", 0);
+        uint32_t category = spells->getHexInt(row, "category", 0);
 
         auto spell = std::make_shared<Spell>();
+        spell->type = static_cast<SpellType>(row);
         spell->name = std::move(name);
         spell->description = std::move(description);
         spell->icon = std::move(icon);
         spell->pips = pips;
-        _spells.insert(std::make_pair(static_cast<SpellType>(row), std::move(spell)));
+        spell->maxcr = maxcr;
+        spell->category = category;
+
+        _spellsArray.push_back(spell);
+        _spells.insert(std::make_pair(spell->type, std::move(spell)));
     }
+
+    // Sort spells by CR from highest (best spells) to lowest.
+    std::sort(_spellsArray.begin(), _spellsArray.end(), [](auto lhs, auto rhs) {
+        return lhs->maxcr > rhs->maxcr;
+    });
+
+    // Then sort by category, keeping order of CR for spells with the same
+    // category.
+    std::stable_sort(_spellsArray.begin(), _spellsArray.end(), [](auto lhs, auto rhs) {
+        return lhs->category < rhs->category;
+    });
 }
 
 std::shared_ptr<Spell> Spells::get(SpellType type) const {

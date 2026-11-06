@@ -59,6 +59,7 @@ public:
     bool isMinOneHP() const { return _minOneHP; }
     bool isDead() const { return _dead; }
     bool isCommandable() const { return _commandable; }
+    bool isInConversation() const { return _isInConversation; }
 
     float getDistanceTo(const glm::vec2 &point) const;
     float getSquareDistanceTo(const glm::vec2 &point) const;
@@ -87,6 +88,7 @@ public:
     void setTag(std::string tag) { _tag = std::move(tag); }
     void setPlotFlag(bool plot) { _plot = plot; }
     void setCommandable(bool commandable) { _commandable = commandable; }
+    void setIsInConversation(bool isInConversation) { _isInConversation = isInConversation; }
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);
@@ -227,6 +229,7 @@ protected:
     bool _commandable {true};
     bool _autoRemoveKey {false};
     bool _interruptable {false};
+    bool _isInConversation {false};
 
     glm::vec3 _position {0.0f};
     glm::quat _orientation {1.0f, 0.0f, 0.0f, 0.0f};

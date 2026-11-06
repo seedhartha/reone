@@ -877,7 +877,7 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
 
     std::vector<std::pair<ModelSceneNode *, float>> distances;
     for (auto &model : _modelRoots) {
-        if (!model->isPickable() || (except && model->user())) {
+        if (!model->isPickable() || (except == model->user())) {
             continue;
         }
         if (model->getSquareDistanceTo(start) > kMaxCollisionDistanceLineOfSight2) {
