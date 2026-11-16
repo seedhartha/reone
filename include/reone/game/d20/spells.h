@@ -38,6 +38,12 @@ public:
     virtual ~ISpells() = default;
 
     virtual std::shared_ptr<Spell> get(SpellType type) const = 0;
+
+    using SpellsArray = std::vector<std::shared_ptr<Spell>>;
+    using ConstIterator = SpellsArray::const_iterator;
+
+    virtual ConstIterator begin() const = 0;
+    virtual ConstIterator end() const = 0;
 };
 
 class Spells : public ISpells, boost::noncopyable {
@@ -55,8 +61,18 @@ public:
 
     std::shared_ptr<Spell> get(SpellType type) const override;
 
+    using SpellsArray = std::vector<std::shared_ptr<Spell>>;
+
+    ISpells::ConstIterator begin() const override { return _spellsArray.begin(); }
+    ISpells::ConstIterator end() const override { return _spellsArray.end(); }
+
 private:
     std::unordered_map<SpellType, std::shared_ptr<Spell>> _spells;
+
+    // Same as _spells above, but linear and sorted by category (e.g. Flurry and
+    // Master Flurry have the same category). With a category, spells are sorted
+    // by CR (highest to lowest, so Master Flurry comes first).
+    ISpells::SpellsArray _spellsArray;
 
     // Services
 

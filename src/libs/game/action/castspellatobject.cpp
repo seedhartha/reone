@@ -16,6 +16,7 @@
  */
 
 #include "reone/game/action/castspellatobject.h"
+#include "reone/game/object/creature.h"
 
 namespace reone {
 
@@ -23,6 +24,11 @@ namespace game {
 
 void CastSpellAtObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
+
+    if (actor.type() == ObjectType::Creature) {
+        Creature *creature = (Creature *)&actor;
+        creature->addCombatActionToHistory(self);
+    }
 
     complete();
 }

@@ -37,6 +37,7 @@ void UseFeatAction::execute(std::shared_ptr<Action> self, Object &actor, float d
     // Make the actor follow its target. When reached, register an attack
     if (creatureActor->navigateTo(_target->position(), true, creatureActor->getAttackRange(), dt)) {
         _game.combat().addAttack(std::move(creatureActor), _target, self);
+        complete();
     }
 }
 

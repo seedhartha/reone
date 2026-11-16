@@ -438,7 +438,8 @@ enum class Faction {
     Gizka2 = 17,
     SelfLoathing = 21,
     OneOnOne = 22,
-    PartyPuppet = 23
+    PartyPuppet = 23,
+    Last = 24
 };
 
 enum class Ability {

@@ -16,13 +16,30 @@
  */
 
 #include "reone/game/action/usetalentonobject.h"
+#include "reone/game/game.h"
+#include "reone/game/object.h"
+#include "reone/game/object/creature.h"
 
 namespace reone {
 
 namespace game {
 
 void UseTalentOnObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    // TODO: implement
+    // TODO: implement for spells
+
+    auto creatureActor = _game.getObjectById<Creature>(actor.id());
+    creatureActor->addCombatActionToHistory(self);
+
+    if (_chosenTalent->type() == TalentType::Feat) {
+        bool reached = creatureActor->navigateTo(
+                _target->position(), true, creatureActor->getAttackRange(), dt);
+
+        if (reached) {
+            _game.combat().addAttack(std::move(creatureActor), _target, self);
+            complete();
+        }
+        return;
+    }
 
     complete();
 }

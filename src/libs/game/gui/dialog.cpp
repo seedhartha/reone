@@ -172,6 +172,7 @@ void DialogGUI::loadStuntParticipants() {
             creature->startStuntMode();
         }
 
+	participant.creature->setIsInConversation(true);
         _participantByTag.insert(std::make_pair(stunt.participant, std::move(participant)));
     }
 }
@@ -345,6 +346,7 @@ void DialogGUI::onFinish() {
 void DialogGUI::releaseStuntParticipants() {
     for (auto &participant : _participantByTag) {
         participant.second.creature->stopStuntMode();
+	participant.second.creature->setIsInConversation(false);
     }
 }
 

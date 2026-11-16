@@ -34,6 +34,9 @@ public:
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
+    const std::shared_ptr<Object> &target() { return _target; }
+    const std::shared_ptr<Talent> &talent() { return _chosenTalent; }
+
 private:
     std::shared_ptr<Talent> _chosenTalent;
     std::shared_ptr<Object> _target;

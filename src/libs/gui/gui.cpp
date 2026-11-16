@@ -277,8 +277,8 @@ void GUI::render() {
         std::queue<std::pair<std::reference_wrapper<Control>, glm::ivec2>> controls;
         controls.push({*_rootControl, _rootOffset});
         while (!controls.empty()) {
-            auto &[controlWrapper, offset] = controls.front();
-            auto &control = controlWrapper.get();
+            auto &control = controls.front().first.get();
+            auto offset = controls.front().second;
             controls.pop();
             control.render({_options.width, _options.height}, offset, pass);
             for (auto &child : control.children()) {
